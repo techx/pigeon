@@ -91,7 +91,7 @@ export default function InboxPage() {
                     setContent("");
                     editor?.commands.clearContent(true);
                 }}>
-                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + (!thread.email_list[thread.email_list.length-1].resolved && !thread.email_list[thread.email_list.length-1].reply ? classes.unresolved : "")} >
+                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.email_list[thread.email_list.length-1].resolved && !thread.email_list[thread.email_list.length-1].reply ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
                     <Text>{thread.email_list[thread.email_list.length-1].subject}</Text>
                 </Box>
