@@ -10,6 +10,7 @@ import {
 
 import InboxPage from "./routes/inbox";
 import IndexPage from "./routes/index";
+import DocumentsPage from "./routes/documents";
 import Shell from "./components/shell";
 
 const router = createBrowserRouter(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
     >
       <Route index path="/" element={<IndexPage />} />
       <Route index path="/inbox" element={<InboxPage />} />
+      <Route index path="/documents" element={<DocumentsPage />} />
     </Route>,
   ),
 );
