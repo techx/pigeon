@@ -1,7 +1,8 @@
 from server import db
 from sqlalchemy import Integer
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from server.models.email import Email
 
 class Thread(db.Model):
     __tablename__ = "Threads"
@@ -24,3 +25,7 @@ class Thread(db.Model):
     @has_email.expression
     def has_email(cls, email):
         return cls.email_list.contains([email])
+    
+    @hybrid_property
+    def first_sender(self):
+        return Email.query.filter_by(id=self.email_list[0]).first().sender

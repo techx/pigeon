@@ -1,7 +1,7 @@
 from server import db
 from flask import request
 from apiflask import APIBlueprint
-from server.utils import embed_text
+#from server.utils import embed_text
 
 admin = APIBlueprint("admin", __name__, url_prefix='/admin', tag='Admin')
 
@@ -46,17 +46,18 @@ def delete_text():
     db.session.commit()
     return {'message': 'Document deleted'}
 
-@admin.route('/update_document', methods=['POST'])
+@admin.route('/edit_document', methods=['POST'])
 def update_text():
     data = request.form
     document = Document.query.get(data['id'])
     document.question = data['question']
+    document.label = data['label']
     document.content = data['content']
     document.source = data['source']
     db.session.commit()
-    return {'message', 'Document updated'}
+    return {'message': 'Document updated'}
 
 @admin.route('/get_documents', methods=['GET'])
 def get_all():
-    documents = Document.query.all()
+    documents = Document.query.order_by(Document.id.desc()).all()
     return [document.map() for document in documents]

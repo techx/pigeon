@@ -23,9 +23,10 @@ def receive_email():
     db.session.add(e)
     db.session.commit()
     if "In-Reply-To" in data:
-        thread = Thread.query.filter(Thread.has_email(Email.query.filter_by(message_id = data["In-Reply-To"]).first().id)).first()
-        thread.email_list = thread.email_list + [e.id]
-        thread.last_email = e.id
+        if data["sender"] != "help@my.hackmit.org":      
+            thread = Thread.query.filter(Thread.has_email(Email.query.filter_by(message_id = data["In-Reply-To"]).first().id)).first()
+            thread.email_list = thread.email_list + [e.id]
+            thread.last_email = e.id
     else:
         thread = Thread(e.id)
         db.session.add(thread)
@@ -39,6 +40,7 @@ def send_email():
     context = {'body': data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
+    thread = Thread.query.filter(Thread.has_email(reply_to_email.id)).first()
     server = smtplib.SMTP('smtp.mailgun.org', 587)
     server.starttls()
     server.ehlo()
@@ -48,16 +50,16 @@ def send_email():
     msg['FROM'] = "HackMIT Team <help@my.hackmit.org>"
     msg['In-Reply-To'] = reply_to_email.message_id
     msg['References'] = reply_to_email.message_id
-    msg['To'] = reply_to_email.sender
+    msg['To'] = thread.first_sender
+    msg['Cc'] = "help@my.hackmit.org" 
     message_id = email.utils.make_msgid(domain='my.hackmit.org')
     msg['message-id'] = message_id
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
-    server.sendmail("help@my.hackmit.org", [reply_to_email.sender], msg.as_bytes())
+    server.sendmail("help@my.hackmit.org", [thread.first_sender], msg.as_bytes())
     reply_to_email.resolved = True
     reply_email = Email('help@my.hackmit.org', f"RE: {reply_to_email.subject}", data["body"], message_id, True)
     db.session.add(reply_email)
     db.session.commit()
-    thread = Thread.query.filter(Thread.has_email(reply_to_email.id)).first()
     thread.email_list = thread.email_list + [reply_email.id]
     thread.last_email = reply_email.id
     db.session.commit()

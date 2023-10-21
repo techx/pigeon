@@ -44,7 +44,6 @@ export default function InboxPage() {
         fetch("/api/emails/get_threads")
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setThreads(data);
             })
     };
@@ -57,6 +56,7 @@ export default function InboxPage() {
 
 
     const sendEmail = () => {
+        notifications.clean();
         const formData = new FormData();
         formData.append('index', activeThread.email_list[activeThread.email_list.length-1].id.toString());
         formData.append('body', content);
@@ -73,7 +73,6 @@ export default function InboxPage() {
         }).then(data => {
             editor?.commands.clearContent(true);
             getThreads();
-            console.log(data);
             notifications.show({
                 title: "Success!",
                 color: "green",

@@ -5,7 +5,7 @@ import { AppShell, NavLink, Space, Text } from "@mantine/core";
 const data = [{label: "Inbox"}, {label: "Documents"}]
 
 export default function HeaderNav() {
-    const [active, setActive] = useState(0);
+    const [active, setActive] = useState(document.location.pathname === "/inbox" ? 0: 1);
     const navigate = useNavigate();
     const links = data.map((item, index) => (
         <NavLink
