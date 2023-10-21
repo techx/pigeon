@@ -1,7 +1,7 @@
 import openai
 import numpy as np
-from server import app
-openai.api_key = app.config.get("OPENAI_API_KEY")
+from server.config import OPENAI_API_KEY
+openai.api_key = OPENAI_API_KEY
 def embed_text(content):
     """Returns embedding of content."""
     response = openai.Embedding.create(input=content, engine="text-embedding-ada-002")

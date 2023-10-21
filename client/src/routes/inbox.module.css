@@ -22,3 +22,7 @@
     padding-right: 0;
     padding-left: 0;
 }
+
+.unresolved {
+    border-left: 15px solid var(--mantine-color-blue-6);
+}
