@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Textarea, TextInput, Button, Space, Card, Text, Group, Stack, ScrollArea, Box, Table } from '@mantine/core';
 import { notifications } from "@mantine/notifications";
+import classes from './documents.module.css';
 
 interface Document {
     id: number;
@@ -16,7 +17,7 @@ export default function DocumentsPage() {
     const [content, setContent] = useState("");
     const [source, setSource] = useState("");
     const [label, setLabel] = useState("");
-
+    const [active, setActive] = useState(-1);
 
     const getDocuments = () => {
         fetch("/api/admin/get_documents")
@@ -60,9 +61,18 @@ export default function DocumentsPage() {
         })
     };
 
-    
+    const handleSelect = (id : number) => {
+        console.log(id, documents);
+        setActive(id);
+        const activeDocument = documents.filter((document) => document.id === id)[0];
+        console.log(activeDocument);
+        setQuestion(activeDocument.question);
+        setContent(activeDocument.content);
+        setSource(activeDocument.source);
+        setLabel(activeDocument.label);
+    }
     const documentList = documents.map((document) => (
-        <Table.Tr  key={document.id}>
+        <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active == document.id && classes.selected)}>
             <Table.Td>{document.label}</Table.Td>
             <Table.Td>{document.question == "" ? "None" : document.question}</Table.Td>
             <Table.Td>{document.content.length < 50 ? document.content : document.content.substring(0, 47) + "..."}</Table.Td>
