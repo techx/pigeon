@@ -71,5 +71,5 @@ def get_threads():
         thread_emails = []
         for email_id in thread.email_list:
           thread_emails.append(Email.query.get(email_id).map())
-        email_list.append(thread_emails)
+        email_list.append({'email_list': thread_emails})
     return email_list

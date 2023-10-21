@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 import pandas as pd
+
 import redis
 import requests
 from redis.commands.search.field import (
@@ -25,8 +26,6 @@ client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 # load corpus
 with open('corpus.json', 'r') as f:
     corpus = json.load(f)
-
-print(len(corpus))
 
 # load embedding model
 embedder = SentenceTransformer('msmarco-distilbert-base-v4')
@@ -197,34 +196,35 @@ def embed_corpus():
     load_embeddings(embeddings)
     create_index()
 
-if __name__ == '__main__':
-    try:
-        embed_corpus()
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-        raise
+# if __name__ == '__main__':
+#     try:
+#         embed_corpus()
+#     except Exception as err:
+#         print(f"Unexpected {err=}, {type(err)=}")
+#         raise
     
-    questions = ['What is the deadline to apply for the hackathon?',
-               'When is HackMIT?',
-               'What are the challenges?',
-               'How does judging work?',
-               'What building should I go to during the event?',
-               'What prizes are available?',
-               'How many people are allowed on a team?',
-               'What is HackMIT?',
-               'Can I attend HackMIT if I am an MIT grad student?',
-               'Can I attend HackMIT if I am a sophomore in high school?',
-               'I\'m a high school student, but I\'m really advanced. Can I attend HackMIT?',
-               'Do I need to bring money to the event?',
-               'Will we be able to sleep at the event?',
-               'Will we be able to stay overnight at the event?',
-               'What should I do if I am a beginner at the event?']
-    results = query_all(3, questions)
-    for result in results:
-        print(result['query'])
-        for doc in result['result']:
-            print(f"Score: {doc['score']}")
-            print(f"Source: {doc['source']}")
-            print(f"Q: {doc['question']}")
-            print(f"A: {doc['answer']}")
-        print()
+#     questions = ['What is the deadline to apply for the hackathon?',
+#                'When is HackMIT?',
+#                'What are the challenges?',
+#                'How does judging work?',
+#                'What building should I go to during the event?',
+#                'What prizes are available?',
+#                'How many people are allowed on a team?',
+#                'What is HackMIT?',
+#                'Can I attend HackMIT if I am an MIT grad student?',
+#                'Can I attend HackMIT if I am a sophomore in high school?',
+#                'I\'m a high school student, but I\'m really advanced. Can I attend HackMIT?',
+#                'Do I need to bring money to the event?',
+#                'Will we be able to sleep at the event?',
+#                'Will we be able to stay overnight at the event?',
+#                'What should I do if I am a beginner at the event?']
+#     results = query_all(3, questions)
+
+#     for result in results:
+#         print(result['query'])
+#         for doc in result['result']:
+#             print(f"Score: {doc['score']}")
+#             print(f"Source: {doc['source']}")
+#             print(f"Q: {doc['question']}")
+#             print(f"A: {doc['answer']}")
+#         print()
