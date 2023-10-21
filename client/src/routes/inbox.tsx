@@ -9,6 +9,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
 
 interface Thread {
+    id: number;
     email_list: Email[];
 }
 
@@ -25,7 +26,7 @@ export default function InboxPage() {
     const [threads, setThreads] = useState<Array<Thread>>([]);
     const [active, setActive] = useState(-1);
     const [content, setContent] = useState("");
-    const activeThread = threads.filter((_, index) => {return index === active;})[0];
+    const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
 
     const editor = useEditor({
         extensions: [
@@ -81,16 +82,16 @@ export default function InboxPage() {
         
     };
 
-    const threadList = threads.map((thread, index) => {
+    const threadList = threads.map((thread) => {
         //const sender = email.sender.indexOf("<") !== -1 ? email.sender.split("<")[0].replace(/"/g, " ") : email.sender;
         const sender = "asdf";
         return (
-            <div key={index} onClick={() => {
-                    setActive(index); 
+            <div key={thread.id} onClick={() => {
+                    setActive(thread.id); 
                     setContent("");
                     editor?.commands.clearContent(true);
                 }}>
-                <Box className={classes.box + " " + (index == active ? classes.selected : "")} >
+                <Box className={classes.box + " " + (thread.id == active ? classes.selected : "")} >
                     <Title size="md">{sender}</Title>
                     <Text>{thread.email_list[thread.email_list.length-1].subject}</Text>
                 </Box>
@@ -112,8 +113,8 @@ export default function InboxPage() {
                 {active != -1 && (
                     <Box>
                         <Timeline>
-                            {activeThread.email_list.map((email, index) => (
-                                <Timeline.Item key={index}>
+                            {activeThread.email_list.map((email) => (
+                                <Timeline.Item key={email.id}>
                                     <Title size="md">{email.sender}</Title>
                                     <Text>{email.subject}</Text>
                                 </Timeline.Item>
