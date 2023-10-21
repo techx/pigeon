@@ -117,6 +117,7 @@ export default function InboxPage() {
                                 <Timeline.Item key={email.id}>
                                     <Title size="md">{email.sender}</Title>
                                     <Text>{email.subject}</Text>
+                                    <Text>{email.body}</Text>
                                 </Timeline.Item>
                             ))}
                         </Timeline>
