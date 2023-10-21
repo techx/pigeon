@@ -1,0 +1,147 @@
+[
+  {
+    "source": "https://dayof.hackmit.org/faq",
+    "question": "Where do we submit our projects?",
+    "answer": "Project submission will be taking place on our platform, Devpost! Here is the link: https://devpost.com/"
+  },
+  {
+    "source": "https://dayof.hackmit.org/faq",
+    "question": "How does judging work?",
+    "answer": "Judging this year will take place on Ballot: https://ballot.hackmit.org/! Our live judging will be schedule based. A master schedule will be generated once project submission completes. Make sure to sign into Ballot to view your schedule! An email with instructions on how to use Ballot will be sent on the day of the hackathon."
+  },
+  {
+    "source": "https://dayof.hackmit.org/faq",
+    "question": "What happens if I come late?",
+    "answer": "If you come late, come to Help Desk and we'll get you up to speed! If you're lost, refer to the Maps tab. Or join the #hotline voice channel in our Discord and we'll help you out!"
+  },
+  {
+    "source": "https://dayof.hackmit.org/faq",
+    "question": "What happens if I don't have a team?",
+    "answer": "If you do not have a team, no worries! We'll be holding a team formation event on Saturday during the learnathon to allow hackers who came without a team to find one. Feel free to also form spontaneous teams with new friends you meet throughout the weekend!"
+  },
+  {
+    "source": "https://dayof.hackmit.org/resources",
+    "question": "",
+    "answer": "If you need some help getting started, we have a react + flask + postgres hackpack available for hackers to use at this link: https://github.com/techx/react-flask-postgres-template"
+  },
+  {
+    "source": "https://dayof.hackmit.org/resources",
+    "question": "",
+    "answer": "If you need some help getting started, we have a tensorflow hackpack available for hackers to use at this link: https://github.com/techx/facial-detection-ml-hackpack"
+  },
+  {
+    "source": "https://dayof.hackmit.org/challenges",
+    "question": "what are the sponsor challenges?",
+    "answer": "the sponsor challenges can be found at this link: https://dayof.hackmit.org/challenges"
+  },
+  {
+    "source": "https://dayof.hackmit.org/speakers",
+    "question": "who are the speakers for the event?",
+    "answer": "the speakers for the event can be found at this link: https://dayof.hackmit.org/speakers. the speakers are Ali Partovi, Sara Du, and Allison Koenecke"
+  },
+  {
+    "source": "https://dayof.hackmit.org/tracks",
+    "question": "what are the tracks for this event?",
+    "answer": "the tracks for this event are sustainability, education, health&accessibility, and interactive media. more information can be found at this link: https://dayof.hackmit.org/tracks"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "When is HackMIT?",
+    "answer": "HackMIT will be a 24-hour hackathon from September 16-17, 2023! We anticipate the event will begin around 9am on Saturday and go until about 7pm on Sunday, but stay tuned for a more detailed schedule as we get closer to the event."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What's the cost?",
+    "answer": "The cost to attend HackMIT is free and includes mentors, workshops, swag, resources, and an unforgettable experience!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "Where's the schedule?",
+    "answer": "We'll release a more detailed schedule in the weeks before the event, but for now, know that check-in will begin at 8am on Saturday, September 16th and the event will end around 7pm on Sunday, September 17th! If you're arriving early, you can also attend our pre-checkin from 9pm to 11pm on Friday, September 15th."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What can I win?",
+    "answer": "We offer three general prizes, a beginner prize, and four track prizes! But don't worry, you'll get free swag just by submitting a project!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "But I've never hacked before!",
+    "answer": "If you have never hacked before, that's totally okay! We'll be hosting beginner workshops where you can start getting your hands dirty with all things hackathon. There will also be a beginner prize available!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "I can't wait until the weekend to get started with HackMIT!",
+    "answer": "We will be hosting Hackweek, a series of livestreamed tech talks, workshops, and speaker events in the week leading up to HackMIT to get you hyped for the hackathon! Stay tuned for the schedule. You can also check out some of our past workshops on our Youtube channel, or join the Hacker Community Discord server."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "I still have questions! Can I attend?",
+    "answer": "You can attend HackMIT if you are a college undergraduate or an MIT M.Eng student! Note that we consider student status during the 2023-2024 academic year, so students who graduated prior to the event are not eligible."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What if I'm no longer eligible? Can I volunteer to be a judge or mentor?",
+    "answer": "If you're not a high schooler or college undergraduate, you are eligible to judge or mentor at HackMIT 2023! You can find the application at https://my.hackmit.org/mentor-judge-application to be a mentor or a judge."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "When is the application deadline?",
+    "answer": "This year, we have TWO admissions cycles: General Cycle: This cycle is for people who will not be requesting travel reimbursements for HackMIT! Applications for the general cycle open in mid June, and are due on July 28th, with decisions released end of August. Go to the link https://my.hackmit.org/ to apply! Travel Reimbursement Cycle: This cycle is for people who will be requesting travel reimbursements for HackMIT! Only people commuting from more than 50 miles away will be eligible for this cycle. Applications for the travel cycle open in mid June, and are due on July 14th, with decisions released mid August. Applying for travel reimbursements will not affect your chances of admission! Go to the link https://my.hackmit.org/travel-application to apply!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "How do teams work?",
+    "answer": "Your team can have up to 4 people! You can select teammates when you register, and you can also form them during the actual event! However, hackers will be accepted on an individual basis."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What if I don't have a team?",
+    "answer": "Don't worry! We'll have team formation events at the beginning of the weekend geared towards helping you find people to work with. You can also meet new people through our admitted hacker discord leading up to our event!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What if I go to MIT?",
+    "answer": "All MIT students will need to submit an application. Incoming MIT freshmen will receive automatic admission, but still need to fill out an application to be guaranteed a spot!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What are hackathon tracks?",
+    "answer": "We've developed four tracks, or impact areas, for you to hack in. The top project in each track will be awarded a prize!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "How will tracks and prizes work?",
+    "answer": "You will be able to submit your project to ONE track to be eligible for that track prize!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "Do I have to submit a project if I attend?",
+    "answer": "You can attend all our events without submitting a project, but you must submit one to receive swag!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "Will HackMIT be fully in person this year?",
+    "answer": "Yes! HackMIT will be full in person this year!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "What will I eat?",
+    "answer": "We'll provide food for all meals from Saturday's breakfast to Sunday's lunch. If you have dietary restrictions, we'll try our best to accommodate them. Of course, we'll also have an abundance of snacks throughout the hacking period."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "Where will I sleep?",
+    "answer": "Hacking all night is fun, but you can also get some rest when you need it! If you indicate in your confirmation form and you live outside the Boston area, we will try our best to match you with an MIT student who will provide places to sleep and shower."
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "Where is HackMIT?",
+    "answer": "HackMIT will be held in the Johnson Athletic Center!"
+  },
+  {
+    "source": "https://hackmit.org/#faq",
+    "question": "How do I get there?",
+    "answer": "Our travel application cycle has passed, and we are unfortunately unable to provide reimbursements to apps submitted after the travel deadline (July 14th). However, if you applied during our travel cycle and are accepted, we can reimburse up to 80% of your travel expenses, as long as you upload your travel receipts upon confirming your attendance and submit a project before judging at the event. We are able to reimburse both domestic and international travel!"
+  }
+]
