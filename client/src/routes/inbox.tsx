@@ -84,14 +84,14 @@ export default function InboxPage() {
     };
 
     const threadList = threads.map((thread) => {
-        const sender = thread.email_list[-1].sender.indexOf("<") !== -1 ? thread.email_list[-1].sender.split("<")[0].replace(/"/g, " ") : thread.email_list[-1].sender;
+        const sender = thread.email_list[thread.email_list.length-1].sender.indexOf("<") !== -1 ? thread.email_list[thread.email_list.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.email_list[thread.email_list.length-1].sender;
         return (
             <div key={thread.id} onClick={() => {
                     setActive(thread.id); 
                     setContent("");
                     editor?.commands.clearContent(true);
                 }}>
-                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + (!thread.email_list[-1].resolved && !thread.email_list[-1].reply ? classes.unresolved : "")} >
+                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + (!thread.email_list[thread.email_list.length-1].resolved && !thread.email_list[thread.email_list.length-1].reply ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
                     <Text>{thread.email_list[thread.email_list.length-1].subject}</Text>
                 </Box>
