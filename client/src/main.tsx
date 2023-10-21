@@ -7,7 +7,6 @@ import { Notifications } from "@mantine/notifications";
 
 const theme = createTheme({
   fontFamily: 'Open Sans, sans-serif',
-  
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

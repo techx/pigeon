@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AppShell, NavLink, Space } from "@mantine/core";
+import { AppShell, NavLink, Space, Text } from "@mantine/core";
 
 const data = [{label: "Inbox"}, {label: "Documents"}]
 
@@ -11,7 +11,7 @@ export default function HeaderNav() {
         <NavLink
             key={item.label}
             active={index === active}
-            label={item.label}
+            label={<Text size="lg">{item.label}</Text>}
             //leftSection={<item.icon size="1rem" stroke={1.5} />}
             onClick={() => {
                 setActive(index); 
@@ -19,10 +19,6 @@ export default function HeaderNav() {
             }}
         />
       ));
-    useEffect(() => {
-        console.log(active);
-    }, [])
-
     return (
         <AppShell navbar={{ width: 200, breakpoint: "sm" }}>
             <AppShell.Navbar>

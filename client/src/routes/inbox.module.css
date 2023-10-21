@@ -1,0 +1,24 @@
+.box {
+    cursor: pointer;
+    padding-left: 15px;
+}
+
+.box:hover {
+   background-color: var(--mantine-color-gray-0); 
+}
+
+.selected {
+    background-color: var(--mantine-primary-color-light-hover);
+}
+
+.selected:hover {
+    background-color: var(--mantine-primary-color-light-hover);
+}
+
+.grid {
+    overflow: hidden;
+    border: 1px solid;
+    border-color: var(--mantine-color-gray-4);
+    padding-right: 0;
+    padding-left: 0;
+}
