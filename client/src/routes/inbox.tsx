@@ -96,22 +96,22 @@ export default function InboxPage() {
     //     )};
 
 
-    const emailList = threads.map((thread, index) => {
-        //const sender = email.sender.indexOf("<") !== -1 ? email.sender.split("<")[0].replace(/"/g, " ") : email.sender;
-        const sender = "asdf";
-        return (
-            <div key={index} onClick={() => {
-                    setActive(index); 
-                    setContent("");
-                    editor?.commands.clearContent(true);
-                }}>
-                <Box>
-                    <EmailList threadId={threads[index].id}/>
-                </Box>
-                <Divider />
-            </div>
-        )
-    });
+    // const emailList = threads.map((thread, index) => {
+    //     //const sender = email.sender.indexOf("<") !== -1 ? email.sender.split("<")[0].replace(/"/g, " ") : email.sender;
+    //     const sender = "asdf";
+    //     return (
+    //         <div key={index} onClick={() => {
+    //                 setActive(index); 
+    //                 setContent("");
+    //                 editor?.commands.clearContent(true);
+    //             }}>
+    //             <Box>
+    //                 <EmailList threadId={threads[index].id}/>
+    //             </Box>
+    //             <Divider />
+    //         </div>
+    //     )
+    // });
 
     
     return (
