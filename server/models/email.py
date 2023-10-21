@@ -15,10 +15,11 @@ class Email(db.Model):
         self.sender = sender
         self.subject = subject
         self.body = body
+        self.reply = reply
         if reply:
             self.message_id = ""
         else:
             self.message_id = message_id
 
     def map(self):
-        return {'id': self.id, 'sender': self.sender, 'subject': self.subject, 'body': self.body, 'message_id': self.message_id, 'resolved': self.resolved}
+        return {'id': self.id, 'sender': self.sender, 'subject': self.subject, 'body': self.body, 'message_id': self.message_id, 'resolved': self.resolved, 'reply': self.reply}

@@ -54,7 +54,7 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail("help@my.hackmit.org", [reply_to_email.sender], msg.as_bytes())
     reply_to_email.resolved = True
-    reply_email = Email('help@my.hackmit.org', f"RE: {reply_to_email.subject}", data["body"], message_id = message_id, reply=True)
+    reply_email = Email('help@my.hackmit.org', f"RE: {reply_to_email.subject}", data["body"], message_id, True)
     db.session.add(reply_email)
     db.session.commit()
     thread = Thread.query.filter(Thread.has_email(reply_to_email.id)).first()
