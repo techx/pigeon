@@ -1,2 +1,6 @@
+flask==3.0.0
+numpy==1.26
+pandas==2.1.1
 redis==5.0.1
 requests==2.31.0
+sentence-transformers==2.2.2
