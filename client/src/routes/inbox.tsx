@@ -82,18 +82,18 @@ export default function InboxPage() {
         
     };
 
-    const EmailList = ({threadId} : {threadId: number}) => {
-        const threadEmails = threads[threadId].email_list;
-        return (
-            <Timeline>
-                {threadEmails.map((email) => (
-                    <Timeline.Item>
-                        <Title size="md">{email.sender}</Title>
-                        <Text>{email.subject}</Text>
-                    </Timeline.Item>
-                ))}
-            </Timeline>
-        )};
+    // const EmailList = ({threadId} : {threadId: number}) => {
+    //     const threadEmails = threads[threadId].email_list;
+    //     return (
+    //         <Timeline>
+    //             {threadEmails.map((email) => (
+    //                 <Timeline.Item>
+    //                     <Title size="md">{email.sender}</Title>
+    //                     <Text>{email.subject}</Text>
+    //                 </Timeline.Item>
+    //             ))}
+    //         </Timeline>
+    //     )};
 
 
     const emailList = threads.map((thread, index) => {
@@ -119,15 +119,15 @@ export default function InboxPage() {
         <Grid>
             <Grid.Col span={4} className={classes.grid}>
                 <Stack  gap={0}>
-                    {emailList}
+                    {/* {emailList} */}
                 </Stack>
             </Grid.Col>
             <Grid.Col span={8} className={classes.grid}>
                 {active != -1 && (
                     <Box>
-                        <Title size="md">{activeEmail.sender.replace(/"/g, "")}</Title>
+                        {/* <Title size="md">{activeEmail.sender.replace(/"/g, "")}</Title>
                         <Text>{activeEmail.subject}</Text>
-                        <Text>{activeEmail.body}</Text>
+                        <Text>{activeEmail.body}</Text> */}
 
                         <RichTextEditor editor={editor}>
                             <RichTextEditor.Toolbar sticky stickyOffset={60}>
