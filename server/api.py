@@ -1,11 +1,20 @@
 from server import app
 from flask import request
-import openai
-openai.api_key = "YOUR_API_KEY" # replace with your API key
+import random
+from utils import embed_text
 @app.route('/api/upload', methods=['POST'])
 def upload_text():
     data = request.get_json()
     label = data['label']
     content = data['content']
-    response = openai.Embedding.create(input = content, engine="text-embedding-ada-002")
-    embedding = np.array([r["embedding"] for r in response['data']], d)
+    embedding = embed_text(content)
+    pipe = client.pipeline()
+    pipe.hset(f"document: {label}, index: {random.randint(0, 10**5)}", mapping={"vector": embedding.tobytes(), "content": content})
+    pipe.execute()
+
+@app.route("/api/ask_question", methods=["POST"])
+def ask_question():
+    data = request.get_json()
+    question = data["question"]
+    question_embedding = embed_text(question)
+    
