@@ -9,7 +9,6 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
 
 interface Thread {
-    id: number;
     email_list: Email[];
 }
 
@@ -26,7 +25,7 @@ export default function InboxPage() {
     const [threads, setThreads] = useState<Array<Thread>>([]);
     const [active, setActive] = useState(-1);
     const [content, setContent] = useState("");
-    const activeThread = threads.filter((thread) => {thread.id == active})[0];
+    const activeThread = threads.filter((_, index) => {return index === active;})[0];
 
     const editor = useEditor({
         extensions: [
@@ -56,8 +55,8 @@ export default function InboxPage() {
 
 
     const sendEmail = () => {
-        let formData = new FormData();
-        formData.append('index', threads[activeThread.id].email_list[-1].id.toString());
+        const formData = new FormData();
+        formData.append('index', activeThread.email_list[activeThread.email_list.length-1].id.toString());
         formData.append('body', content);
         fetch("/api/emails/send_email", {
             method: 'POST',
@@ -82,21 +81,7 @@ export default function InboxPage() {
         
     };
 
-    // const EmailList = ({threadId} : {threadId: number}) => {
-    //     const threadEmails = threads[threadId].email_list;
-    //     return (
-    //         <Timeline>
-    //             {threadEmails.map((email) => (
-    //                 <Timeline.Item>
-    //                     <Title size="md">{email.sender}</Title>
-    //                     <Text>{email.subject}</Text>
-    //                 </Timeline.Item>
-    //             ))}
-    //         </Timeline>
-    //     )};
-
-
-    const emailList = threads.map((thread, index) => {
+    const threadList = threads.map((thread, index) => {
         //const sender = email.sender.indexOf("<") !== -1 ? email.sender.split("<")[0].replace(/"/g, " ") : email.sender;
         const sender = "asdf";
         return (
@@ -105,8 +90,9 @@ export default function InboxPage() {
                     setContent("");
                     editor?.commands.clearContent(true);
                 }}>
-                <Box>
-                    <EmailList threadId={threads[index].id}/>
+                <Box className={classes.box + " " + (index == active ? classes.selected : "")} >
+                    <Title size="md">{sender}</Title>
+                    <Text>{thread.email_list[thread.email_list.length-1].subject}</Text>
                 </Box>
                 <Divider />
             </div>
@@ -119,15 +105,20 @@ export default function InboxPage() {
         <Grid>
             <Grid.Col span={4} className={classes.grid}>
                 <Stack  gap={0}>
-                    {/* {emailList} */}
+                    {threadList}
                 </Stack>
             </Grid.Col>
             <Grid.Col span={8} className={classes.grid}>
                 {active != -1 && (
                     <Box>
-                        {/* <Title size="md">{activeEmail.sender.replace(/"/g, "")}</Title>
-                        <Text>{activeEmail.subject}</Text>
-                        <Text>{activeEmail.body}</Text> */}
+                        <Timeline>
+                            {activeThread.email_list.map((email, index) => (
+                                <Timeline.Item key={index}>
+                                    <Title size="md">{email.sender}</Title>
+                                    <Text>{email.subject}</Text>
+                                </Timeline.Item>
+                            ))}
+                        </Timeline>
 
                         <RichTextEditor editor={editor}>
                             <RichTextEditor.Toolbar sticky stickyOffset={60}>
