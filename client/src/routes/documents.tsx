@@ -25,7 +25,7 @@ export default function DocumentsPage() {
 
     const ref = useClickOutside(() => {
         setActive(-1); 
-        if(active != -1) clearContent();
+        if(active !== -1) clearContent();
     });
 
     const getDocuments = () => {
@@ -218,16 +218,16 @@ export default function DocumentsPage() {
         const cat = document.label.toLowerCase() + " " + document.question.toLowerCase() + " " + document.content.toLowerCase() + " " + document.source.toLowerCase();
         if(search && !cat.includes(search.toLowerCase())) return;
         return (
-        <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active == document.id && classes.selected)}>
+        <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active === document.id && classes.selected)}>
             <Table.Td>{document.label}</Table.Td>
-            <Table.Td>{document.question == "" ? "N/A" : document.question}</Table.Td>
+            <Table.Td>{document.question === "" ? "N/A" : document.question}</Table.Td>
             <Table.Td>{document.content.length < 50 ? document.content : document.content.substring(0, 47) + "..."}</Table.Td>
         </Table.Tr>
     )});
     return (
         <Container ref={ref}>
             <Space h="xl"/>
-            <TextInput disabled={active != -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
+            <TextInput disabled={active !== -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
            <ScrollArea h={400}>
             <Table >
                 <Table.Thead>
@@ -251,9 +251,9 @@ export default function DocumentsPage() {
                 <Textarea required value={content} onChange={(e) => setContent(e.target.value)} minRows={2} autosize label="Content"/>
                 <TextInput required value={source} onChange={(e) => setSource(e.target.value)} label="Source" />
                 <Group>
-                    {active == -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
-                    {active == -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props}>Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
-                    {active == -1 && (<Button onClick={() => clearDocuments()}>Clear Documents</Button>)}
+                    {active === -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
+                    {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props}>Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
+                    {active === -1 && (<Button onClick={() => clearDocuments()}>Clear Documents</Button>)}
                 </Group>
             </Stack>
             

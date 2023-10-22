@@ -77,5 +77,3 @@ def clear_documents():
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
     return {'message': 'Documents cleared'}
-
-  

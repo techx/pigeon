@@ -1,5 +1,6 @@
 import os
 import smtplib
+import re
 import email
 import email.mime.multipart
 import email.mime.text
@@ -109,6 +110,8 @@ def receive_email():
 def send_email():
     data = request.form
     reply_to_email = Email.query.get(data["index"])
+    clean_regex = re.compile('<.*?>')
+    clean_text = re.sub(clean_regex, ' ', data["body"])
     context = {'body': data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
@@ -129,7 +132,7 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail("help@my.hackmit.org", [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email('help@my.hackmit.org', reply_to_email.subject, data["body"], data["body"], message_id, True, thread.id)
+    reply_email = Email('help@my.hackmit.org', reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id

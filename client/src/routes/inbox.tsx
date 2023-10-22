@@ -128,13 +128,13 @@ export default function InboxPage() {
                 </Stack>
             </Grid.Col>
             <Grid.Col span={58} className={classes.thread}>
-                {active != -1 && (
+                {active !== -1 && (
                     <Box>
                         <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
                                 {activeThread.emailList.map((email) => (
-                                    <Timeline.Item key={email.id} bullet={email.sender == "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
+                                    <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
                                         <Title size="xl">{email.sender}</Title>
                                         <Text dangerouslySetInnerHTML={{__html: email.html}}/>
                                     </Timeline.Item>
