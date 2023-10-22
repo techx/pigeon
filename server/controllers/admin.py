@@ -1,6 +1,9 @@
 from server import db
 from flask import request
 from apiflask import APIBlueprint
+from server.models.document import Document
+from server.nlp.embeddings import embed_corpus
+
 
 admin = APIBlueprint("admin", __name__, url_prefix='/admin', tag='Admin')
   
@@ -27,7 +30,7 @@ def delete_text():
     db.session.commit()
     return {'message': 'Document deleted'}
 
-@admin.route('/update_document', methods=['POST'])
+@admin.route('/edit_document', methods=['POST'])
 def update_text():
     data = request.form
     document = Document.query.get(data['id'])
@@ -35,9 +38,31 @@ def update_text():
     document.content = data['content']
     document.source = data['source']
     db.session.commit()
-    return {'message', 'Document updated'}
+    return {'message': 'Document updated'}
 
 @admin.route('/get_documents', methods=['GET'])
 def get_all():
-    documents = Document.query.all()
+    documents = Document.query.order_by(Document.id.desc()).all()
     return [document.map() for document in documents]
+
+@admin.route('/update_embeddings', methods=['GET'])
+def update_embeddings():
+    documents = Document.query.order_by(Document.id.desc()).all()
+    docs = [document.map() for document in documents]
+    modified_corpus = [{'question': doc['question'], 'source': doc['source'], 'answer': doc['content'], 'sql_id': doc['id']} for doc in docs]
+    embed_corpus(modified_corpus)
+    return {'message': 'Embeddings updated'}
+
+@admin.route('import_documents', methods=['POST'])
+def import_json():
+    file = request.files['file']
+    json_data = json.load(file)
+    try:
+        for doc in json_data:
+            document = Document(doc['question'] if 'question' in doc else "", doc['content'], doc['source'], doc['label'] if 'label' in doc else "")
+            db.session.add(document)
+        db.session.commit()
+    except:
+        raise Exception('failed to import documents')
+    return {'message': 'Documents imported'}
+  

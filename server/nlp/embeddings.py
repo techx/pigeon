@@ -17,7 +17,7 @@ from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 
 from textwrap import TextWrapper
-from server.config import Document, OpenAIMessage
+from server.config import RedisDocument, OpenAIMessage
 
 VECTOR_DIMENSION = 768
 
@@ -27,8 +27,13 @@ client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 # load embedding model
 embedder = SentenceTransformer('msmarco-distilbert-base-v4')
 
-def load_corpus(corpus):
-    """ loads corpus.json into redis
+def load_corpus(corpus: list[RedisDocument]):
+    """ loads given corpus into redis
+
+    PARAMETERS
+    ----------
+    corpus : :obj:`list` of :obj:`RedisDocument`
+        list of documents, each represented by dictionary
 
     RAISES
     ------
@@ -102,9 +107,14 @@ def load_embeddings(embeddings : list[list[float]]):
     
     print("successfully loaded all embeddings")
 
-def create_index():
+def create_index(corpus_len : int):
     """ create search index in redis
     assumes that documents and embeddings have already been loaded into redis
+
+    PARAMETERS
+    ----------
+    corpus_len : :obj:`int`
+        number of documents in corpus
 
     RAISES
     ------
@@ -117,6 +127,7 @@ def create_index():
         TextField("$.source", no_stem=True, as_name="source"),
         TextField("$.question", no_stem=True, as_name="question"),
         TextField("$.answer", no_stem=True, as_name="answer"),
+        NumericField("$.sql_id", as_name="sql_id"),
         VectorField(
             "$.question_and_answer_embeddings",
             "FLAT",
@@ -136,7 +147,7 @@ def create_index():
     if (res == "OK"):
         start = time.time()
         while(1):
-            if str(client.ft("idx:documents_vss").info()['num_docs']) == str(len(corpus)):
+            if str(client.ft("idx:documents_vss").info()['num_docs']) == str(corpus_len):
                 info = client.ft("idx:documents_vss").info()
                 num_docs = info["num_docs"]
                 indexing_failures = info["hash_indexing_failures"]
@@ -156,7 +167,7 @@ def create_query(k : int):
     """
     return Query(f'(*)=>[KNN {k} @vector $query_vector AS vector_score]') \
         .sort_by('vector_score') \
-        .return_fields('vector_score', 'source', 'question', 'answer') \
+        .return_fields('vector_score', 'source', 'question', 'answer', 'sql_id') \
         .dialect(2)
 
 def queries(query, queries : list[str]) -> list[dict]:
@@ -203,6 +214,7 @@ def queries(query, queries : list[str]) -> list[dict]:
                     "source": doc.source,
                     "question": doc.question,
                     "answer": doc.answer,
+                    "sql_id": doc.sql_id,
                 }
             )
         results_list.append({"query": queries[i], "result": query_result})
@@ -227,8 +239,13 @@ def query_all(k : int, questions : list[str]):
     redis_query = create_query(k)
     return queries(redis_query, questions)
 
-def embed_corpus(corpus : list[Document]):
-    """ load corpus, compute embeddings, load embeddings into redis    
+def embed_corpus(corpus : list[RedisDocument]):
+    """ load corpus, compute embeddings, load embeddings into redis   
+
+    PARAMETERS
+    ----------
+    corpus : :obj:`list` of :obj:`dict`
+        list of documents, each represented by dictionary
 
     RAISES
     ------
@@ -242,7 +259,7 @@ def embed_corpus(corpus : list[Document]):
     load_corpus(corpus)
     embeddings = compute_embeddings()
     load_embeddings(embeddings)
-    create_index()
+    create_index(len(corpus))
 
 def test():
     try:
