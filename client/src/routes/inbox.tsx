@@ -1,5 +1,5 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline } from "@mantine/core";
-import { useState, useEffect } from "react";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Modal, ThemeIcon } from "@mantine/core";
+import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
@@ -7,20 +7,23 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
+import { useDisclosure } from '@mantine/hooks';
 
 interface Thread {
     id: number;
-    email_list: Email[];
+    emailList: Email[];
+    resolved: boolean;
 }
 
 interface Email {
     id: number;
     body: string;
-    message_id: string;
+    html: string;
+    messageId: string;
     sender: string;
     subject: string;
-    resolved: boolean;
     reply: boolean;
+    threadId: number;
 }
 
 export default function InboxPage() {
@@ -28,6 +31,10 @@ export default function InboxPage() {
     const [active, setActive] = useState(-1);
     const [content, setContent] = useState("");
     const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
+    const [threadSize, setThreadSize] = useState(activeThread ? activeThread.emailList.length : 0);
+    const [opened, { open, close }] = useDisclosure(false);
+    
+    const viewport = useRef<HTMLDivElement>(null);
 
     const editor = useEditor({
         extensions: [
@@ -45,7 +52,7 @@ export default function InboxPage() {
             .then(res => res.json())
             .then(data => {
                 setThreads(data);
-            })
+            });
     };
     useEffect(() => {
         getThreads();
@@ -58,7 +65,7 @@ export default function InboxPage() {
     const sendEmail = () => {
         notifications.clean();
         const formData = new FormData();
-        formData.append('index', activeThread.email_list[activeThread.email_list.length-1].id.toString());
+        formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
         formData.append('body', content);
         fetch("/api/emails/send_email", {
             method: 'POST',
@@ -82,17 +89,25 @@ export default function InboxPage() {
         
     };
 
+    useEffect(() => {
+        if(activeThread && activeThread.emailList.length > threadSize){
+            if(viewport && viewport.current) viewport.current!.scrollTo({top: viewport.current!.scrollHeight, behavior: "smooth"});
+            setThreadSize(activeThread.emailList.length);
+        }
+    }, [active, threads])
+    
     const threadList = threads.map((thread) => {
-        const sender = thread.email_list[thread.email_list.length-1].sender.indexOf("<") !== -1 ? thread.email_list[thread.email_list.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.email_list[thread.email_list.length-1].sender;
+        const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
             <div key={thread.id} onClick={() => {
-                    setActive(thread.id); 
                     setContent("");
                     editor?.commands.clearContent(true);
+                    setActive(thread.id);
+                    setThreadSize(threads.filter((newThread) => {return thread.id === newThread.id;})[0].emailList.length);
                 }}>
-                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.email_list[thread.email_list.length-1].resolved && !thread.email_list[thread.email_list.length-1].reply ? classes.unresolved : "")} >
+                <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
-                    <Text>{thread.email_list[thread.email_list.length-1].subject}</Text>
+                    <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
                 </Box>
                 <Divider />
             </div>
@@ -101,26 +116,29 @@ export default function InboxPage() {
 
     
     return (
-       <Box>
-        <Grid>
-            <Grid.Col span={4} className={classes.grid}>
+     
+        <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
+            <Grid.Col span={40} className={classes.threads} >
+                <Text className={classes.inboxText}>Inbox</Text>
                 <Stack  gap={0}>
                     {threadList}
                 </Stack>
             </Grid.Col>
-            <Grid.Col span={8} className={classes.grid}>
+            <Grid.Col span={58} className={classes.thread}>
                 {active != -1 && (
                     <Box>
-                        <Timeline>
-                            {activeThread.email_list.map((email) => (
-                                <Timeline.Item key={email.id}>
-                                    <Title size="md">{email.sender}</Title>
-                                    <Text>{email.subject}</Text>
-                                    <Text dangerouslySetInnerHTML={{__html: email.body}}/>
+                        <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
+                        <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
+                        <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
+                            {activeThread.emailList.map((email) => (
+                                <Timeline.Item key={email.id} bullet={email.sender == "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
+                                    <Title size="xl">{email.sender}</Title>
+                                    <Text dangerouslySetInnerHTML={{__html: email.html}}/>
                                 </Timeline.Item>
                             ))}
                         </Timeline>
-
+                        </ScrollArea>
+                        <Stack className={classes.editor}>
                         <RichTextEditor editor={editor}>
                             <RichTextEditor.Toolbar sticky stickyOffset={60}>
                                 <RichTextEditor.ControlsGroup>
@@ -146,18 +164,21 @@ export default function InboxPage() {
                                 <RichTextEditor.Unlink />
                                 </RichTextEditor.ControlsGroup>
                             </RichTextEditor.Toolbar>
-                            <RichTextEditor.Content />
+                            <RichTextEditor.Content className={classes.content}/>
                         </RichTextEditor>
-
+                        <Modal size="60vw" opened={opened} onClose={close} title="Authentication">
+                                {/* Modal content */}
+                        </Modal>
                         <Group>
-                            <Button>Generate</Button>
                             <Button onClick={() => sendEmail()}>Send</Button>
-                            <Button onClick={() => {}}>Mark as Unresolved</Button>
+                            <Button color="green">Regenerate Response</Button>
+                            <Button color="orange" onClick={open}>Show Sources</Button>
                         </Group>
+                        </Stack>
                     </Box>  
                 )}
             </Grid.Col>
         </Grid>
-       </Box>
+    
     );
 }

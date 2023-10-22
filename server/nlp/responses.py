@@ -3,7 +3,7 @@ import numpy as np
 from server.nlp.embeddings import query_all
 import os
 import ast
-from server.config import Document, OpenAIMessage, OPENAI_API_KEY
+from server.config import RedisDocument, OpenAIMessage, OPENAI_API_KEY
 
 openai.api_key = OPENAI_API_KEY
 
@@ -78,7 +78,7 @@ def confidence_metric(confidences : list[float]) -> float:
     """
     return np.min(np.array(confidences))
 
-def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[Document]], float]:
+def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[RedisDocument]], float]:
     """generate email context
 
     Parameters
@@ -90,7 +90,7 @@ def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[D
     -------
     :obj:`list` of :obj:`OpenAIMessage`
         list of contexts for all questions in email
-    :obj:`dict` of :obj:`[str, list[Document]]`
+    :obj:`dict` of :obj:`[str, list[RedisDocument]]`
         dictionary mapping each question to list of context documents used to answer question
     :obj:`float`
         confidence metric for all documents
@@ -116,7 +116,7 @@ def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[D
     contexts.append({"role": "system", "content": message})
     return contexts, docs, confidence_metric(confidences)
 
-def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[str, dict[str, list[Document]], float]:
+def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[str, dict[str, list[RedisDocument]], float]:
     """generate response to email
 
     Parameters
@@ -130,7 +130,7 @@ def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[s
     -------
     str
         email response
-    :obj:`dict` of :obj:`[str, list[Document]]`
+    :obj:`dict` of :obj:`[str, list[RedisDocument]]`
         dictionary mapping each question to list of context documents used to answer question
     float
         confidence of response
@@ -145,7 +145,6 @@ def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[s
     return openai_response(thread), docs, confidence
 
 def test():
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
     thread = []
     new_email = "Where is the hackathon held? When is the application deadline? When is HackMIT happening?"
     response, docs, confidence = generate_response(new_email)
@@ -177,7 +176,3 @@ def test():
         print()
     print(response)
     print("confidence:", confidence)
-
-
-
-

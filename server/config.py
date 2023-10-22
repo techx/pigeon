@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.dirname(__file__) / Path('../.env'))
 
 OpenAIMessage = dict[str, str]
-Document = dict[str, str]
+RedisDocument = dict[str, str]
 
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:2003")
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2000")

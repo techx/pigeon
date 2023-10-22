@@ -52,7 +52,7 @@ def get_all():
 def update_embeddings():
     documents = Document.query.order_by(Document.id.desc()).all()
     docs = [document.map() for document in documents]
-    modified_corpus = [{'question': doc['question'], 'source': doc['source'], 'answer': doc['content']} for doc in docs]
+    modified_corpus = [{'question': doc['question'], 'source': doc['source'], 'answer': doc['content'], 'sql_id': doc['id']} for doc in docs]
     embed_corpus(modified_corpus)
     return {'message': 'Embeddings updated'}
 

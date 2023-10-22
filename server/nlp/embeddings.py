@@ -17,7 +17,7 @@ from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 
 from textwrap import TextWrapper
-from server.config import Document, OpenAIMessage
+from server.config import RedisDocument, OpenAIMessage
 
 VECTOR_DIMENSION = 768
 
@@ -31,12 +31,12 @@ client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 # load embedding model
 embedder = SentenceTransformer('msmarco-distilbert-base-v4')
 
-def load_corpus(corpus: list[dict]):
+def load_corpus(corpus: list[RedisDocument]):
     """ loads given corpus into redis
 
     PARAMETERS
     ----------
-    corpus : :obj:`list` of :obj:`dict`
+    corpus : :obj:`list` of :obj:`RedisDocument`
         list of documents, each represented by dictionary
 
     RAISES
@@ -131,6 +131,7 @@ def create_index(corpus_len : int):
         TextField("$.source", no_stem=True, as_name="source"),
         TextField("$.question", no_stem=True, as_name="question"),
         TextField("$.answer", no_stem=True, as_name="answer"),
+        NumericField("$.sql_id", as_name="sql_id"),
         VectorField(
             "$.question_and_answer_embeddings",
             "FLAT",
@@ -170,7 +171,7 @@ def create_query(k : int):
     """
     return Query(f'(*)=>[KNN {k} @vector $query_vector AS vector_score]') \
         .sort_by('vector_score') \
-        .return_fields('vector_score', 'source', 'question', 'answer') \
+        .return_fields('vector_score', 'source', 'question', 'answer', 'sql_id') \
         .dialect(2)
 
 def queries(query, queries : list[str]) -> list[dict]:
@@ -217,6 +218,7 @@ def queries(query, queries : list[str]) -> list[dict]:
                     "source": doc.source,
                     "question": doc.question,
                     "answer": doc.answer,
+                    "sql_id": doc.sql_id,
                 }
             )
         results_list.append({"query": queries[i], "result": query_result})
@@ -241,7 +243,7 @@ def query_all(k : int, questions : list[str]):
     redis_query = create_query(k)
     return queries(redis_query, questions)
 
-def embed_corpus(corpus : list[dict]):
+def embed_corpus(corpus : list[RedisDocument]):
     """ load corpus, compute embeddings, load embeddings into redis   
 
     PARAMETERS
