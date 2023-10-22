@@ -90,6 +90,11 @@ export default function InboxPage() {
     }
     const parseDate = (date : string) => {
         const d = new Date(date);
+        if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString();
+        else return d.toLocaleDateString();
+    }
+    const parseFullDate = (date : string) => {
+        const d = new Date(date);
         return d.toLocaleString();
     }
 
@@ -255,7 +260,7 @@ export default function InboxPage() {
                 <Text className={classes.sourceQuestion}>{question}</Text>
                 <Accordion>
                     {response.documents[index].map((document, documentIndex) => {
-                        return <Accordion.Item className={classes.confidence_red} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
+                        return <Accordion.Item className={classes.document} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
                             <Accordion.Control>
                                 {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
                             </Accordion.Control>
@@ -286,14 +291,17 @@ export default function InboxPage() {
             <Grid.Col span={sourceActive ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
-                        <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
+                        <Center className={classes.subjectText}>{"Subject: " + activeThread.emailList[0].subject}</Center>
                         {/* <Stack className={classes.threadList}> */}
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
                             <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
                                 {activeThread.emailList.map((email) => (
                                     <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
-                                        <Title size="xl">{email.sender}</Title>
+                                        <Flex className={classes.between}>
+                                            <Title size="xl">{email.sender}</Title>
+                                            <Text>{parseFullDate(email.date)}</Text>
+                                        </Flex>
                                         <Text dangerouslySetInnerHTML={{__html: email.html}}/>
                                     </Timeline.Item>
                                 ))}

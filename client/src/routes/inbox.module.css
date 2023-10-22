@@ -107,7 +107,8 @@
 }
 
 .between {
-    justify-content: space-between
+    justify-content: space-between;
+    padding-right: 10px;
 }
 .sourceHeader {
     font-size: 1.5rem;
@@ -138,12 +139,7 @@
     margin-bottom: 0;
 }
 
-.confidence_red {
-    border-left: 6px solid var(--mantine-color-red-6);
+.document {
+    border-left: 6px solid var(--mantine-color-blue-6);
 }
-.confidence_green {
-    border-left: 6px solid var(--mantine-color-green-6);
-}
-.confidence_yellow {
-    border-left: 6px solid var(--mantine-color-yellow-6);
-}
+

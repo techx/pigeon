@@ -14,7 +14,6 @@ export default function IndexPage() {
         </Text>
         <Box>
           <Text className={classes.sectionHeader}> How do I use Pigeon? </Text>
-
           <Center>
             <Text className={classes.text + " " + classes.bottom}>
               If you run into any other issues please email us at{" "}
