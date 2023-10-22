@@ -219,9 +219,9 @@ export default function DocumentsPage() {
         if(search && !cat.includes(search.toLowerCase())) return;
         return (
         <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active === document.id && classes.selected)}>
-            <Table.Td>{document.label}</Table.Td>
-            <Table.Td>{document.question === "" ? "N/A" : document.question}</Table.Td>
-            <Table.Td>{document.content.length < 50 ? document.content : document.content.substring(0, 47) + "..."}</Table.Td>
+            <Table.Td><Text>{document.label}</Text></Table.Td>
+            <Table.Td><Text>{document.question === "" ? "N/A" : document.question}</Text></Table.Td>
+            <Table.Td><Text>{document.content}</Text></Table.Td>
         </Table.Tr>
     )});
     return (
