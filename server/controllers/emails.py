@@ -71,6 +71,8 @@ def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], l
 def receive_email():
     data = request.form
     thread_emails = []
+    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
+        return {"message": "Missing fields"}, 400
     if "In-Reply-To" in data:
         replied_to_email = Email.query.filter_by(message_id = data["In-Reply-To"]).first()
         if data["sender"] != "help@my.hackmit.org" and replied_to_email:
