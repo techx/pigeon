@@ -1,6 +1,7 @@
 .box {
     cursor: pointer;
     padding-left: 15px;
+    border-top: 1px solid var(--mantine-color-gray-4);
 }
 
 .box:hover {
@@ -16,13 +17,59 @@
 }
 
 .grid {
+    height: 100vh;
+}
+.grid_inner {
+    height: 100%;
+    margin: 0;
+}
+
+.threads {
     overflow: hidden;
     border: 1px solid;
     border-color: var(--mantine-color-gray-4);
     padding-right: 0;
     padding-left: 0;
+    padding-top: 0;
+}
+
+.thread {
+    right: 10vw;
+    padding: 0;
 }
 
 .unresolved {
-    border-left: 15px solid var(--mantine-color-blue-6);
+    border-left: 10px solid var(--mantine-color-blue-6);
+}
+
+.inboxText {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.subjectText {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0;
+    text-align: center;
+    border-top: 1px solid var(--mantine-color-gray-4);
+    border-bottom: 1px solid var(--mantine-color-gray-4);
+}
+
+.threadScroll {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+    border-bottom: 1px solid var(--mantine-color-gray-4);
+}
+
+.editor {
+    margin-top: 20px;
+    padding-left: 20px;
+}
+
+.content {
+    min-height: 90px;
 }

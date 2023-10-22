@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import './index.css'
+import './main.css'
 import { MantineProvider, createTheme } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
 const theme = createTheme({
-  fontFamily: 'Open Sans, sans-serif',
+  fontFamily: 'Verdana, sans-serif',
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

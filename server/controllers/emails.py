@@ -19,17 +19,24 @@ emails = APIBlueprint("emails", __name__, url_prefix='/emails', tag='Emails')
 @emails.route("/receive_email", methods=["POST"])
 def receive_email():
     data = request.form
-    e = Email(data["From"], data["Subject"], data["stripped-text"], data["Message-Id"], False)
-    db.session.add(e)
-    db.session.commit()
     if "In-Reply-To" in data:
-        if data["sender"] != "help@my.hackmit.org":      
-            thread = Thread.query.filter(Thread.has_email(Email.query.filter_by(message_id = data["In-Reply-To"]).first().id)).first()
-            thread.email_list = thread.email_list + [e.id]
-            thread.last_email = e.id
+        replied_to_email = Email.query.filter_by(message_id = data["In-Reply-To"]).first()
+        if data["sender"] != "help@my.hackmit.org" and replied_to_email:
+            thread = Thread.query.get(replied_to_email.thread_id)
+            if thread:
+                e = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+                db.session.add(e)
+                db.session.commit()
+                thread.last_email = e.id
+                thread.resolved = False
     else:
-        thread = Thread(e.id)
+        thread = Thread()
         db.session.add(thread)
+        db.session.commit()
+        e = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+        db.session.add(e)
+        db.session.commit()
+        thread.last_email = e.id
     db.session.commit()
     return data
 
@@ -40,13 +47,13 @@ def send_email():
     context = {'body': data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
-    thread = Thread.query.filter(Thread.has_email(reply_to_email.id)).first()
+    thread = Thread.query.get(reply_to_email.thread_id)
     server = smtplib.SMTP('smtp.mailgun.org', 587)
     server.starttls()
     server.ehlo()
     server.login(MAIL_USERNAME, MAIL_PASSWORD)
     msg = email.mime.multipart.MIMEMultipart()
-    msg['Subject'] = f"RE: {reply_to_email.subject}"
+    msg['Subject'] = reply_to_email.subject
     msg['FROM'] = "HackMIT Team <help@my.hackmit.org>"
     msg['In-Reply-To'] = reply_to_email.message_id
     msg['References'] = reply_to_email.message_id
@@ -56,22 +63,16 @@ def send_email():
     msg['message-id'] = message_id
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail("help@my.hackmit.org", [thread.first_sender], msg.as_bytes())
-    reply_to_email.resolved = True
-    reply_email = Email('help@my.hackmit.org', f"RE: {reply_to_email.subject}", data["body"], message_id, True)
+    thread.resolved = True
+    reply_email = Email('help@my.hackmit.org', reply_to_email.subject, data["body"], data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
-    thread.email_list = thread.email_list + [reply_email.id]
     thread.last_email = reply_email.id
     db.session.commit()
     return {'message': 'Email sent successfully'}
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
-    thread_list = Thread.query.order_by(Thread.last_email.desc()).all()
-    email_list = []
-    for thread in thread_list:
-        thread_emails = []
-        for email_id in thread.email_list:
-          thread_emails.append(Email.query.get(email_id).map())
-        email_list.append({'id': thread.id, 'email_list': thread_emails})
+    thread_list = Thread.query.order_by(Thread.resolved, Thread.last_email.desc()).all()
+    email_list = [{'id': thread.id, 'resolved': thread.resolved, 'emailList': [thread_email.map() for thread_email in Email.query.filter_by(thread_id=thread.id).order_by(Email.id).all()]} for thread in thread_list]
     return email_list
