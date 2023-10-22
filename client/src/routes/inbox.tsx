@@ -89,6 +89,7 @@ export default function InboxPage() {
         return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
     }
     const parseDate = (date : string) => {
+        console.log(date);
         const d = new Date(date);
         if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString();
         else return d.toLocaleDateString();
@@ -260,13 +261,13 @@ export default function InboxPage() {
                 <Text className={classes.sourceQuestion}>{question}</Text>
                 <Accordion>
                     {response.documents[index].map((document, documentIndex) => {
-                        return <Accordion.Item style={{"border-left": `6px solid ${computeColor(document.confidence)}`}} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
+                        return <Accordion.Item style={{"border-left": `6px solid ${computeColor(Math.round(document.confidence / 0.8 * 100) / 100)}`}} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
                             <Accordion.Control>
                                 {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
                             </Accordion.Control>
                             <Accordion.Panel>
                                 <div>
-                                    <Text className={classes.sourceConfidence}>{"Confidence: " + document.confidence}</Text>
+                                    <Text className={classes.sourceConfidence}>{"Confidence: " +  Math.round(document.confidence / 0.8 * 100) / 100}</Text>
                                     {document.question.length > 0 && (<Text className={classes.sourceText}>{document.question}</Text>)}
                                     <Text className={classes.sourceText}>{document.content}</Text>
                                     <Anchor href={document.source} target="_blank">Source</Anchor>
@@ -311,8 +312,8 @@ export default function InboxPage() {
                             {activeThread && !activeThread.resolved && <Group>
                                 <Text>Response Confidence</Text>
                                 <Progress.Root size={30} style={{width: "70%"}}>
-                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={computeColor(response?.confidence)}>
-                                    <Progress.Label>{response === undefined || response.confidence < 0 ? "0": Math.round(response.confidence * 100)}%</Progress.Label>
+                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 125)} color={computeColor(response?.confidence)}>
+                                    <Progress.Label>{response === undefined || response.confidence < 0 ? "0": Math.round(response.confidence * 125)}%</Progress.Label>
                                     </Progress.Section>
                                 </Progress.Root>
                             </Group>}
