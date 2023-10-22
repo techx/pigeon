@@ -20,6 +20,7 @@ interface Email {
     body: string;
     html: string;
     messageId: string;
+    date: string;
     sender: string;
     subject: string;
     reply: boolean;
@@ -78,6 +79,10 @@ export default function InboxPage() {
         const red = [255, 0, 0];
         const green = [0, 255, 0];
         return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
+    }
+    const parseDate = (date : string) => {
+        const d = new Date(date);
+        return d.toLocaleString();
     }
 
     const getResponse = () => {
@@ -145,11 +150,20 @@ export default function InboxPage() {
     const regenerateResponse = () => {
         const formData = new FormData();
         formData.append('id', active.toString());
+        notifications.show({
+            id: 'loading',
+            title: "Loading",
+            color: "blue",
+            message: "Generating response...",
+            loading: true,
+            autoClose: false,
+        })
         fetch("/api/emails/regen_response", {
             method: 'POST',
             body: formData
         }).then(res => {
             if(res.ok) return res.json();
+            notifications.hide('loading');
             notifications.show({
                 title: "Error!",
                 color: "red",
@@ -158,6 +172,7 @@ export default function InboxPage() {
         }).then(data => {
             setResponse(data);
             setContent(data.content.replaceAll("\n", "<br/>"));
+            notifications.hide('loading');
             notifications.show({
                 title: "Success!",
                 color: "green",
@@ -192,7 +207,10 @@ export default function InboxPage() {
                 }}>
                 <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
-                    <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                    <Flex className={classes.between}>
+                        <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                        <Text>{parseDate(thread.emailList[thread.emailList.length-1].date)}</Text>
+                    </Flex>
                     <Text className={classes.preview}>{strip(thread.emailList[thread.emailList.length-1].body)}</Text>
                 </Box>
                 <Divider />

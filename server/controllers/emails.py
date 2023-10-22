@@ -71,7 +71,7 @@ def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], l
 def receive_email():
     data = request.form
 
-    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
+    if "Date" not in data or "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
         return {"message": "Missing fields"}, 400
 
     email = None
@@ -83,13 +83,13 @@ def receive_email():
         if data["sender"] != MAIL_USERNAME and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
-                email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+                email = Email(data["Date"], data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
     else:
         # new email, create new thread
         thread = Thread()
         db.session.add(thread)
         db.session.commit()
-        email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+        email = Email(data["Date"], data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
 
     if email is not None and thread is not None:
         openai_messages = thread_emails_to_openai_messages(thread.emails)
