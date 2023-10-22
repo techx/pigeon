@@ -37,7 +37,7 @@ def thread_email_ids_to_openai_messages(thread_email_ids : list[int]) -> list[Op
         openai_messages.append({"role": role, "content": email.body})
     return openai_messages
 
-def document_data(documents : list[dict]) -> tuple(list[str], list[list[int]], list[list[float]]):
+def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], list[list[float]]]:
     """process raw openai document output
 
     Parameters
@@ -101,7 +101,6 @@ def receive_email():
     questions, document_ids, document_confidences = document_data(documents)
     r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
 
-    print(r.map())
     db.session.add(r)
     db.session.commit()
 
