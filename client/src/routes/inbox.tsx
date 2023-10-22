@@ -317,7 +317,7 @@ export default function InboxPage() {
             <Grid.Col span={(sourceActive) ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
-                        <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
+                        <Center className={classes.subjectText}>{"Subject: " + activeThread.emailList[0].subject}</Center>
                         {/* <Stack className={classes.threadList}> */}
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
@@ -374,7 +374,7 @@ export default function InboxPage() {
                             </Modal> */}
                             <Group>
                                 <Button onClick={() => sendEmail()}>Send</Button>
-                                <Button color="green">Regenerate Response</Button>
+                                <Button color="green" onClick={() => regenerateResponse()}>Regenerate Response</Button>
                                 <Button color="orange" onClick={() => toggleSources()}>Show Sources</Button>
                             </Group>
                         </Stack>

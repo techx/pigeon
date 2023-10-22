@@ -13,7 +13,7 @@ export default function IndexPage() {
           Welcome to Pigeon, an AI-powered email assistant!
         </Text>
         <Box>
-          <Text className={classes.sectionHeader}> How do I use Pigeon? </Text>
+          {/* <Text className={classes.sectionHeader}> How do I use Pigeon? </Text> */}
           <Center>
             <Text className={classes.text}>
               If you run into any other issues please email us at{" "}
