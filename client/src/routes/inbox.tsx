@@ -96,6 +96,10 @@ export default function InboxPage() {
         if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString();
         else return d.toLocaleDateString();
     }
+    const parseFullDate = (date : string) => {
+        const d = new Date(date);
+        return d.toLocaleString();
+    }
 
     const getResponse = () => {
         const formData = new FormData();
@@ -320,7 +324,10 @@ export default function InboxPage() {
                             <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
                                 {activeThread.emailList.map((email) => (
                                     <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
-                                        <Title size="xl">{email.sender}</Title>
+                                        <Flex className={classes.between}>
+                                            <Title size="xl">{email.sender}</Title>
+                                            <Text>{parseFullDate(email.date)}</Text>
+                                        </Flex>
                                         <Text dangerouslySetInnerHTML={{__html: email.html}}/>
                                     </Timeline.Item>
                                 ))}
