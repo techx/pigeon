@@ -101,11 +101,7 @@ def receive_email():
         thread_emails = thread.emails
 
     db.session.commit()
-    # openai_messages = thread_email_ids_to_openai_messages(thread_emails)
-    # openai_res, documents, confidence = generate_response(e.body, openai_messages)
-    # questions, document_ids, document_confidences = document_data(documents)
-    # r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
-
+    
     if (email != -1):
         openai_messages = thread_emails_to_openai_messages(thread_emails)
         openai_res, documents, confidence = generate_response(email.body, openai_messages)
