@@ -60,10 +60,12 @@ export default function InboxPage() {
         return () => clearInterval(interval);
     }, []);
     
-
+    const strip: (text: String) => String = (text) =>{
+        return text.replace(/(<([^>]+)>)/gi, "");
+    }
 
     const sendEmail = () => {
-        const strippedContent = content.replace(/(<([^>]+)>)/gi, "");
+        const strippedContent = strip(content);
         if(strippedContent.length < 10){
             notifications.show({
                 title: "Error!",
@@ -121,6 +123,7 @@ export default function InboxPage() {
                 <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
                     <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                    <Text className={classes.preview}>{strip(thread.emailList[thread.emailList.length-1].body)}</Text>
                 </Box>
                 <Divider />
             </div>
@@ -129,74 +132,73 @@ export default function InboxPage() {
 
     
     return (
-     
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
-            <Grid.Col span={40} className={classes.threads} >
+            <Grid.Col span={25} className={classes.threads} >
                 <Text className={classes.inboxText}>Inbox</Text>
-                <Stack  gap={0}>
+                <Stack gap={0} className={classes.threadList}>
                     {threadList}
                 </Stack>
             </Grid.Col>
-            <Grid.Col span={58} className={classes.thread}>
+            <Grid.Col span={73} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
-                        <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
-                            {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
-                            <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
-                                {activeThread.emailList.map((email) => (
-                                    <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
-                                        <Title size="xl">{email.sender}</Title>
-                                        <Text dangerouslySetInnerHTML={{__html: email.html}}/>
-                                    </Timeline.Item>
-                                ))}
-                            </Timeline>
-                        </ScrollArea>
-                        <Stack className={classes.editor}>
-                            <Group>
-                                <Text>Response Confidence</Text>
-                                <Progress.Root size={30} style={{width: "70%"}}>
-                                    <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
-                                    <Progress.Label>50%</Progress.Label>
-                                    </Progress.Section>
-                                </Progress.Root>
-                            </Group>
-                            <RichTextEditor classNames={{content: classes.content}} editor={editor}>
-                                <RichTextEditor.Toolbar sticky stickyOffset={60}>
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.Bold />
-                                        <RichTextEditor.Italic />
-                                        <RichTextEditor.Underline />
-                                    </RichTextEditor.ControlsGroup>
+                            <ScrollArea className={classes.threadScroll} viewportRef={viewport}>
+                                {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
+                                <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
+                                    {activeThread.emailList.map((email) => (
+                                        <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
+                                            <Title size="xl">{email.sender}</Title>
+                                            <Text dangerouslySetInnerHTML={{__html: email.html}}/>
+                                        </Timeline.Item>
+                                    ))}
+                                </Timeline>
+                            </ScrollArea>
+                            <Stack className={classes.editor}>
+                                <Group>
+                                    <Text>Response Confidence</Text>
+                                    <Progress.Root size={30} style={{width: "70%"}}>
+                                        <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
+                                        <Progress.Label>50%</Progress.Label>
+                                        </Progress.Section>
+                                    </Progress.Root>
+                                </Group>
+                                <RichTextEditor classNames={{content: classes.content}} editor={editor}>
+                                    <RichTextEditor.Toolbar sticky stickyOffset={60}>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.Bold />
+                                            <RichTextEditor.Italic />
+                                            <RichTextEditor.Underline />
+                                        </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.H1 />
-                                        <RichTextEditor.H2 />
-                                        <RichTextEditor.H3 />
-                                        <RichTextEditor.H4 />
-                                    </RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.H1 />
+                                            <RichTextEditor.H2 />
+                                            <RichTextEditor.H3 />
+                                            <RichTextEditor.H4 />
+                                        </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.BulletList />
-                                        <RichTextEditor.OrderedList />
-                                    </RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.BulletList />
+                                            <RichTextEditor.OrderedList />
+                                        </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.Link />
-                                        <RichTextEditor.Unlink />
-                                    </RichTextEditor.ControlsGroup>
-                                </RichTextEditor.Toolbar>
-                                <RichTextEditor.Content/>
-                            </RichTextEditor>
-                            <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
-                                    {/* Modal content */}
-                            </Modal>
-                            <Group>
-                                <Button onClick={() => sendEmail()}>Send</Button>
-                                <Button color="green">Regenerate Response</Button>
-                                <Button color="orange" onClick={open}>Show Sources</Button>
-                            </Group>
-                        </Stack>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.Link />
+                                            <RichTextEditor.Unlink />
+                                        </RichTextEditor.ControlsGroup>
+                                    </RichTextEditor.Toolbar>
+                                    <RichTextEditor.Content/>
+                                </RichTextEditor>
+                                <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
+                                        {/* Modal content */}
+                                </Modal>
+                                <Group>
+                                    <Button onClick={() => sendEmail()}>Send</Button>
+                                    <Button color="green">Regenerate Response</Button>
+                                    <Button color="orange" onClick={open}>Show Sources</Button>
+                                </Group>
+                            </Stack>
                     </Box>  
                 )}
             </Grid.Col>
