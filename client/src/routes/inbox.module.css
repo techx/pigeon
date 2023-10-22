@@ -71,5 +71,6 @@
 }
 
 .content {
-    min-height: 90px;
+    height: 180px;
+    overflow: scroll;
 }

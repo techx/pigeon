@@ -38,6 +38,7 @@ def update_text():
     document.question = data['question']
     document.content = data['content']
     document.source = data['source']
+    document.label = data['label']
     db.session.commit()
     return {'message': 'Document updated'}
 

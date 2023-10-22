@@ -23,7 +23,10 @@ export default function DocumentsPage() {
     const [file, setFile] = useState<File | null>(null);
 
 
-    const ref = useClickOutside(() => {setActive(-1); clearContent();});
+    const ref = useClickOutside(() => {
+        setActive(-1); 
+        if(active != -1) clearContent();
+    });
 
     const getDocuments = () => {
         fetch("/api/admin/get_documents")

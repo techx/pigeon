@@ -81,7 +81,7 @@ def receive_email():
                 db.session.commit()
                 thread.last_email = thread_email.id
                 thread.resolved = False
-                thread_emails = [thread_email for thread_email in Email.query.filter_by(thread_id = thread.id).order_by(Email.id).all()]
+                thread_emails = thread.emails
     else:
         thread = Thread()
         db.session.add(thread)
@@ -90,15 +90,15 @@ def receive_email():
         db.session.add(thread_email)
         db.session.commit()
         thread.last_email = thread_email.id
-        thread_emails = [thread_email]
+        thread_emails = thread.emails
+
     db.session.commit()
+    # openai_messages = thread_email_ids_to_openai_messages(thread_emails)
+    # openai_res, documents, confidence = generate_response(e.body, openai_messages)
+    # questions, document_ids, document_confidences = document_data(documents)
+    # r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
 
-    openai_messages = thread_email_ids_to_openai_messages(thread_emails)
-    openai_res, documents, confidence = generate_response(e.body, openai_messages)
-    questions, document_ids, document_confidences = document_data(documents)
-    r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
-
-    db.session.add(r)
+    # db.session.add(r)
     db.session.commit()
 
     return data
