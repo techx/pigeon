@@ -219,9 +219,9 @@ export default function DocumentsPage() {
         if(search && !cat.includes(search.toLowerCase())) return;
         return (
         <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active === document.id && classes.selected)}>
-            <Table.Td>{document.label}</Table.Td>
-            <Table.Td>{document.question === "" ? "N/A" : document.question}</Table.Td>
-            <Table.Td>{document.content.length < 50 ? document.content : document.content.substring(0, 47) + "..."}</Table.Td>
+            <Table.Td><Text>{document.label}</Text></Table.Td>
+            <Table.Td><Text>{document.question === "" ? "N/A" : document.question}</Text></Table.Td>
+            <Table.Td><Text>{document.content}</Text></Table.Td>
         </Table.Tr>
     )});
     return (
@@ -252,8 +252,8 @@ export default function DocumentsPage() {
                 <TextInput required value={source} onChange={(e) => setSource(e.target.value)} label="Source" />
                 <Group>
                     {active === -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
-                    {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props}>Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
-                    {active === -1 && (<Button onClick={() => clearDocuments()}>Clear Documents</Button>)}
+                    {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props} color="green">Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
+                    {active === -1 && (<Button color="orange" onClick={() => clearDocuments()}>Clear Documents</Button>)}
                 </Group>
             </Stack>
             

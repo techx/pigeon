@@ -2,6 +2,7 @@ from server import db
 from flask import request
 from apiflask import APIBlueprint
 from server.models.document import Document
+from server.models.response import Response
 from server.nlp.embeddings import embed_corpus
 from ast import literal_eval
 import json

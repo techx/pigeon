@@ -82,9 +82,16 @@ export default function InboxPage() {
         const interval = setInterval(getThreads, 10000);
         return () => clearInterval(interval);
     }, []);
-    const strip: (text: String) => String = (text) =>{
+    const strip: (text: String) => String = (text) => {
         return text.replace(/(<([^>]+)>)/gi, "");
     }
+    const computeColor = (confidence : number | undefined) => {
+        if (!confidence) return 'rgba(255,0,0,1)'
+        const red = [255, 0, 0];
+        const green = [0, 255, 0];
+        return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
+    }
+
     const getResponse = () => {
         const formData = new FormData();
         formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
@@ -123,7 +130,7 @@ export default function InboxPage() {
 
         notifications.clean();
         const formData = new FormData();
-        formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
+        formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
         formData.append('body', content);
         fetch("/api/emails/send_email", {
             method: 'POST',
@@ -145,6 +152,30 @@ export default function InboxPage() {
               });
         });
         
+    };
+
+    const regenerateResponse = () => {
+        const formData = new FormData();
+        formData.append('id', active.toString());
+        fetch("/api/emails/regen_response", {
+            method: 'POST',
+            body: formData
+        }).then(res => {
+            if(res.ok) return res.json();
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "Something went wrong!",
+              });
+        }).then(data => {
+            setResponse(data);
+            setContent(data.content.replaceAll("\n", "<br/>"));
+            notifications.show({
+                title: "Success!",
+                color: "green",
+                message: "Response has been regenerated!",
+            });
+        });
     };
 
     useEffect(() => {
@@ -247,7 +278,8 @@ export default function InboxPage() {
             <Grid.Col span={(sourceActive) ? 53 : 63} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
-                        <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
+                        <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
+                        {/* <Stack className={classes.threadList}> */}
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
                             <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
@@ -263,7 +295,7 @@ export default function InboxPage() {
                             {activeThread && !activeThread.resolved && <Group>
                                 <Text>Response Confidence</Text>
                                 <Progress.Root size={30} style={{width: "70%"}}>
-                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={response !== undefined && response.confidence > 0.6 ? "green" : "red"}>
+                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={computeColor(response?.confidence)}>
                                     <Progress.Label>{response === undefined || response.confidence < 0 ? "0": Math.round(response.confidence * 100)}%</Progress.Label>
                                     </Progress.Section>
                                 </Progress.Root>

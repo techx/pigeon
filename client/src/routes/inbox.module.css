@@ -36,7 +36,7 @@
 }
 
 .threadList {
-    max-height: 100vh;
+    max-height: calc(100vh - 6vh);
     overflow: scroll;
 }
 
@@ -59,19 +59,22 @@
 }
 
 .inboxText {
-    font-size: 2rem;
+    font-size: 3vh;
     font-weight: 500;
     margin-bottom: 0;
     text-align: center;
+    height: 6vh;
+    border-bottom: 1px solid var(--mantine-color-gray-4);
 }
 
 .subjectText {
-    font-size: 2rem;
+    font-size: 3vh;
     font-weight: 500;
     margin-bottom: 0;
     text-align: center;
     border-top: 1px solid var(--mantine-color-gray-4);
     border-bottom: 1px solid var(--mantine-color-gray-4);
+    height: 6vh;
 }
 
 .threadScroll {
@@ -79,6 +82,7 @@
     padding-top: 10px;
     padding-right: 10px;
     border-bottom: 1px solid var(--mantine-color-gray-4);
+    border-right: 1px solid var(--mantine-color-gray-4);
     height: 40vh;
 }
 

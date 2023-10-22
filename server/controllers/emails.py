@@ -8,7 +8,7 @@ from flask import request
 from jinja2 import Environment, FileSystemLoader
 from apiflask import APIBlueprint
 from server import db
-from server.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_USERNAME, OpenAIMessage
+from server.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_USERNAME, MAIL_SENDER_TAG, OpenAIMessage
 from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
@@ -76,7 +76,6 @@ def receive_email():
 
     email = None
     thread = None
-    thread_emails = []
     
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
@@ -93,8 +92,8 @@ def receive_email():
         email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
 
     if email is not None and thread is not None:
-        openai_messages = thread_emails_to_openai_messages(thread_emails)
-        openai_res, documents, confidence = generate_response(email.body, openai_messages)
+        openai_messages = thread_emails_to_openai_messages(thread.emails)
+        openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
         questions, document_ids, document_confidences = document_data(documents)
         db.session.add(email)
         db.session.commit()
@@ -109,7 +108,7 @@ def receive_email():
 @emails.route("/send_email", methods=["POST"])
 def send_email():
     data = request.form
-    reply_to_email = Email.query.get(data["index"])
+    reply_to_email = Email.query.get(data["id"])
     clean_regex = re.compile('<.*?>')
     clean_text = re.sub(clean_regex, ' ', data["body"])
     context = {'body': data["body"]}
@@ -122,7 +121,7 @@ def send_email():
     server.login(MAIL_USERNAME, MAIL_PASSWORD)
     msg = email.mime.multipart.MIMEMultipart()
     msg['Subject'] = reply_to_email.subject
-    msg['FROM'] = "HackMIT Team <help@my.hackmit.org>"
+    msg['FROM'] = MAIL_SENDER_TAG
     msg['In-Reply-To'] = reply_to_email.message_id
     msg['References'] = reply_to_email.message_id
     msg['To'] = thread.first_sender
@@ -132,7 +131,7 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email(MAIL_USERNAME, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    reply_email = Email(MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id
@@ -146,6 +145,29 @@ def get_response():
     if not response:
         return {'message': 'Response not found'}, 400
     return response.map()
+
+@emails.route("/regen_response", methods=["POST"])
+def regen_response():
+    data = request.form
+    thread = Thread.query.get(data["id"])
+    email = Email.query.get(thread.last_email)
+    response = Response.query.filter_by(email_id = email.id).first()
+    if not thread or not email or not response:
+        return {'message': 'Something went wrong!'}, 400
+    
+    openai_messages = thread_emails_to_openai_messages(thread.emails)
+    openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
+    questions, document_ids, document_confidences = document_data(documents)
+
+    response.response = openai_res
+    response.questions = questions
+    response.documents = document_ids
+    response.documents_confidence = document_confidences
+    response.confidence = confidence
+    db.session.commit()
+
+    return response.map()
+    
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
