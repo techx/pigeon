@@ -103,7 +103,6 @@ def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[R
     docs = {}
 
     results = query_all(3, questions)
-    print(results)
     message = "Here is some context to help you answer this email: \n"
     for result in results:
         confidence = 0

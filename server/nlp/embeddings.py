@@ -227,6 +227,7 @@ def queries(query, queries : list[str]) -> list[dict]:
             )
         results_list.append({"query": queries[i], "result": query_result})
 
+    print("done running query")
     return results_list
 
 def query_all(k : int, questions : list[str]):

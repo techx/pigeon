@@ -105,3 +105,43 @@
     text-overflow: ellipsis;
     padding-right: 10px;
 }
+
+.between {
+    justify-content: space-between
+}
+.sourceHeader {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0;
+    text-align: center;
+    justify-content: flex-end;
+    border-top: 1px solid var(--mantine-color-gray-4);
+    border-bottom: 1px solid var(--mantine-color-gray-4);
+}
+.sourceText {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.sourceQuestion{
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.sourceConfidence{
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.confidence_red {
+    border-left: 6px solid var(--mantine-color-red-6);
+}
+.confidence_green {
+    border-left: 6px solid var(--mantine-color-green-6);
+}
+.confidence_yellow {
+    border-left: 6px solid var(--mantine-color-yellow-6);
+}
