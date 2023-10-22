@@ -52,7 +52,6 @@ export default function InboxPage() {
     const [content, setContent] = useState("");
     const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
     const [threadSize, setThreadSize] = useState(activeThread ? activeThread.emailList.length : 0);
-    const [opened, { open, close }] = useDisclosure(false);
     const [sourceActive, setSourceActive] = useState(false);
     const [curSource, setCurSource] = useState<Source | null>(null);
     
@@ -281,6 +280,7 @@ export default function InboxPage() {
     }
 
     const sourceList = sources.map((source) => {
+
         return (
             <div key={source.id} onClick={
                 () => {
@@ -310,7 +310,7 @@ export default function InboxPage() {
                         {threadList}
                     </Stack>
                 </Grid.Col>
-            <Grid.Col span={(sourceActive) ? 53 : 63} className={classes.thread}>
+            <Grid.Col span={(sourceActive) ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
@@ -375,7 +375,7 @@ export default function InboxPage() {
                 )}
             </Grid.Col>
             {sourceActive && (
-                <Grid.Col span={30} className={classes.threads} >
+                <Grid.Col span={26} className={classes.threads} >
                     <Text className={classes.inboxText}>Sources</Text>
                     <Accordion chevronPosition="right" variant="contained">
                             {sourceList}
