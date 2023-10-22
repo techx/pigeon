@@ -152,12 +152,11 @@ def regen_response():
     thread = Thread.query.get(data["id"])
     email = Email.query.get(thread.last_email)
     response = Response.query.filter_by(email_id = email.id).first()
-    print(data, thread, email, response)
     if not thread or not email or not response:
         return {'message': 'Something went wrong!'}, 400
     
     openai_messages = thread_emails_to_openai_messages(thread.emails)
-    openai_res, documents, confidence = generate_response(email.body, openai_messages)
+    openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
     questions, document_ids, document_confidences = document_data(documents)
 
     response.response = openai_res
