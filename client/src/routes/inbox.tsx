@@ -132,61 +132,60 @@ export default function InboxPage() {
                     <Box>
                         <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
-                            {/* TODO(azliu): MAIL_USERNAME */}
-                        <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
-                            {activeThread.emailList.map((email) => (
-                                <Timeline.Item key={email.id} bullet={email.sender == "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
-                                    <Title size="xl">{email.sender}</Title>
-                                    <Text dangerouslySetInnerHTML={{__html: email.html}}/>
-                                </Timeline.Item>
-                            ))}
-                        </Timeline>
+                            {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
+                            <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
+                                {activeThread.emailList.map((email) => (
+                                    <Timeline.Item key={email.id} bullet={email.sender == "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
+                                        <Title size="xl">{email.sender}</Title>
+                                        <Text dangerouslySetInnerHTML={{__html: email.html}}/>
+                                    </Timeline.Item>
+                                ))}
+                            </Timeline>
                         </ScrollArea>
                         <Stack className={classes.editor}>
-                        <Group>
-                            <Text>Response Confidence</Text>
-                            <Progress.Root size={30} style={{width: "70%"}}>
-                                <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
-                                <Progress.Label>50%</Progress.Label>
-                                </Progress.Section>
-                            </Progress.Root>
-                        </Group>
-                        <RichTextEditor editor={editor}>
-                            <RichTextEditor.Toolbar sticky stickyOffset={60}>
-                                <RichTextEditor.ControlsGroup>
-                                    <RichTextEditor.Bold />
-                                    <RichTextEditor.Italic />
-                                    <RichTextEditor.Underline />
-                                </RichTextEditor.ControlsGroup>
+                            <Group>
+                                <Text>Response Confidence</Text>
+                                <Progress.Root size={30} style={{width: "70%"}}>
+                                    <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
+                                    <Progress.Label>50%</Progress.Label>
+                                    </Progress.Section>
+                                </Progress.Root>
+                            </Group>
+                            <RichTextEditor classNames={{content: classes.content}} editor={editor}>
+                                <RichTextEditor.Toolbar sticky stickyOffset={60}>
+                                    <RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.Bold />
+                                        <RichTextEditor.Italic />
+                                        <RichTextEditor.Underline />
+                                    </RichTextEditor.ControlsGroup>
 
-                                <RichTextEditor.ControlsGroup>
-                                    <RichTextEditor.H1 />
-                                    <RichTextEditor.H2 />
-                                    <RichTextEditor.H3 />
-                                    <RichTextEditor.H4 />
-                                </RichTextEditor.ControlsGroup>
+                                    <RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.H1 />
+                                        <RichTextEditor.H2 />
+                                        <RichTextEditor.H3 />
+                                        <RichTextEditor.H4 />
+                                    </RichTextEditor.ControlsGroup>
 
-                                <RichTextEditor.ControlsGroup>
-                                    <RichTextEditor.BulletList />
-                                    <RichTextEditor.OrderedList />
-                                </RichTextEditor.ControlsGroup>
+                                    <RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.BulletList />
+                                        <RichTextEditor.OrderedList />
+                                    </RichTextEditor.ControlsGroup>
 
-                                <RichTextEditor.ControlsGroup>
-                                <RichTextEditor.Link />
-                                <RichTextEditor.Unlink />
-                                </RichTextEditor.ControlsGroup>
-                            </RichTextEditor.Toolbar>
-                            <RichTextEditor.Content className={classes.content}/>
-                        </RichTextEditor>
-                        <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
-                                {/* Modal content */}
-                        </Modal>
-                        <Group>
-                            <Button onClick={() => sendEmail()}>Send</Button>
-                            <Button color="green">Regenerate Response</Button>
-                            <Button color="orange" onClick={open}>Show Sources</Button>
-                        </Group>
-                        
+                                    <RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.Link />
+                                        <RichTextEditor.Unlink />
+                                    </RichTextEditor.ControlsGroup>
+                                </RichTextEditor.Toolbar>
+                                <RichTextEditor.Content/>
+                            </RichTextEditor>
+                            <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
+                                    {/* Modal content */}
+                            </Modal>
+                            <Group>
+                                <Button onClick={() => sendEmail()}>Send</Button>
+                                <Button color="green">Regenerate Response</Button>
+                                <Button color="orange" onClick={open}>Show Sources</Button>
+                            </Group>
                         </Stack>
                     </Box>  
                 )}
