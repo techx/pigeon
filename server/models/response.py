@@ -11,7 +11,7 @@ class Response(db.Model):
     documents = db.Column(ARRAY(db.Integer), nullable = False) # 2D array
     documents_confidence = db.Column(ARRAY(db.Float), nullable = False) # 2D array
     confidence = db.Column(db.Float, nullable = False)
-    email_id = db.Column(db.Integer, nullable = True)
+    email_id = db.Column(db.Integer)
 
     def __init__(self, response, questions, documents, documents_confidence, confidence, email_id = -1):
         self.response = response
@@ -22,4 +22,4 @@ class Response(db.Model):
         self.email_id = email_id
 
     def map(self):
-        return {'id': self.id, 'questions': self.questions, 'documents': self.documents, 'documents_confidence': self.documents_confidence, 'confidence': self.confidence, 'email_id': self.email_id}
+        return {'id': self.id, 'response': self.response, 'questions': self.questions, 'documents': self.documents, 'documents_confidence': self.documents_confidence, 'confidence': self.confidence, 'email_id': self.email_id}

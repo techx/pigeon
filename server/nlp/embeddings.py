@@ -19,6 +19,10 @@ from sentence_transformers import SentenceTransformer
 from textwrap import TextWrapper
 from server.config import RedisDocument, OpenAIMessage
 
+import os
+
+cwd = os.path.dirname(__file__)
+
 VECTOR_DIMENSION = 768
 
 # load redis client
@@ -76,7 +80,7 @@ def compute_embeddings():
         question_and_answer).astype(np.float32).tolist()
 
     # save embeddings
-    with open('embeddings.json', 'w') as f:
+    with open(f'{cwd}/embeddings.json', 'w') as f:
         json.dump(embeddings, f)
 
     VECTOR_DIMENSION = len(embeddings[0])
