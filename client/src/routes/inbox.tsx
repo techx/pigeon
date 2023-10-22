@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
-import { IconSend, IconRepeat, IconFolderOpen } from '@tabler/icons-react';
+import { IconSend, IconRepeat, IconFolderOpen, IconFolderOff } from '@tabler/icons-react';
 
 interface Thread {
     id: number;
@@ -349,7 +349,7 @@ export default function InboxPage() {
                                 <Group>
                                     <Button leftSection={<IconSend />} onClick={() => sendEmail()}>Send</Button>
                                     {!activeThread.resolved && (<Button leftSection={<IconRepeat />} onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
-                                    {!activeThread.resolved && (<Button leftSection={<IconFolderOpen />} color="orange" onClick={() => setSourceActive(!sourceActive)}>Toggle Sources</Button>)}
+                                    {!activeThread.resolved && (<Button leftSection={sourceActive ? <IconFolderOff/> : <IconFolderOpen /> } color="orange" onClick={() => setSourceActive(!sourceActive)}>{sourceActive ? "Close Sources": "Open Sources"}</Button>)}
                                 </Group>
                             </Stack>
                     </Box>  
