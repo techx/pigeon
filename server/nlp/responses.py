@@ -1,7 +1,6 @@
 import openai
 import numpy as np
 from server.nlp.embeddings import query_all
-import os
 import ast
 from server.config import RedisDocument, OpenAIMessage, OPENAI_API_KEY
 
@@ -24,7 +23,7 @@ def openai_response(thread: list[OpenAIMessage]) -> str:
     """
 
     messages = [{"role": "system", "content": "You are an organizer for HackMIT who is responding to an email from a participant. \
-             Please write an email response to the participant. Begin the email with the header 'Dear Participant' and end the email with footer 'Best regards, The HackMIT Team'. \
+             Please write an email response to the participant. Begin the email with the header 'Dear [First Name]' where '[First Name]' is the participant's first name and end the email with the footer 'Best regards, The HackMIT Team'. \
              You receive documents to help you answer the email. Please do not include information that is not explicitly stated in the documents. If possible, keep responses brief."}]
     messages += thread
 

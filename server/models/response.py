@@ -22,4 +22,4 @@ class Response(db.Model):
         self.email_id = email_id
 
     def map(self):
-        return {'id': self.id, 'response': self.response, 'questions': self.questions, 'documents': self.documents, 'documents_confidence': self.documents_confidence, 'confidence': self.confidence, 'email_id': self.email_id}
+        return {'id': self.id, 'content': self.response, 'questions': self.questions, 'documents': self.documents, 'documentsConfidence': self.documents_confidence, 'confidence': self.confidence, 'emailId': self.email_id}
