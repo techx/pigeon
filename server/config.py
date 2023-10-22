@@ -23,4 +23,6 @@ MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 MAIL_MAX_EMAILS = 40
 
+MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
