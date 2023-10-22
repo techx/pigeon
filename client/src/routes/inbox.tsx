@@ -283,7 +283,7 @@ export default function InboxPage() {
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
             {!sourceActive && (<Grid.Col span={30} className={classes.threads} >
                     <Text className={classes.inboxText}>Inbox</Text>
-                    <Stack  gap={0}>
+                    <Stack  gap={0} className={classes.threadList}>
                         {threadList}
                     </Stack>
                 </Grid.Col>)}
