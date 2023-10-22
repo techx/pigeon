@@ -34,7 +34,6 @@ def thread_emails_to_openai_messages(thread_emails : list[int]) -> list[OpenAIMe
     for email in thread_emails:
         role = "user" if email.sender != MAIL_USERNAME else "assistant"
         openai_messages.append({"role": role, "content": email.body})
-    print("openai messages", openai_messages)
     return openai_messages
 
 def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], list[list[float]]]:
@@ -97,20 +96,20 @@ def receive_email():
         db.session.add(thread)
         db.session.commit()
         incoming_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+        email = incoming_email
         db.session.add(incoming_email)
         db.session.commit()
         thread.last_email = incoming_email.id
         thread_emails = thread.emails
 
     db.session.commit()
-    
+
     if (email != -1):
         openai_messages = thread_emails_to_openai_messages(thread_emails)
         openai_res, documents, confidence = generate_response(email.body, openai_messages)
         questions, document_ids, document_confidences = document_data(documents)
         r = Response(openai_res, questions, document_ids, document_confidences, confidence, email.id)
 
-        print(r.map())
         db.session.add(r)
         db.session.commit()
 
