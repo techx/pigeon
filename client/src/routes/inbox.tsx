@@ -26,6 +26,16 @@ interface Email {
     threadId: number;
 }
 
+interface Response {
+    id: number;
+    content: string;
+    questions: string[];
+    documents: string[];
+    documentsConfidence: number[];
+    confidence: number;
+    emailId: number;
+}
+
 export default function InboxPage() {
     const [threads, setThreads] = useState<Array<Thread>>([]);
     const [active, setActive] = useState(-1);
@@ -33,7 +43,8 @@ export default function InboxPage() {
     const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
     const [threadSize, setThreadSize] = useState(activeThread ? activeThread.emailList.length : 0);
     const [opened, { open, close }] = useDisclosure(false);
-    
+    const [response, setResponse] = useState<Response | undefined>(undefined);
+
     const viewport = useRef<HTMLDivElement>(null);
 
     const editor = useEditor({
@@ -46,7 +57,7 @@ export default function InboxPage() {
             setContent(editor.getHTML());
         },
         content: content,
-    });
+    }, [response]);
     const getThreads = () => {
         fetch("/api/emails/get_threads")
             .then(res => res.json())
@@ -60,6 +71,29 @@ export default function InboxPage() {
         return () => clearInterval(interval);
     }, []);
     
+    const getResponse = () => {
+        const formData = new FormData();
+        formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
+        fetch("/api/emails/get_response", {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if(res.ok) return res.json();
+                notifications.show({
+                    title: "Error!",
+                    color: "red",
+                    message: "Something went wrong!",
+                });
+            })
+            .then(data => {
+                setResponse(data);
+                setContent(data.content.replaceAll("\n", "<br/>"));
+            })
+    }   
+    useEffect(() => {
+        if(activeThread && !activeThread.resolved) getResponse();
+    }, [active]);
 
 
     const sendEmail = () => {
@@ -93,13 +127,18 @@ export default function InboxPage() {
         if(activeThread && activeThread.emailList.length > threadSize){
             if(viewport && viewport.current) viewport.current!.scrollTo({top: viewport.current!.scrollHeight, behavior: "smooth"});
             setThreadSize(activeThread.emailList.length);
+            if (!activeThread.resolved) getResponse();
         }
         if (threads.length > 0 && active === -1) {
-            setActive(threads[0].id);
+            const actualThreads = threads.filter(thread => thread.emailList.length > 0).map(thread => thread.id);
+            if (actualThreads.length > 0) {
+                setActive(Math.min(...actualThreads));
+            }
         }
     }, [active, threads])
     
     const threadList = threads.map((thread) => {
+        if(thread.emailList.length === 0) return (<></>);
         const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
             <div key={thread.id} onClick={() => {
@@ -143,14 +182,14 @@ export default function InboxPage() {
                             </Timeline>
                         </ScrollArea>
                         <Stack className={classes.editor}>
-                            <Group>
+                            {activeThread && !activeThread.resolved && <Group>
                                 <Text>Response Confidence</Text>
                                 <Progress.Root size={30} style={{width: "70%"}}>
-                                    <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
-                                    <Progress.Label>50%</Progress.Label>
+                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={response !== undefined && response.confidence > 0.6 ? "green" : "red"}>
+                                    <Progress.Label>{response === undefined || response.confidence < 0 ? "0": Math.round(response.confidence * 100)}%</Progress.Label>
                                     </Progress.Section>
                                 </Progress.Root>
-                            </Group>
+                            </Group>}
                             <RichTextEditor classNames={{content: classes.content}} editor={editor}>
                                 <RichTextEditor.Toolbar sticky stickyOffset={60}>
                                     <RichTextEditor.ControlsGroup>

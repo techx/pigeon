@@ -74,46 +74,36 @@ def receive_email():
     if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
         return {"message": "Missing fields"}, 400
 
-    email = -1
+    email = None
+    thread = None
     thread_emails = []
-    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
-        return {"message": "Missing fields"}, 400
+    
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
         replied_to_email = Email.query.filter_by(message_id = data["In-Reply-To"]).first()
         if data["sender"] != MAIL_USERNAME and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
-                incoming_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-                db.session.add(incoming_email)
-                db.session.commit()
-                email = incoming_email
-                thread.last_email = incoming_email.id
-                thread.resolved = False
-                thread_emails = thread.emails
+                email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
     else:
         # new email, create new thread
         thread = Thread()
         db.session.add(thread)
         db.session.commit()
-        incoming_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-        email = incoming_email
-        db.session.add(incoming_email)
-        db.session.commit()
-        thread.last_email = incoming_email.id
-        thread_emails = thread.emails
+        email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
 
-    db.session.commit()
-
-    if (email != -1):
+    if email is not None and thread is not None:
         openai_messages = thread_emails_to_openai_messages(thread_emails)
         openai_res, documents, confidence = generate_response(email.body, openai_messages)
         questions, document_ids, document_confidences = document_data(documents)
-        r = Response(openai_res, questions, document_ids, document_confidences, confidence, email.id)
-
-        db.session.add(r)
+        db.session.add(email)
         db.session.commit()
-
+        r = Response(openai_res, questions, document_ids, document_confidences, confidence, email.id)
+        db.session.add(r)
+        thread.last_email = email.id
+        thread.resolved = False
+        thread_emails = thread.emails
+        db.session.commit()
     return data
 
 @emails.route("/send_email", methods=["POST"])
@@ -142,12 +132,20 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email(MAIL_USERNAME, reply_to_email.subject, data["body"], data["body"], message_id, True, thread.id)
+    reply_email = Email(MAIL_USERNAME, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id
     db.session.commit()
     return {'message': 'Email sent successfully'}
+
+@emails.route("/get_response", methods=["POST"])
+def get_response():
+    data = request.form
+    response = Response.query.filter_by(email_id = data["id"]).first()
+    if not response:
+        return {'message': 'Response not found'}, 400
+    return response.map()
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():

@@ -1,9 +1,9 @@
-import { Title, Container, Button, Center } from "@mantine/core";
+import { Title, Container, Button, Center, Text } from "@mantine/core";
 
 export default function IndexPage() {
   return (
     <Container>
-      asdf
+      <Text>Pigeon</Text>
     </Container>
   );
 }
