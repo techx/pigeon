@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Textarea, TextInput, Button, Space, Card, Text, Group, Stack, ScrollArea, Box, Table, FileInput} from '@mantine/core';
+import { Container, Textarea, TextInput, Button, Space, Card, Text, Group, Stack, ScrollArea, Box, Table, FileButton} from '@mantine/core';
 import { notifications } from "@mantine/notifications";
 import classes from './documents.module.css';
 import { useClickOutside } from '@mantine/hooks';
@@ -20,10 +20,13 @@ export default function DocumentsPage() {
     const [label, setLabel] = useState("");
     const [active, setActive] = useState(-1);
     const [search, setSearch] = useState("");
-    const [file, setFile] = useState<File | null>(null);
 
 
-    const ref = useClickOutside(() => {setActive(-1); clearContent();});
+
+    const ref = useClickOutside(() => {
+        setActive(-1); 
+        if(active != -1) clearContent();
+    });
 
     const getDocuments = () => {
         fetch("/api/admin/get_documents")
@@ -47,11 +50,23 @@ export default function DocumentsPage() {
         setSource("");
         setLabel("");
     }
-    const uploadJSON = () => {
+
+    const uploadJSON = (file : File | null) => {
         notifications.clean();
+        if (!file) {
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "No file selected!",
+              });
+            return;
+        }
+        let formData = new FormData();
+        formData.append('file', file);
+        console.log(formData);
         fetch("/api/admin/upload_json", {
             method: "POST",
-            body: file
+            body: file,
         }).then(res => {
             if(res.ok) return res.json();
             notifications.show({
@@ -167,6 +182,29 @@ export default function DocumentsPage() {
               });
         }).then(updateEmbeddings)
     }
+    const clearDocuments = () => {
+        notifications.clean();
+        fetch("/api/admin/clear_documents", {
+            method: "POST",
+        }).then(res => {
+            if(res.ok) return res.json();
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "Something went wrong!",
+              });
+        }).then(data => {
+            clearContent();
+            getDocuments();
+            setActive(-1);
+            notifications.show({
+                title: "Success!",
+                color: "green",
+                message: data.message,
+              });
+        }).then(updateEmbeddings)
+    
+    };
 
     const handleSelect = (id : number) => {
         setActive(id);
@@ -214,8 +252,8 @@ export default function DocumentsPage() {
                 <TextInput required value={source} onChange={(e) => setSource(e.target.value)} label="Source" />
                 <Group>
                     {active == -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
-                    {active == -1 ? (<FileInput color="red" value={file} onChange={setFile}placeholder="Attach JSON"></FileInput>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
-                    {active == -1 && <Button onClick={() => uploadJSON()}>Upload JSON</Button>}
+                    {active == -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props}>Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
+                    {active == -1 && (<Button onClick={() => clearDocuments()}>Clear Documents</Button>)}
                 </Group>
             </Stack>
             

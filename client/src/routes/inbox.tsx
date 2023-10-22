@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Modal, ThemeIcon } from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress } from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -94,6 +94,9 @@ export default function InboxPage() {
             if(viewport && viewport.current) viewport.current!.scrollTo({top: viewport.current!.scrollHeight, behavior: "smooth"});
             setThreadSize(activeThread.emailList.length);
         }
+        if (threads.length > 0 && active === -1) {
+            setActive(threads[0].id);
+        }
     }, [active, threads])
     
     const threadList = threads.map((thread) => {
@@ -140,6 +143,14 @@ export default function InboxPage() {
                         </Timeline>
                         </ScrollArea>
                         <Stack className={classes.editor}>
+                        <Group>
+                            <Text>Response Confidence</Text>
+                            <Progress.Root size={30} style={{width: "70%"}}>
+                                <Progress.Section value={33} color={threads.length < 0 ? "green" : "red"}>
+                                <Progress.Label>50%</Progress.Label>
+                                </Progress.Section>
+                            </Progress.Root>
+                        </Group>
                         <RichTextEditor editor={editor}>
                             <RichTextEditor.Toolbar sticky stickyOffset={60}>
                                 <RichTextEditor.ControlsGroup>
@@ -167,7 +178,7 @@ export default function InboxPage() {
                             </RichTextEditor.Toolbar>
                             <RichTextEditor.Content className={classes.content}/>
                         </RichTextEditor>
-                        <Modal size="60vw" opened={opened} onClose={close} title="Authentication">
+                        <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
                                 {/* Modal content */}
                         </Modal>
                         <Group>
@@ -175,6 +186,7 @@ export default function InboxPage() {
                             <Button color="green">Regenerate Response</Button>
                             <Button color="orange" onClick={open}>Show Sources</Button>
                         </Group>
+                        
                         </Stack>
                     </Box>  
                 )}

@@ -3,6 +3,7 @@ from flask import request
 from apiflask import APIBlueprint
 from server.models.document import Document
 from server.nlp.embeddings import embed_corpus
+from ast import literal_eval
 import json
 
 
@@ -38,6 +39,7 @@ def update_text():
     document.question = data['question']
     document.content = data['content']
     document.source = data['source']
+    document.label = data['label']
     db.session.commit()
     return {'message': 'Document updated'}
 
@@ -54,16 +56,26 @@ def update_embeddings():
     embed_corpus(modified_corpus)
     return {'message': 'Embeddings updated'}
 
-@admin.route('import_documents', methods=['POST'])
-def import_json():
-    file = request.files['file']
-    json_data = json.load(file)
+@admin.route('upload_json', methods=['POST'])
+def upload_json():
     try:
+        file = request.data
+        json_data = literal_eval(file.decode('utf8'))
         for doc in json_data:
             document = Document(doc['question'] if 'question' in doc else "", doc['content'], doc['source'], doc['label'] if 'label' in doc else "")
             db.session.add(document)
         db.session.commit()
-    except:
-        raise Exception('failed to import documents')
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}, 400
     return {'message': 'Documents imported'}
+
+@admin.route('clear_documents', methods=['POST'])
+def clear_documents():
+    try:
+        Document.query.delete()
+        db.session.commit()
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}, 400
+    return {'message': 'Documents cleared'}
+
   

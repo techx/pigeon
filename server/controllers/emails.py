@@ -71,6 +71,9 @@ def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], l
 def receive_email():
     data = request.form
 
+    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
+        return {"message": "Missing fields"}, 400
+
     email = -1
     thread_emails = []
     if "In-Reply-To" in data:
@@ -85,7 +88,7 @@ def receive_email():
                 email = incoming_email
                 thread.last_email = incoming_email.id
                 thread.resolved = False
-                thread_emails = [thread_email for thread_email in Email.query.filter_by(thread_id = thread.id).order_by(Email.id).all()]
+                thread_emails = thread.emails
     else:
         # new email, create new thread
         thread = Thread()
@@ -95,10 +98,13 @@ def receive_email():
         db.session.add(incoming_email)
         db.session.commit()
         thread.last_email = incoming_email.id
-        email = incoming_email
-        thread_emails = [incoming_email]
+        thread_emails = thread.emails
 
     db.session.commit()
+    # openai_messages = thread_email_ids_to_openai_messages(thread_emails)
+    # openai_res, documents, confidence = generate_response(e.body, openai_messages)
+    # questions, document_ids, document_confidences = document_data(documents)
+    # r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
 
     if (email != -1):
         openai_messages = thread_emails_to_openai_messages(thread_emails)
