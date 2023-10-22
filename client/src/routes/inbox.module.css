@@ -126,6 +126,8 @@
 }
 
 .sourceQuestion{
+    text-align: center;
+    margin: 10px;
     font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 0;
@@ -137,12 +139,7 @@
     margin-bottom: 0;
 }
 
-.confidence_red {
-    border-left: 6px solid var(--mantine-color-red-6);
+.document {
+    border-left: 6px solid var(--mantine-color-blue-6);
 }
-.confidence_green {
-    border-left: 6px solid var(--mantine-color-green-6);
-}
-.confidence_yellow {
-    border-left: 6px solid var(--mantine-color-yellow-6);
-}
+

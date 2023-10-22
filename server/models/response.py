@@ -22,4 +22,13 @@ class Response(db.Model):
         self.email_id = email_id
 
     def map(self):
-        return {'id': self.id, 'content': self.response, 'questions': self.questions, 'documents': self.documents, 'documentsConfidence': self.documents_confidence, 'confidence': self.confidence, 'emailId': self.email_id}
+        documents = []
+        for index in range(len(self.questions)):
+            question_documents = []
+            for document_index in range(len(self.documents[index])):
+                doc = Document.query.get(self.documents[index][document_index]).map()
+                del doc['id']
+                doc['confidence'] = self.documents_confidence[index][document_index]
+                question_documents.append(doc)
+            documents.append(question_documents)
+        return {'id': self.id, 'content': self.response, 'questions': self.questions, 'documents': documents, 'confidence': self.confidence, 'emailId': self.email_id}
