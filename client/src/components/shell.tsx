@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AppShell, NavLink, Space, Text } from "@mantine/core";
+import { AppShell, NavLink, Space, Text, Anchor } from "@mantine/core";
 import { IconInbox, IconBook } from "@tabler/icons-react";
 
-const data = [{label: "Inbox", icon: IconInbox}, {label: "Documents", icon: IconBook}]
+const data = [{label: "Pigeon", img: "./pigeon.png"}, {label: "Inbox", icon: IconInbox}, {label: "Documents", icon: IconBook}]
 
 export default function HeaderNav() {
-    const [active, setActive] = useState(document.location.pathname === "/inbox" ? 0: 1);
+    const inboxPath = document.location.pathname === "/inbox";
+    const documentsPath = document.location.pathname === "/documents";
+    const [active, setActive] = useState(+inboxPath + 2*+documentsPath - 1);
     const navigate = useNavigate();
     const links = data.map((item, index) => (
+        item.icon ?
         <NavLink
             key={item.label}
             active={index === active}
@@ -18,7 +21,10 @@ export default function HeaderNav() {
                 setActive(index); 
                 navigate(item.label.toLowerCase());
             }}
-        />
+        /> :
+        <Anchor key={item.label} onClick={() => navigate("/")}>
+            <img src={item.img} width="150px" height="150px"/>
+        </Anchor>
       ));
     return (
         <AppShell navbar={{ width: 200, breakpoint: "sm" }}>
