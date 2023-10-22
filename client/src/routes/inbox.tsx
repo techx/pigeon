@@ -8,6 +8,7 @@ import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from '@mantine/hooks';
+import { IconSend, IconRepeat, IconFolderOpen } from '@tabler/icons-react';
 
 interface Thread {
     id: number;
@@ -96,6 +97,7 @@ export default function InboxPage() {
                 });
             })
             .then(data => {
+                console.log(data.confidence);
                 setResponse(data);
                 setContent(data.content.replaceAll("\n", "<br/>"));
             })
@@ -185,10 +187,12 @@ export default function InboxPage() {
         const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
             <div key={thread.id} onClick={() => {
+                if(active !== thread.id) {
                     setContent("");
                     editor?.commands.clearContent(true);
                     setActive(thread.id);
                     setThreadSize(threads.filter((newThread) => {return thread.id === newThread.id;})[0].emailList.length);
+                }
                 }}>
                 <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
@@ -265,9 +269,9 @@ export default function InboxPage() {
                                         {/* Modal content */}
                                 </Modal>
                                 <Group>
-                                    <Button onClick={() => sendEmail()}>Send</Button>
-                                    {!activeThread.resolved && (<Button onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
-                                    {!activeThread.resolved && (<Button color="orange" onClick={open}>Show Sources</Button>)}
+                                    <Button leftSection={<IconSend />} onClick={() => sendEmail()}>Send</Button>
+                                    {!activeThread.resolved && (<Button leftSection={<IconRepeat />} onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
+                                    {!activeThread.resolved && (<Button leftSection={<IconFolderOpen />} color="orange" onClick={open}>Show Sources</Button>)}
                                 </Group>
                             </Stack>
                         {/* </Stack> */}

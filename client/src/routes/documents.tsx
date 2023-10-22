@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Container, Textarea, TextInput, Button, Space, Card, Text, Group, Stack, ScrollArea, Box, Table, FileButton} from '@mantine/core';
+import { Container, Textarea, TextInput, Button, Title, Card, Text, Group, Stack, ScrollArea, Box, Table, FileButton} from '@mantine/core';
 import { notifications } from "@mantine/notifications";
 import classes from './documents.module.css';
 import { useClickOutside } from '@mantine/hooks';
+import { IconSearch } from '@tabler/icons-react';
 
 interface Document {
     id: number;
@@ -226,8 +227,8 @@ export default function DocumentsPage() {
     )});
     return (
         <Container ref={ref}>
-            <Space h="xl"/>
-            <TextInput disabled={active !== -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
+            <Text className={classes.title}>Documents</Text>
+            <TextInput leftSection={<IconSearch size={20}/>} disabled={active !== -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
            <ScrollArea h={400}>
             <Table >
                 <Table.Thead>
