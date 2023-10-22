@@ -26,13 +26,22 @@ interface Email {
     threadId: number;
 }
 
+interface Source {
+    id: number;
+    question: string;
+    body: string;
+    confidence: number;
+}
+
 export default function InboxPage() {
     const [threads, setThreads] = useState<Array<Thread>>([]);
+    const [sources, setSources] = useState<Array<Source>>([]);
     const [active, setActive] = useState(-1);
     const [content, setContent] = useState("");
     const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
     const [threadSize, setThreadSize] = useState(activeThread ? activeThread.emailList.length : 0);
     const [opened, { open, close }] = useDisclosure(false);
+    const [sourceActive, setSourceActive] = useState(false);
     
     const viewport = useRef<HTMLDivElement>(null);
 
@@ -117,17 +126,34 @@ export default function InboxPage() {
         )
     });
 
+
+    const getSources = () => {
+        let formData = new FormData();
+        formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
+        fetch("/api/admin/get_sources").then(res => res.json())
+            .then(data => {
+                setSources(data);
+            }).then(() => {
+                console.log(sources);
+            });
+    };
+
+    const toggleSources = () => {
+        setSourceActive(!sourceActive);
+        if (sourceActive) {
+            getSources();
+        }
+    }
     
     return (
-     
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
-            <Grid.Col span={40} className={classes.threads} >
-                <Text className={classes.inboxText}>Inbox</Text>
-                <Stack  gap={0}>
-                    {threadList}
-                </Stack>
-            </Grid.Col>
-            <Grid.Col span={58} className={classes.thread}>
+                <Grid.Col span={(sourceActive) ? 15 : 30} className={classes.threads} >
+                    <Text className={classes.inboxText}>Inbox</Text>
+                    <Stack  gap={0}>
+                        {threadList}
+                    </Stack>
+                </Grid.Col>
+            <Grid.Col span={(sourceActive) ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
@@ -178,19 +204,26 @@ export default function InboxPage() {
                                 </RichTextEditor.Toolbar>
                                 <RichTextEditor.Content/>
                             </RichTextEditor>
-                            <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
-                                    {/* Modal content */}
-                            </Modal>
+                            {/* <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
+                                    {/* Modal content }
+                            </Modal> */}
                             <Group>
                                 <Button onClick={() => sendEmail()}>Send</Button>
                                 <Button color="green">Regenerate Response</Button>
-                                <Button color="orange" onClick={open}>Show Sources</Button>
+                                <Button color="orange" onClick={() => toggleSources()}>Show Sources</Button>
                             </Group>
                         </Stack>
                     </Box>  
                 )}
             </Grid.Col>
-        </Grid>
-    
+            {sourceActive && (
+                <Grid.Col span={25} className={classes.threads} >
+                    <Text className={classes.inboxText}>Sources</Text>
+                    <Stack  gap={0}>
+                        {threadList}
+                    </Stack>
+                </Grid.Col>
+            )}
+        </Grid>    
     );
 }

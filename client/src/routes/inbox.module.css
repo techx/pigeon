@@ -68,10 +68,10 @@
 .editor {
     margin-top: 20px;
     padding-left: 20px;
-    height: 180px;
+    height: 400px;
 }
 
 .content {
-    max-height: 180px;
+    max-height: 400px;
     overflow: scroll;
 }
