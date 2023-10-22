@@ -1,6 +1,8 @@
 .box {
     cursor: pointer;
     padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border-top: 1px solid var(--mantine-color-gray-4);
 }
 
@@ -33,13 +35,27 @@
     padding-top: 0;
 }
 
+.threadList {
+    max-height: 100vh;
+    overflow: scroll;
+}
+
 .thread {
     right: 10vw;
     padding: 0;
 }
 
+.rightPanel {
+    max-height: 300vh;
+    overflow: scroll;
+    /* max-height: 100vh;
+    overflow: scroll;
+    border: solid 2px red;
+    padding: 0; */
+}
+
 .unresolved {
-    border-left: 10px solid var(--mantine-color-blue-6);
+    border-left: 6px solid var(--mantine-color-blue-6);
 }
 
 .inboxText {
@@ -63,15 +79,25 @@
     padding-top: 10px;
     padding-right: 10px;
     border-bottom: 1px solid var(--mantine-color-gray-4);
+    height: 40vh;
 }
 
 .editor {
     margin-top: 20px;
     padding-left: 20px;
-    height: 180px;
+    height: 20vh;
 }
 
 .content {
-    max-height: 180px;
+    height: 20vh;
     overflow: scroll;
+}
+
+.preview {
+    size: 10px;
+    color: var(--mantine-color-gray-7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
 }

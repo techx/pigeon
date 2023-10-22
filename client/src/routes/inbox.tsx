@@ -70,7 +70,9 @@ export default function InboxPage() {
         const interval = setInterval(getThreads, 10000);
         return () => clearInterval(interval);
     }, []);
-    
+    const strip: (text: String) => String = (text) =>{
+        return text.replace(/(<([^>]+)>)/gi, "");
+    }
     const getResponse = () => {
         const formData = new FormData();
         formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
@@ -97,6 +99,16 @@ export default function InboxPage() {
 
 
     const sendEmail = () => {
+        const strippedContent = strip(content);
+        if(strippedContent.length < 10){
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "Your response must be at least 10 characters long!",
+              });
+            return;
+        }
+
         notifications.clean();
         const formData = new FormData();
         formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
@@ -150,6 +162,7 @@ export default function InboxPage() {
                 <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
                     <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                    <Text className={classes.preview}>{strip(thread.emailList[thread.emailList.length-1].body)}</Text>
                 </Box>
                 <Divider />
             </div>
@@ -158,15 +171,14 @@ export default function InboxPage() {
 
     
     return (
-     
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
-            <Grid.Col span={40} className={classes.threads} >
+            <Grid.Col span={25} className={classes.threads} >
                 <Text className={classes.inboxText}>Inbox</Text>
-                <Stack  gap={0}>
+                <Stack gap={0} className={classes.threadList}>
                     {threadList}
                 </Stack>
             </Grid.Col>
-            <Grid.Col span={58} className={classes.thread}>
+            <Grid.Col span={73} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
@@ -198,34 +210,34 @@ export default function InboxPage() {
                                         <RichTextEditor.Underline />
                                     </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.H1 />
-                                        <RichTextEditor.H2 />
-                                        <RichTextEditor.H3 />
-                                        <RichTextEditor.H4 />
-                                    </RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.H1 />
+                                            <RichTextEditor.H2 />
+                                            <RichTextEditor.H3 />
+                                            <RichTextEditor.H4 />
+                                        </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.BulletList />
-                                        <RichTextEditor.OrderedList />
-                                    </RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.BulletList />
+                                            <RichTextEditor.OrderedList />
+                                        </RichTextEditor.ControlsGroup>
 
-                                    <RichTextEditor.ControlsGroup>
-                                        <RichTextEditor.Link />
-                                        <RichTextEditor.Unlink />
-                                    </RichTextEditor.ControlsGroup>
-                                </RichTextEditor.Toolbar>
-                                <RichTextEditor.Content/>
-                            </RichTextEditor>
-                            <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
-                                    {/* Modal content */}
-                            </Modal>
-                            <Group>
-                                <Button onClick={() => sendEmail()}>Send</Button>
-                                <Button color="green">Regenerate Response</Button>
-                                <Button color="orange" onClick={open}>Show Sources</Button>
-                            </Group>
-                        </Stack>
+                                        <RichTextEditor.ControlsGroup>
+                                            <RichTextEditor.Link />
+                                            <RichTextEditor.Unlink />
+                                        </RichTextEditor.ControlsGroup>
+                                    </RichTextEditor.Toolbar>
+                                    <RichTextEditor.Content/>
+                                </RichTextEditor>
+                                <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
+                                        {/* Modal content */}
+                                </Modal>
+                                <Group>
+                                    <Button onClick={() => sendEmail()}>Send</Button>
+                                    <Button color="green">Regenerate Response</Button>
+                                    <Button color="orange" onClick={open}>Show Sources</Button>
+                                </Group>
+                            </Stack>
                     </Box>  
                 )}
             </Grid.Col>
