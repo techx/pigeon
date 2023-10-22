@@ -258,6 +258,8 @@ def embed_corpus(corpus : list[dict]):
     client.flushdb()
 
     # embed corpus
+    if not corpus:
+        return
     load_corpus(corpus)
     embeddings = compute_embeddings()
     load_embeddings(embeddings)
