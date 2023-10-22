@@ -257,19 +257,21 @@ export default function InboxPage() {
     const sourceList = response?.questions.map((question, index) => {
         return (
             <div key={index}>
-                <Text className={classes.sourceQuestion}>{question}</Text>
+                <Text className={classes.sourceQuestion}>{"Question: " + question}</Text>
                 <Accordion>
                     {response.documents[index].map((document, documentIndex) => {
                         return <Accordion.Item className={classes.document} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
-                            <Accordion.Control>
-                                {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
+                            <Accordion.Control className={classes.sourceLabel}>
+                                <strong>{document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}</strong>
+                                <Text className={classes.sourceConfidence}>{"Relevance: " + document.confidence}</Text>
+
                             </Accordion.Control>
                             <Accordion.Panel>
                                 <div>
-                                    <Text className={classes.sourceConfidence}>{"Confidence: " + document.confidence}</Text>
                                     {document.question.length > 0 && (<Text className={classes.sourceText}>{document.question}</Text>)}
                                     <Text className={classes.sourceText}>{document.content}</Text>
-                                    <Anchor href={document.source} target="_blank">Source</Anchor>
+                                    <Text>Source: ({document.source})</Text>
+                                    {/* Change source to links in the future */}
                                 </div>
                             </Accordion.Panel>
                         </Accordion.Item>;

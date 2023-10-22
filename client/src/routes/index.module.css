@@ -17,6 +17,10 @@
     text-align: "left";
 }
 
+.text {
+    font-size: 20px;
+}
+
 .top {
     font-weight: 800;
     font-size: 60px;
@@ -27,7 +31,7 @@
 .bottom {
     text-align: center;
     position: absolute;
-    bottom: -70vh;
+    bottom: -33vh;
 }
 
 .subtext {
