@@ -14,6 +14,7 @@ from server.models.thread import Thread
 from server.models.response import Response
 from server.nlp.responses import generate_response
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f'{cwd}/../email_template']))
@@ -72,7 +73,7 @@ def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], l
 def receive_email():
     data = request.form
 
-    if "Date" not in data or "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
+    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
         return {"message": "Missing fields"}, 400
 
     email = None
@@ -84,14 +85,14 @@ def receive_email():
         if data["sender"] != MAIL_USERNAME and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
-                email = Email(data["Date"], data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+                email = Email(datetime.now(ZoneInfo("America/New_York")), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
     else:
         # new email, create new thread
         thread = Thread()
         db.session.add(thread)
         db.session.commit()
-        email = Email(data["Date"], data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-
+        email = Email(datetime.now(ZoneInfo("America/New_York")), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+    print(email.date)
     if email is not None and thread is not None:
         openai_messages = thread_emails_to_openai_messages(thread.emails)
         openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
@@ -102,7 +103,6 @@ def receive_email():
         db.session.add(r)
         thread.last_email = email.id
         thread.resolved = False
-        thread_emails = thread.emails
         db.session.commit()
     return data
 
@@ -132,8 +132,8 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    print(datetime.now(timezone.utc).astimezone())
-    reply_email = Email(datetime.now(timezone.utc).astimezone(), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    reply_email = Email(datetime.now(ZoneInfo("America/New_York")), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    print(reply_email.date)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id

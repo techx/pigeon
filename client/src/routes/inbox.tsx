@@ -221,7 +221,7 @@ export default function InboxPage() {
     const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
         if (a.resolved && !b.resolved) return 1;
         if (!a.resolved && b.resolved) return -1;
-        if (a.emailList[a.emailList.length-1].date && b.emailList[b.emailList.length-1].date)
+        if (a.emailList.length > 0 && b.emailList.length > 0 && a.emailList[a.emailList.length-1] && a.emailList[a.emailList.length-1].date && b.emailList[b.emailList.length-1] && b.emailList[b.emailList.length-1].date)
             return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
         else return -1;
     }
@@ -262,11 +262,11 @@ export default function InboxPage() {
                     {response.documents[index].map((document, documentIndex) => {
                         return <Accordion.Item style={{"border-left": `6px solid ${computeColor(Math.round(document.confidence / 0.8 * 100) / 100)}`}} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
                             <Accordion.Control>
-                                {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
+                                {document.label.length === 0 ? "Unlabeled Document" : document.label}
+                                <Text className={classes.sourceConfidence}>{"Relevance: " +  Math.round(document.confidence / 0.8 * 100) / 100}</Text>
                             </Accordion.Control>
                             <Accordion.Panel>
                                 <div>
-                                    <Text className={classes.sourceConfidence}>{"Confidence: " +  Math.round(document.confidence / 0.8 * 100) / 100}</Text>
                                     {document.question.length > 0 && (<Text className={classes.sourceText}>{document.question}</Text>)}
                                     <Text className={classes.sourceText}>{document.content}</Text>
                                     <Text>Source: ({document.source})</Text>
@@ -296,9 +296,9 @@ export default function InboxPage() {
                         {/* <Stack className={classes.threadList}> */}
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
-                            <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
+                            <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === '"HackMIT Team" <help@my.hackmit.org>').map(email => activeThread.emailList.indexOf(email)))}>
                                 {activeThread.emailList.map((email) => (
-                                    <Timeline.Item key={email.id} bullet={email.sender === "help@my.hackmit.org" && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
+                                    <Timeline.Item key={email.id} bullet={email.sender === '"HackMIT Team" <help@my.hackmit.org>' && (<ThemeIcon size={20} color="blue" radius="xl"></ThemeIcon>)}>
                                         <Flex className={classes.between}>
                                             <Title size="xl">{email.sender}</Title>
                                             <Text>{parseFullDate(email.date)}</Text>
