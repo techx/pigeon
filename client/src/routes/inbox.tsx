@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Center, Flex, Modal, ThemeIcon, Progress, Accordion} from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Accordion, Center} from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -21,6 +21,7 @@ interface Email {
     body: string;
     html: string;
     messageId: string;
+    date: string;
     sender: string;
     subject: string;
     reply: boolean;
@@ -91,6 +92,10 @@ export default function InboxPage() {
         const green = [0, 255, 0];
         return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
     }
+    const parseDate = (date : string) => {
+        const d = new Date(date);
+        return d.toLocaleString();
+    }
 
     const getResponse = () => {
         const formData = new FormData();
@@ -129,6 +134,14 @@ export default function InboxPage() {
         }
 
         notifications.clean();
+        notifications.show({
+            id: 'loading',
+            title: "Loading",
+            color: "blue",
+            message: "Sending email...",
+            loading: true,
+            autoClose: false,
+        })
         const formData = new FormData();
         formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
         formData.append('body', content);
@@ -137,6 +150,7 @@ export default function InboxPage() {
             body: formData
         }).then(res => {
             if(res.ok) return res.json();
+            notifications.hide('loading')
             notifications.show({
                 title: "Error!",
                 color: "red",
@@ -145,6 +159,7 @@ export default function InboxPage() {
         }).then(data => {
             editor?.commands.clearContent(true);
             getThreads();
+            notifications.hide('loading')
             notifications.show({
                 title: "Success!",
                 color: "green",
@@ -157,11 +172,20 @@ export default function InboxPage() {
     const regenerateResponse = () => {
         const formData = new FormData();
         formData.append('id', active.toString());
+        notifications.show({
+            id: 'loading',
+            title: "Loading",
+            color: "blue",
+            message: "Generating response...",
+            loading: true,
+            autoClose: false,
+        })
         fetch("/api/emails/regen_response", {
             method: 'POST',
             body: formData
         }).then(res => {
             if(res.ok) return res.json();
+            notifications.hide('loading');
             notifications.show({
                 title: "Error!",
                 color: "red",
@@ -170,6 +194,7 @@ export default function InboxPage() {
         }).then(data => {
             setResponse(data);
             setContent(data.content.replaceAll("\n", "<br/>"));
+            notifications.hide('loading');
             notifications.show({
                 title: "Success!",
                 color: "green",
@@ -191,8 +216,14 @@ export default function InboxPage() {
             }
         }
     }, [active, threads])
-    
-    const threadList = threads.map((thread) => {
+
+    const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
+        if (a.resolved && !b.resolved) return 1;
+        if (!a.resolved && b.resolved) return -1;
+        return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+    }
+
+    const threadList = threads.sort(sortThreads).map((thread) => {
         if(thread.emailList.length === 0) return (<></>);
         const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
@@ -205,7 +236,10 @@ export default function InboxPage() {
                 }}>
                 <Box className={classes.box + " " + (thread.id === active ? classes.selected : "") + " " + (!thread.resolved ? classes.unresolved : "")} >
                     <Title size="md">{sender}</Title>
-                    <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                    <Flex className={classes.between}>
+                        <Text>{thread.emailList[thread.emailList.length-1].subject}</Text>
+                        <Text>{parseDate(thread.emailList[thread.emailList.length-1].date)}</Text>
+                    </Flex>
                     <Text className={classes.preview}>{strip(thread.emailList[thread.emailList.length-1].body)}</Text>
                 </Box>
                 <Divider />

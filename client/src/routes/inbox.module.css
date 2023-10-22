@@ -105,6 +105,10 @@
     text-overflow: ellipsis;
     padding-right: 10px;
 }
+
+.between {
+    justify-content: space-between
+}
 .sourceHeader {
     font-size: 1.5rem;
     font-weight: 500;
