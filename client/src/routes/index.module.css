@@ -1,0 +1,31 @@
+.wrapper {
+    text-align: left;
+    margin-left: 0px;
+}
+
+.text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 20px;
+}
+
+.sectionHeader {
+    font-weight: 700;
+    font-size: 30;
+    text-align: "left";
+    color: "#228BE6";
+}
+
+.top {
+    font-weight: 800;
+    font-size: 60px;
+    line-height: 1;
+    color: "#2F9E44";
+}
+
+.subtext {
+    font-weight: 400;
+    font-size: 24;
+    padding-bottom: 10;
+    color: "gray.6";
+}
