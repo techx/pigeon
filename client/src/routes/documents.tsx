@@ -252,8 +252,8 @@ export default function DocumentsPage() {
                 <TextInput required value={source} onChange={(e) => setSource(e.target.value)} label="Source" />
                 <Group>
                     {active === -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
-                    {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props}>Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
-                    {active === -1 && (<Button onClick={() => clearDocuments()}>Clear Documents</Button>)}
+                    {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props} color="green">Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
+                    {active === -1 && (<Button color="orange" onClick={() => clearDocuments()}>Clear Documents</Button>)}
                 </Group>
             </Stack>
             
