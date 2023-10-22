@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Center } from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Accordion, Center} from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -8,6 +8,7 @@ import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from '@mantine/hooks';
+import { IconPlus } from '@tabler/icons-react';
 
 interface Thread {
     id: number;
@@ -27,6 +28,13 @@ interface Email {
     threadId: number;
 }
 
+interface Source {
+    id: number;
+    question: string;
+    body: string;
+    confidence: number;
+}
+
 interface Response {
     id: number;
     content: string;
@@ -39,11 +47,15 @@ interface Response {
 
 export default function InboxPage() {
     const [threads, setThreads] = useState<Array<Thread>>([]);
+    const [sources, setSources] = useState<Array<Source>>([]);
     const [active, setActive] = useState(-1);
     const [content, setContent] = useState("");
     const activeThread = threads.filter((thread) => {return thread.id === active;})[0];
     const [threadSize, setThreadSize] = useState(activeThread ? activeThread.emailList.length : 0);
     const [opened, { open, close }] = useDisclosure(false);
+    const [sourceActive, setSourceActive] = useState(false);
+    const [curSource, setCurSource] = useState<Source | null>(null);
+    
     const [response, setResponse] = useState<Response | undefined>(undefined);
 
     const viewport = useRef<HTMLDivElement>(null);
@@ -216,6 +228,7 @@ export default function InboxPage() {
         const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
             <div key={thread.id} onClick={() => {
+                    setCurSource(null)
                     setContent("");
                     editor?.commands.clearContent(true);
                     setActive(thread.id);
@@ -233,16 +246,70 @@ export default function InboxPage() {
             </div>
         )
     });
-        
+
+
+    const getSource = () => {
+        const formData = new FormData();
+        formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
+        fetch("/api/emails/get_response", {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if(res.ok) return res.json();
+                notifications.show({
+                    title: "Error!",
+                    color: "red",
+                    message: "Something went wrong!",
+                });
+                console.log(res);
+            })
+            .then(data => {
+                console.log(data);
+            })
+    };
+
+    
+    const toggleSources = () => {
+        setSourceActive(!sourceActive);
+        if (sourceActive) {
+            getSource();
+        }
+        setSources([{id: 1, question: "What is the meaning of life?", body: "4asdf2", confidence: 0.5}, {id: 2, question: "What is the meaning asdfof life?", body: "42", confidence: 0.3}, {id: 3, question: "What is the meaningasd of life?", body: "42sadf", confidence: 0.5}])
+
+    }
+
+    const sourceList = sources.map((source) => {
+        return (
+            <div key={source.id} onClick={
+                () => {
+                    setCurSource(source);
+                }
+            }>
+                <Accordion.Item className={classes.confidence_red} key={source.id} value={source.question}>
+                <Accordion.Control className={classes.sourceQuestion}>
+                    {source.question}
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                        <div>
+                            <Text className={classes.sourceConfidence}>{"Confidence: " + source.confidence}</Text>
+                            <Text className={classes.sourceText}>{source.body}</Text>
+                        </div>
+                    </Accordion.Panel>
+                </Accordion.Item>
+            </div>
+        )
+    });
+    
     return (
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
-            <Grid.Col span={25} className={classes.threads} >
-                <Center className={classes.inboxText}>Inbox</Center>
-                <Stack gap={0} className={classes.threadList}>
-                    {threadList}
-                </Stack>
-            </Grid.Col>
-            <Grid.Col span={73} className={classes.thread}>
+                <Grid.Col span={(sourceActive) ? 15 : 30} className={classes.threads} >
+                    <Text className={classes.inboxText}>Inbox</Text>
+                    <Stack  gap={0}>
+                        {threadList}
+                    </Stack>
+                </Grid.Col>
+            <Grid.Col span={(sourceActive) ? 53 : 63} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
@@ -287,27 +354,45 @@ export default function InboxPage() {
                                             <RichTextEditor.OrderedList />
                                         </RichTextEditor.ControlsGroup>
 
-                                        <RichTextEditor.ControlsGroup>
-                                            <RichTextEditor.Link />
-                                            <RichTextEditor.Unlink />
-                                        </RichTextEditor.ControlsGroup>
-                                    </RichTextEditor.Toolbar>
-                                    <RichTextEditor.Content/>
-                                </RichTextEditor>
-                                <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
-                                        {/* Modal content */}
-                                </Modal>
-                                <Group>
-                                    <Button onClick={() => sendEmail()}>Send</Button>
-                                    {!activeThread.resolved && (<Button onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
-                                    {!activeThread.resolved && (<Button color="orange" onClick={open}>Show Sources</Button>)}
-                                </Group>
-                            </Stack>
-                        {/* </Stack> */}
+                                    <RichTextEditor.ControlsGroup>
+                                        <RichTextEditor.Link />
+                                        <RichTextEditor.Unlink />
+                                    </RichTextEditor.ControlsGroup>
+                                </RichTextEditor.Toolbar>
+                                <RichTextEditor.Content/>
+                            </RichTextEditor>
+                            {/* <Modal size="60vw" opened={opened} onClose={close} title="Source Documents">
+                                    {/* Modal content }
+                            </Modal> */}
+                            <Group>
+                                <Button onClick={() => sendEmail()}>Send</Button>
+                                <Button color="green">Regenerate Response</Button>
+                                <Button color="orange" onClick={() => toggleSources()}>Show Sources</Button>
+                            </Group>
+                        </Stack>
                     </Box>  
                 )}
             </Grid.Col>
-        </Grid>
-    
+            {sourceActive && (
+                <Grid.Col span={30} className={classes.threads} >
+                    <Text className={classes.inboxText}>Sources</Text>
+                    <Accordion chevronPosition="right" variant="contained">
+                            {sourceList}
+                    </Accordion>
+                </Grid.Col>
+            )}
+            {/* {curSource && 
+                <Grid.Col span={30} className={classes.threads  } >                    
+                    <Group className={classes.sourceHeader}>
+                        <Text className={classes.sourceText}>Specific Source</Text>
+                        <CloseButton onClick={() => setCurSource(null)} />
+                    </Group>
+                    <Text className={classes.preview}>{curSource.question}</Text>
+                    <Text className={classes.preview}>{curSource.body}</Text>
+                    <Text className={classes.preview}>{curSource.confidence}</Text>
+
+                </Grid.Col>
+            } */}
+        </Grid>    
     );
 }
