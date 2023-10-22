@@ -63,6 +63,16 @@ export default function InboxPage() {
 
 
     const sendEmail = () => {
+        const strippedContent = content.replace(/(<([^>]+)>)/gi, "");
+        if(strippedContent.length < 10){
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "Your response must be at least 10 characters long!",
+              });
+            return;
+        }
+
         notifications.clean();
         const formData = new FormData();
         formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
