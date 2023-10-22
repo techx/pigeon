@@ -3,6 +3,7 @@ from flask import request
 from apiflask import APIBlueprint
 from server.models.document import Document
 from server.nlp.embeddings import embed_corpus
+import json
 
 
 admin = APIBlueprint("admin", __name__, url_prefix='/admin', tag='Admin')

@@ -24,6 +24,10 @@ VECTOR_DIMENSION = 768
 # load redis client
 client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
+# load corpus
+# with open('corpus.json', 'r') as f:
+#     corpus = json.load(f)
+
 # load embedding model
 embedder = SentenceTransformer('msmarco-distilbert-base-v4')
 
