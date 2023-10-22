@@ -118,7 +118,7 @@ export default function InboxPage() {
 
         notifications.clean();
         const formData = new FormData();
-        formData.append('index', activeThread.emailList[activeThread.emailList.length-1].id.toString());
+        formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
         formData.append('body', content);
         fetch("/api/emails/send_email", {
             method: 'POST',
@@ -140,6 +140,30 @@ export default function InboxPage() {
               });
         });
         
+    };
+
+    const regenerateResponse = () => {
+        const formData = new FormData();
+        formData.append('id', active.toString());
+        fetch("/api/emails/regen_response", {
+            method: 'POST',
+            body: formData
+        }).then(res => {
+            if(res.ok) return res.json();
+            notifications.show({
+                title: "Error!",
+                color: "red",
+                message: "Something went wrong!",
+              });
+        }).then(data => {
+            setResponse(data);
+            setContent(data.content.replaceAll("\n", "<br/>"));
+            notifications.show({
+                title: "Success!",
+                color: "green",
+                message: "Response has been regenerated!",
+            });
+        });
     };
 
     useEffect(() => {
@@ -242,8 +266,8 @@ export default function InboxPage() {
                                 </Modal>
                                 <Group>
                                     <Button onClick={() => sendEmail()}>Send</Button>
-                                    <Button color="green">Regenerate Response</Button>
-                                    <Button color="orange" onClick={open}>Show Sources</Button>
+                                    {!activeThread.resolved && (<Button onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
+                                    {!activeThread.resolved && (<Button color="orange" onClick={open}>Show Sources</Button>)}
                                 </Group>
                             </Stack>
                         {/* </Stack> */}

@@ -76,7 +76,6 @@ def receive_email():
 
     email = None
     thread = None
-    thread_emails = []
     
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
@@ -93,7 +92,7 @@ def receive_email():
         email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
 
     if email is not None and thread is not None:
-        openai_messages = thread_emails_to_openai_messages(thread_emails)
+        openai_messages = thread_emails_to_openai_messages(thread.emails)
         openai_res, documents, confidence = generate_response(email.body, openai_messages)
         questions, document_ids, document_confidences = document_data(documents)
         db.session.add(email)
@@ -109,7 +108,7 @@ def receive_email():
 @emails.route("/send_email", methods=["POST"])
 def send_email():
     data = request.form
-    reply_to_email = Email.query.get(data["index"])
+    reply_to_email = Email.query.get(data["id"])
     clean_regex = re.compile('<.*?>')
     clean_text = re.sub(clean_regex, ' ', data["body"])
     context = {'body': data["body"]}
@@ -146,6 +145,30 @@ def get_response():
     if not response:
         return {'message': 'Response not found'}, 400
     return response.map()
+
+@emails.route("/regen_response", methods=["POST"])
+def regen_response():
+    data = request.form
+    thread = Thread.query.get(data["id"])
+    email = Email.query.get(thread.last_email)
+    response = Response.query.filter_by(email_id = email.id).first()
+    print(data, thread, email, response)
+    if not thread or not email or not response:
+        return {'message': 'Something went wrong!'}, 400
+    
+    openai_messages = thread_emails_to_openai_messages(thread.emails)
+    openai_res, documents, confidence = generate_response(email.body, openai_messages)
+    questions, document_ids, document_confidences = document_data(documents)
+
+    response.response = openai_res
+    response.questions = questions
+    response.documents = document_ids
+    response.documents_confidence = document_confidences
+    response.confidence = confidence
+    db.session.commit()
+
+    return response.map()
+    
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
