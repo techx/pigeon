@@ -167,7 +167,7 @@ def regen_response():
     response.confidence = confidence
     db.session.commit()
 
-    return response.map()
+    return {'message': 'Successfully updated'}, 200
     
 
 @emails.route("/get_threads", methods=["GET"])

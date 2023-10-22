@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Accordion, Center} from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Anchor, ThemeIcon, Progress, Accordion, Center} from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -252,22 +252,23 @@ export default function InboxPage() {
     const sourceList = response?.questions.map((question, index) => {
         return (
             <div key={index}>
-                <Text>{question}</Text>
+                <Text className={classes.sourceQuestion}>{question}</Text>
                 <Accordion>
-                    {response.documents[index].map((document, documentIndex) => (
-                        <Accordion.Item className={classes.confidence_red} value={document.label}>
+                    {response.documents[index].map((document, documentIndex) => {
+                        return <Accordion.Item className={classes.confidence_red} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
                             <Accordion.Control>
-                                {document.label}
+                                {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
                             </Accordion.Control>
                             <Accordion.Panel>
                                 <div>
                                     <Text className={classes.sourceConfidence}>{"Confidence: " + document.confidence}</Text>
                                     {document.question.length > 0 && (<Text className={classes.sourceText}>{document.question}</Text>)}
                                     <Text className={classes.sourceText}>{document.content}</Text>
+                                    <Anchor href={document.source} target="_blank">Source</Anchor>
                                 </div>
                             </Accordion.Panel>
-                        </Accordion.Item>
-                    ))}
+                        </Accordion.Item>;
+                    })}
                 </Accordion>
             </div>
         )
@@ -275,13 +276,14 @@ export default function InboxPage() {
     
     return (
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
-                <Grid.Col span={(sourceActive) ? 15 : 30} className={classes.threads} >
+            {!sourceActive && (<Grid.Col span={30} className={classes.threads} >
                     <Text className={classes.inboxText}>Inbox</Text>
                     <Stack  gap={0}>
                         {threadList}
                     </Stack>
-                </Grid.Col>
-            <Grid.Col span={(sourceActive) ? 58 : 68} className={classes.thread}>
+                </Grid.Col>)}
+                
+            <Grid.Col span={sourceActive ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
@@ -338,18 +340,20 @@ export default function InboxPage() {
                                 <Group>
                                     <Button leftSection={<IconSend />} onClick={() => sendEmail()}>Send</Button>
                                     {!activeThread.resolved && (<Button leftSection={<IconRepeat />} onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
-                                    {!activeThread.resolved && (<Button leftSection={<IconFolderOpen />} color="orange" onClick={() => setSourceActive(!sourceActive)}>Show Sources</Button>)}
+                                    {!activeThread.resolved && (<Button leftSection={<IconFolderOpen />} color="orange" onClick={() => setSourceActive(!sourceActive)}>Toggle Sources</Button>)}
                                 </Group>
                             </Stack>
                     </Box>  
                 )}
             </Grid.Col>
             {sourceActive && (
-                <Grid.Col span={26} className={classes.threads} >
+                <Grid.Col span={42} className={classes.threads} >
                     <Text className={classes.inboxText}>Sources</Text>
-                    <Accordion chevronPosition="right" variant="contained">
-                            {sourceList}
-                    </Accordion>
+                    <ScrollArea h="95vh">
+                        {sourceList}
+                    </ScrollArea>
+                    
+                    
                 </Grid.Col>
             )}
            
