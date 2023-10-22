@@ -260,7 +260,7 @@ export default function InboxPage() {
                 <Text className={classes.sourceQuestion}>{question}</Text>
                 <Accordion>
                     {response.documents[index].map((document, documentIndex) => {
-                        return <Accordion.Item className={classes.document} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
+                        return <Accordion.Item style={{"border-left": `6px solid ${computeColor(document.confidence)}`}} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
                             <Accordion.Control>
                                 {document.label.length === 0 ? "Unlabeled Document " + documentIndex: document.label + " " + documentIndex}
                             </Accordion.Control>
