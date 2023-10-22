@@ -220,15 +220,15 @@ export default function DocumentsPage() {
         if(search && !cat.includes(search.toLowerCase())) return;
         return (
         <Table.Tr onClick = {() => handleSelect(document.id)}key={document.id} className={classes.row + " " + (active === document.id && classes.selected)}>
-            <Table.Td><Text>{document.label}</Text></Table.Td>
-            <Table.Td><Text>{document.question === "" ? "N/A" : document.question}</Text></Table.Td>
-            <Table.Td><Text>{document.content}</Text></Table.Td>
+            <Table.Td>{document.label}</Table.Td>
+            <Table.Td>{document.question === "" ? "N/A" : document.question}</Table.Td>
+            <Table.Td>{document.content}</Table.Td>
         </Table.Tr>
     )});
     return (
         <Container ref={ref}>
             <Text className={classes.title}>Documents</Text>
-            <TextInput leftSection={<IconSearch size={20}/>} disabled={active !== -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
+            <TextInput className={classes.search} leftSection={<IconSearch size={20}/>} disabled={active !== -1} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={"Search any field"} />
            <ScrollArea h={400}>
             <Table >
                 <Table.Thead>
@@ -243,7 +243,7 @@ export default function DocumentsPage() {
                 </Table.Tbody>
                 </Table>
                 </ScrollArea>
-            <Stack>
+            <Stack className={classes.stack}>
                 <Group grow>
                     <TextInput required value={label} onChange={(e) => setLabel(e.target.value)} label="Label" />
                     <TextInput value={question} onChange={(e) => setQuestion(e.target.value)} label="Question (optional)"/>

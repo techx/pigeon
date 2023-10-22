@@ -7,8 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
-import { useDisclosure } from '@mantine/hooks';
-import { IconSend, IconRepeat, IconFolderOpen } from '@tabler/icons-react';
+import { IconSend, IconRepeat, IconFolderOpen, IconFolderOff } from '@tabler/icons-react';
 
 interface Thread {
     id: number;
@@ -258,7 +257,7 @@ export default function InboxPage() {
     const sourceList = response?.questions.map((question, index) => {
         return (
             <div key={index}>
-                <Text className={classes.sourceQuestion}>{question}</Text>
+                <Text className={classes.sourceQuestion}>{"Question: " + question}</Text>
                 <Accordion>
                     {response.documents[index].map((document, documentIndex) => {
                         return <Accordion.Item style={{"border-left": `6px solid ${computeColor(Math.round(document.confidence / 0.8 * 100) / 100)}`}} key={documentIndex} value={document.label.length === 0 ? "Unlabeled Document "+documentIndex : document.label + " " + documentIndex}>
@@ -270,7 +269,8 @@ export default function InboxPage() {
                                     <Text className={classes.sourceConfidence}>{"Confidence: " +  Math.round(document.confidence / 0.8 * 100) / 100}</Text>
                                     {document.question.length > 0 && (<Text className={classes.sourceText}>{document.question}</Text>)}
                                     <Text className={classes.sourceText}>{document.content}</Text>
-                                    <Anchor href={document.source} target="_blank">Source</Anchor>
+                                    <Text>Source: ({document.source})</Text>
+                                    {/* Change source to links in the future */}
                                 </div>
                             </Accordion.Panel>
                         </Accordion.Item>;
@@ -349,7 +349,7 @@ export default function InboxPage() {
                                 <Group>
                                     <Button leftSection={<IconSend />} onClick={() => sendEmail()}>Send</Button>
                                     {!activeThread.resolved && (<Button leftSection={<IconRepeat />} onClick={() => regenerateResponse()} color="green">Regenerate Response</Button>)} 
-                                    {!activeThread.resolved && (<Button leftSection={<IconFolderOpen />} color="orange" onClick={() => setSourceActive(!sourceActive)}>Toggle Sources</Button>)}
+                                    {!activeThread.resolved && (<Button leftSection={sourceActive ? <IconFolderOff/> : <IconFolderOpen /> } color="orange" onClick={() => setSourceActive(!sourceActive)}>{sourceActive ? "Close Sources": "Open Sources"}</Button>)}
                                 </Group>
                             </Stack>
                     </Box>  

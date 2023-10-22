@@ -13,7 +13,7 @@ from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
 from server.nlp.responses import generate_response
-import datetime
+from datetime import datetime, timezone
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f'{cwd}/../email_template']))
@@ -132,7 +132,8 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email(datetime.datetime.now(), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    print(datetime.now(timezone.utc).astimezone())
+    reply_email = Email(datetime.now(timezone.utc).astimezone(), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id

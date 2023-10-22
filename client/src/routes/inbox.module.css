@@ -82,7 +82,6 @@
     padding-top: 10px;
     padding-right: 10px;
     border-bottom: 1px solid var(--mantine-color-gray-4);
-    border-right: 1px solid var(--mantine-color-gray-4);
     height: 40vh;
 }
 
@@ -125,16 +124,21 @@
     margin-bottom: 0;
 }
 
-.sourceQuestion{
+.sourceQuestion {
     text-align: center;
     margin: 10px;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 0;
+    color: var(--mantine-color-blue-6)
+}
+
+.sourceLabel {
+    font-size: 0.9rem;
 }
 
 .sourceConfidence{
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 500;
     margin-bottom: 0;
 }

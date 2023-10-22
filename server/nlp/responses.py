@@ -24,11 +24,13 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
         email response
     """
 
-    messages = [{"role": "system", "content": f"You are an organizer for HackMIT who is responding to an email from a participant. \
-             Please write an email response to the participant. Begin the email with the header 'Dear [First Name]' where '[First Name]' is the participant's first name and end the email with the footer 'Best regards, The HackMIT Team'. \
+    messages = [{"role": "system", "content": f"You are an organizer for HackHarvard who is responding to an email from a participant. \
+             Please write an email response to the participant. Begin the email with the header 'Dear [First Name]' where '[First Name]' is the participant's first name and end the email with the footer 'Best regards, The HackHarvard Team'. \
              The participant's email address is {sender}.\
-             You receive documents to help you answer the email. Please do not include information that is not explicitly stated in the documents. If possible, keep responses brief."}]
+             You receive documents to help you answer the email. Please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. However, please write the emails in a friendly tone."}]
     messages += thread
+
+    messages += [{"role": "system", "content": f"Once again, please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. However, please write the emails in a friendly tone."}]
 
     response = openai.ChatCompletion.create(
         model=MODEL,
@@ -53,7 +55,7 @@ def openai_parse(email : str) -> list[str]:
     response = openai.ChatCompletion.create(
         model=MODEL,
         messages=[
-            {"role": "system", "content": "You are an organizer for HackMIT. Please parse incoming emails from participants into separate questions. Return a list of questions in the format of a python list."},
+            {"role": "system", "content": "You are an organizer for HackHarvard. Please parse incoming emails from participants into separate questions. Return a list of questions in the format of a python list."},
             {"role": "user", "content": email}
         ]
     )
@@ -149,7 +151,7 @@ def generate_response(sender: str, email : str, thread : list[OpenAIMessage] = [
 
 def test():
     thread = []
-    new_email = "Where is the hackathon held? When is the application deadline? When is HackMIT happening?"
+    new_email = "Where is the hackathon held? When is the application deadline? When is HackHarvard happening?"
     response, docs, confidence = generate_response(new_email)
     
     for question in docs.keys():
