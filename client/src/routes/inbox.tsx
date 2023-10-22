@@ -94,7 +94,8 @@ export default function InboxPage() {
     }
     const parseDate = (date : string) => {
         const d = new Date(date);
-        return d.toLocaleString();
+        if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString();
+        else return d.toLocaleDateString();
     }
 
     const getResponse = () => {

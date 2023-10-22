@@ -107,7 +107,8 @@
 }
 
 .between {
-    justify-content: space-between
+    justify-content: space-between;
+    padding-right: 10px;
 }
 .sourceHeader {
     font-size: 1.5rem;
