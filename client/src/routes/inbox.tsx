@@ -223,7 +223,9 @@ export default function InboxPage() {
     const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
         if (a.resolved && !b.resolved) return 1;
         if (!a.resolved && b.resolved) return -1;
-        return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+        if (a.emailList[a.emailList.length-1].date && b.emailList[b.emailList.length-1].date)
+            return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+        else return -1;
     }
 
     const threadList = threads.sort(sortThreads).map((thread) => {
