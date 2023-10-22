@@ -114,8 +114,6 @@ export default function InboxPage() {
                 });
             })
             .then(data => {
-                console.log(data.confidence);
-                console.log(data.documents);
                 setResponse(data);
                 setContent(data.content.replaceAll("\n", "<br/>"));
 
