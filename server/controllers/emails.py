@@ -8,7 +8,7 @@ from flask import request
 from jinja2 import Environment, FileSystemLoader
 from apiflask import APIBlueprint
 from server import db
-from server.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_USERNAME, OpenAIMessage
+from server.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_USERNAME, MAIL_SENDER_TAG, OpenAIMessage
 from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
@@ -122,7 +122,7 @@ def send_email():
     server.login(MAIL_USERNAME, MAIL_PASSWORD)
     msg = email.mime.multipart.MIMEMultipart()
     msg['Subject'] = reply_to_email.subject
-    msg['FROM'] = "HackMIT Team <help@my.hackmit.org>"
+    msg['FROM'] = MAIL_SENDER_TAG
     msg['In-Reply-To'] = reply_to_email.message_id
     msg['References'] = reply_to_email.message_id
     msg['To'] = thread.first_sender
@@ -132,7 +132,7 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email(MAIL_USERNAME, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    reply_email = Email(MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id
