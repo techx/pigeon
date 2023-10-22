@@ -7,7 +7,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from "@tiptap/extension-placeholder";
 import { notifications } from "@mantine/notifications";
-import { useDisclosure } from '@mantine/hooks';
 import { IconSend, IconRepeat, IconFolderOpen } from '@tabler/icons-react';
 
 interface Thread {
@@ -114,8 +113,6 @@ export default function InboxPage() {
                 });
             })
             .then(data => {
-                console.log(data.confidence);
-                console.log(data.documents);
                 setResponse(data);
                 setContent(data.content.replaceAll("\n", "<br/>"));
 
@@ -223,7 +220,9 @@ export default function InboxPage() {
     const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
         if (a.resolved && !b.resolved) return 1;
         if (!a.resolved && b.resolved) return -1;
-        return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+        if (a.emailList[a.emailList.length-1].date && b.emailList[b.emailList.length-1].date)
+            return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+        else return -1;
     }
 
     const threadList = threads.sort(sortThreads).map((thread) => {
@@ -285,7 +284,7 @@ export default function InboxPage() {
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
             {!sourceActive && (<Grid.Col span={30} className={classes.threads} >
                     <Text className={classes.inboxText}>Inbox</Text>
-                    <Stack  gap={0}>
+                    <Stack  gap={0} className={classes.threadList}>
                         {threadList}
                     </Stack>
                 </Grid.Col>)}
