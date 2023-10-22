@@ -122,6 +122,14 @@ export default function InboxPage() {
         }
 
         notifications.clean();
+        notifications.show({
+            id: 'loading',
+            title: "Loading",
+            color: "blue",
+            message: "Sending email...",
+            loading: true,
+            autoClose: false,
+        })
         const formData = new FormData();
         formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
         formData.append('body', content);
@@ -130,6 +138,7 @@ export default function InboxPage() {
             body: formData
         }).then(res => {
             if(res.ok) return res.json();
+            notifications.hide('loading')
             notifications.show({
                 title: "Error!",
                 color: "red",
@@ -138,6 +147,7 @@ export default function InboxPage() {
         }).then(data => {
             editor?.commands.clearContent(true);
             getThreads();
+            notifications.hide('loading')
             notifications.show({
                 title: "Success!",
                 color: "green",
@@ -194,8 +204,14 @@ export default function InboxPage() {
             }
         }
     }, [active, threads])
-    
-    const threadList = threads.map((thread) => {
+
+    const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
+        if (a.resolved && !b.resolved) return 1;
+        if (!a.resolved && b.resolved) return -1;
+        return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+    }
+
+    const threadList = threads.sort(sortThreads).map((thread) => {
         if(thread.emailList.length === 0) return (<></>);
         const sender = thread.emailList[thread.emailList.length-1].sender.indexOf("<") !== -1 ? thread.emailList[thread.emailList.length-1].sender.split("<")[0].replace(/"/g, " ") : thread.emailList[thread.emailList.length-1].sender;
         return (
@@ -217,8 +233,7 @@ export default function InboxPage() {
             </div>
         )
     });
-
-    
+        
     return (
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
             <Grid.Col span={25} className={classes.threads} >
