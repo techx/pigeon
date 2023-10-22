@@ -8,7 +8,7 @@ from flask import request
 from jinja2 import Environment, FileSystemLoader
 from apiflask import APIBlueprint
 from server import db
-from server.config import MAIL_USERNAME, MAIL_PASSWORD, OpenAIMessage
+from server.config import MAIL_USERNAME, MAIL_PASSWORD, MAIL_USERNAME, OpenAIMessage
 from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
@@ -18,8 +18,8 @@ cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f'{cwd}/../email_template']))
 emails = APIBlueprint("emails", __name__, url_prefix='/emails', tag='Emails')
 
-def thread_email_ids_to_openai_messages(thread_email_ids : list[int]) -> list[OpenAIMessage]:
-    """converts list of email ids to openai messages
+def thread_emails_to_openai_messages(thread_emails : list[int]) -> list[OpenAIMessage]:
+    """converts list of email to openai messages
 
     Parameters
     ----------
@@ -32,9 +32,8 @@ def thread_email_ids_to_openai_messages(thread_email_ids : list[int]) -> list[Op
         list of openai messages
     """
     openai_messages = []
-    for email_id in thread_email_ids:
-        email = Email.query.get(email_id)
-        role = "user" if email.sender != "help@my.hackmit.org" else "assistant"
+    for email in thread_emails:
+        role = "user" if email.sender != MAIL_USERNAME else "assistant"
         openai_messages.append({"role": role, "content": email.body})
     return openai_messages
 
@@ -71,38 +70,49 @@ def document_data(documents : list[dict]) -> tuple[list[str], list[list[int]], l
 @emails.route("/receive_email", methods=["POST"])
 def receive_email():
     data = request.form
+
+    if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
+        return {"message": "Missing fields"}, 400
+
+    email = -1
     thread_emails = []
     if "From" not in data or "Subject" not in data or "stripped-text" not in data or "stripped-html" not in data or "Message-Id" not in data:
         return {"message": "Missing fields"}, 400
     if "In-Reply-To" in data:
+        # reply to existing email, add to existing thread
         replied_to_email = Email.query.filter_by(message_id = data["In-Reply-To"]).first()
-        if data["sender"] != "help@my.hackmit.org" and replied_to_email:
+        if data["sender"] != MAIL_USERNAME and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
-                thread_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-                db.session.add(thread_email)
+                incoming_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+                db.session.add(incoming_email)
                 db.session.commit()
-                thread.last_email = thread_email.id
+                email = incoming_email
+                thread.last_email = incoming_email.id
                 thread.resolved = False
                 thread_emails = thread.emails
     else:
+        # new email, create new thread
         thread = Thread()
         db.session.add(thread)
         db.session.commit()
-        thread_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-        db.session.add(thread_email)
+        incoming_email = Email(data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+        email = incoming_email
+        db.session.add(incoming_email)
         db.session.commit()
-        thread.last_email = thread_email.id
+        thread.last_email = incoming_email.id
         thread_emails = thread.emails
 
     db.session.commit()
-    # openai_messages = thread_email_ids_to_openai_messages(thread_emails)
-    # openai_res, documents, confidence = generate_response(e.body, openai_messages)
-    # questions, document_ids, document_confidences = document_data(documents)
-    # r = Response(openai_res, questions, document_ids, document_confidences, confidence, e.id)
 
-    # db.session.add(r)
-    db.session.commit()
+    if (email != -1):
+        openai_messages = thread_emails_to_openai_messages(thread_emails)
+        openai_res, documents, confidence = generate_response(email.body, openai_messages)
+        questions, document_ids, document_confidences = document_data(documents)
+        r = Response(openai_res, questions, document_ids, document_confidences, confidence, email.id)
+
+        db.session.add(r)
+        db.session.commit()
 
     return data
 
@@ -126,13 +136,13 @@ def send_email():
     msg['In-Reply-To'] = reply_to_email.message_id
     msg['References'] = reply_to_email.message_id
     msg['To'] = thread.first_sender
-    msg['Cc'] = "help@my.hackmit.org" 
+    msg['Cc'] = MAIL_USERNAME 
     message_id = email.utils.make_msgid(domain='my.hackmit.org')
     msg['message-id'] = message_id
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
-    server.sendmail("help@my.hackmit.org", [thread.first_sender], msg.as_bytes())
+    server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email('help@my.hackmit.org', reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
+    reply_email = Email(MAIL_USERNAME, reply_to_email.subject, data["body"], data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id

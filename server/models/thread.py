@@ -10,7 +10,7 @@ class Thread(db.Model):
     id = db.Column(Integer, primary_key = True)
     resolved = db.Column(db.Boolean, nullable = False, default=False)
     last_email = db.Column(Integer)
-    emails = relationship("Email", backref="Threads", lazy=True)
+    emails = relationship("Email", backref="threads", lazy=True)
   
     @hybrid_property
     def first_sender(self):

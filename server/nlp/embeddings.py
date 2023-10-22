@@ -19,6 +19,10 @@ from sentence_transformers import SentenceTransformer
 from textwrap import TextWrapper
 from server.config import RedisDocument, OpenAIMessage
 
+import os
+
+cwd = os.path.dirname(__file__)
+
 VECTOR_DIMENSION = 768
 
 # load redis client
@@ -62,21 +66,21 @@ def compute_embeddings():
     """
     print("computing embeddings...")
 
-    # get keys, questions, answers
+    # get keys, questions, content
     keys = sorted(client.keys("documents:*"))
     questions = client.json().mget(keys, "$.question")
-    answers = client.json().mget(keys, "$.answer")
+    content = client.json().mget(keys, "$.content")
 
-    assert(len(questions) == len(answers))
+    assert(len(questions) == len(content))
 
     # compute embeddings
-    question_and_answer = [questions[i][0] + " " +
-                            answers[i][0] for i in range(len(questions))]
+    question_and_content = [questions[i][0] + " " +
+                            content[i][0] for i in range(len(questions))]
     embeddings = embedder.encode(
-        question_and_answer).astype(np.float32).tolist()
+        question_and_content).astype(np.float32).tolist()
 
     # save embeddings
-    with open('embeddings.json', 'w') as f:
+    with open(f'{cwd}/embeddings.json', 'w') as f:
         json.dump(embeddings, f)
 
     VECTOR_DIMENSION = len(embeddings[0])
@@ -103,7 +107,7 @@ def load_embeddings(embeddings : list[list[float]]):
     pipeline = client.pipeline()
     for i, embedding in enumerate(embeddings, start=1):
         redis_key = f'documents:{i:03}'
-        pipeline.json().set(redis_key, "$.question_and_answer_embeddings", embedding)
+        pipeline.json().set(redis_key, "$.question_and_content_embeddings", embedding)
     res = pipeline.execute()
     
     if not all(res):
@@ -130,10 +134,10 @@ def create_index(corpus_len : int):
     schema = (
         TextField("$.source", no_stem=True, as_name="source"),
         TextField("$.question", no_stem=True, as_name="question"),
-        TextField("$.answer", no_stem=True, as_name="answer"),
+        TextField("$.content", no_stem=True, as_name="content"),
         NumericField("$.sql_id", as_name="sql_id"),
         VectorField(
-            "$.question_and_answer_embeddings",
+            "$.question_and_content_embeddings",
             "FLAT",
             {
                 "TYPE": "FLOAT32",
@@ -171,7 +175,7 @@ def create_query(k : int):
     """
     return Query(f'(*)=>[KNN {k} @vector $query_vector AS vector_score]') \
         .sort_by('vector_score') \
-        .return_fields('vector_score', 'source', 'question', 'answer', 'sql_id') \
+        .return_fields('vector_score', 'source', 'question', 'content', 'sql_id') \
         .dialect(2)
 
 def queries(query, queries : list[str]) -> list[dict]:
@@ -217,7 +221,7 @@ def queries(query, queries : list[str]) -> list[dict]:
                     "score": vector_score,
                     "source": doc.source,
                     "question": doc.question,
-                    "answer": doc.answer,
+                    "content": doc.content,
                     "sql_id": doc.sql_id,
                 }
             )
@@ -257,7 +261,9 @@ def embed_corpus(corpus : list[RedisDocument]):
         if failed to load corpus
     """
     # flush database
+    print("cleaning database...")
     client.flushdb()
+    print("done cleaning database")
 
     # embed corpus
     if not corpus:
@@ -297,5 +303,5 @@ def test():
             print(f"Score: {doc['score']}")
             print(f"Source: {doc['source']}")
             print(f"Q: {doc['question']}")
-            print(f"A: {doc['answer']}")
+            print(f"A: {doc['content']}")
         print()

@@ -108,7 +108,7 @@ def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[R
         docs[result['query']] = []
         for doc in result['result']:
             confidence = max(confidence, doc['score'])
-            message += doc['question'] + " " + doc['answer'] + '\n'
+            message += doc['question'] + " " + doc['content'] + '\n'
             docs[result['query']].append(doc)
         # contexts.append({"role": "system", "content": message})
         confidences.append(confidence)
@@ -154,7 +154,7 @@ def test():
         for doc in docs[question]:
             print("confidence:", doc['score'])
             print(f"Q: {doc['question']}") 
-            print(f"A: {doc['answer']}")
+            print(f"A: {doc['content']}")
         print()
     print(response)
     print("confidence:", confidence)
@@ -172,7 +172,7 @@ def test():
         for doc in docs[question]:
             print("confidence:", doc['score'])
             print(f"Q: {doc['question']}") 
-            print(f"A: {doc['answer']}")
+            print(f"A: {doc['content']}")
         print()
     print(response)
     print("confidence:", confidence)
