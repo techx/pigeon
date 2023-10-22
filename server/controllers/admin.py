@@ -1,27 +1,8 @@
 from server import db
 from flask import request
 from apiflask import APIBlueprint
-#from server.utils import embed_text
 
 admin = APIBlueprint("admin", __name__, url_prefix='/admin', tag='Admin')
-
-class Document(db.Model):
-    __tablename__ = "Documents"
-
-    id = db.Column(db.Integer, primary_key = True)
-    question = db.Column(db.Text(), nullable = False)
-    label = db.Column(db.Text(), nullable = False)
-    content = db.Column(db.Text(), nullable = False)
-    source = db.Column(db.Text(), nullable = False)
-
-    def __init__(self, question, content, source, label):
-        self.question = question
-        self.content = content
-        self.source = source
-        self.label = label
-    
-    def map(self):
-        return {'id': self.id, 'question': self.question, 'content': self.content, 'source': self.source, 'label': self.label}
   
 @admin.route('/upload_document', methods=['POST'])
 def upload_text():
@@ -46,18 +27,17 @@ def delete_text():
     db.session.commit()
     return {'message': 'Document deleted'}
 
-@admin.route('/edit_document', methods=['POST'])
+@admin.route('/update_document', methods=['POST'])
 def update_text():
     data = request.form
     document = Document.query.get(data['id'])
     document.question = data['question']
-    document.label = data['label']
     document.content = data['content']
     document.source = data['source']
     db.session.commit()
-    return {'message': 'Document updated'}
+    return {'message', 'Document updated'}
 
 @admin.route('/get_documents', methods=['GET'])
 def get_all():
-    documents = Document.query.order_by(Document.id.desc()).all()
+    documents = Document.query.all()
     return [document.map() for document in documents]
