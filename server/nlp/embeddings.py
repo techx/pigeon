@@ -24,11 +24,20 @@ VECTOR_DIMENSION = 768
 # load redis client
 client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
+# load corpus
+# with open('corpus.json', 'r') as f:
+#     corpus = json.load(f)
+
 # load embedding model
 embedder = SentenceTransformer('msmarco-distilbert-base-v4')
 
-def load_corpus(corpus):
-    """ loads corpus.json into redis
+def load_corpus(corpus: list[dict]):
+    """ loads given corpus into redis
+
+    PARAMETERS
+    ----------
+    corpus : :obj:`list` of :obj:`dict`
+        list of documents, each represented by dictionary
 
     RAISES
     ------
@@ -102,9 +111,14 @@ def load_embeddings(embeddings : list[list[float]]):
     
     print("successfully loaded all embeddings")
 
-def create_index():
+def create_index(corpus_len : int):
     """ create search index in redis
     assumes that documents and embeddings have already been loaded into redis
+
+    PARAMETERS
+    ----------
+    corpus_len : :obj:`int`
+        number of documents in corpus
 
     RAISES
     ------
@@ -136,7 +150,7 @@ def create_index():
     if (res == "OK"):
         start = time.time()
         while(1):
-            if str(client.ft("idx:documents_vss").info()['num_docs']) == str(len(corpus)):
+            if str(client.ft("idx:documents_vss").info()['num_docs']) == str(corpus_len):
                 info = client.ft("idx:documents_vss").info()
                 num_docs = info["num_docs"]
                 indexing_failures = info["hash_indexing_failures"]
@@ -227,8 +241,13 @@ def query_all(k : int, questions : list[str]):
     redis_query = create_query(k)
     return queries(redis_query, questions)
 
-def embed_corpus(corpus : list[Document]):
-    """ load corpus, compute embeddings, load embeddings into redis    
+def embed_corpus(corpus : list[dict]):
+    """ load corpus, compute embeddings, load embeddings into redis   
+
+    PARAMETERS
+    ----------
+    corpus : :obj:`list` of :obj:`dict`
+        list of documents, each represented by dictionary
 
     RAISES
     ------
@@ -242,7 +261,7 @@ def embed_corpus(corpus : list[Document]):
     load_corpus(corpus)
     embeddings = compute_embeddings()
     load_embeddings(embeddings)
-    create_index()
+    create_index(len(corpus))
 
 def test():
     try:

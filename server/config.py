@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv(os.path.dirname(__file__) / Path('../../.env'))
+load_dotenv(os.path.dirname(__file__) / Path('../.env'))
 
 OpenAIMessage = dict[str, str]
 Document = dict[str, str]
