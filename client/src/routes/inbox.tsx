@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Accordion} from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Center, Flex, Modal, ThemeIcon, Progress, Accordion} from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -246,6 +246,7 @@ export default function InboxPage() {
     }
 
     const sourceList = sources.map((source) => {
+
         return (
             <div key={source.id} onClick={
                 () => {
@@ -275,7 +276,7 @@ export default function InboxPage() {
                         {threadList}
                     </Stack>
                 </Grid.Col>
-            <Grid.Col span={(sourceActive) ? 53 : 63} className={classes.thread}>
+            <Grid.Col span={(sourceActive) ? 58 : 68} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
                         <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
@@ -340,7 +341,7 @@ export default function InboxPage() {
                 )}
             </Grid.Col>
             {sourceActive && (
-                <Grid.Col span={30} className={classes.threads} >
+                <Grid.Col span={26} className={classes.threads} >
                     <Text className={classes.inboxText}>Sources</Text>
                     <Accordion chevronPosition="right" variant="contained">
                             {sourceList}

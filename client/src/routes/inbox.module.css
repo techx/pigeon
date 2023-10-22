@@ -135,8 +135,8 @@
 .confidence_red {
     border-left: 6px solid var(--mantine-color-red-6);
 }
-.confidence_orange {
-    border-left: 6px solid var(--mantine-color-orange-6);
+.confidence_green {
+    border-left: 6px solid var(--mantine-color-green-6);
 }
 .confidence_yellow {
     border-left: 6px solid var(--mantine-color-yellow-6);
