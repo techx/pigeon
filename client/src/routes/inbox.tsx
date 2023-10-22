@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress } from "@mantine/core";
+import { Box, Grid, Stack, Text, Title, Divider, Button, Group, Timeline, ScrollArea, Flex, Modal, ThemeIcon, Progress, Center } from "@mantine/core";
 import { useState, useEffect, useRef } from "react";
 import classes from './inbox.module.css';
 import { RichTextEditor } from '@mantine/tiptap';
@@ -70,9 +70,16 @@ export default function InboxPage() {
         const interval = setInterval(getThreads, 10000);
         return () => clearInterval(interval);
     }, []);
-    const strip: (text: String) => String = (text) =>{
+    const strip: (text: String) => String = (text) => {
         return text.replace(/(<([^>]+)>)/gi, "");
     }
+    const computeColor = (confidence : number | undefined) => {
+        if (!confidence) return 'rgba(255,0,0,1)'
+        const red = [255, 0, 0];
+        const green = [0, 255, 0];
+        return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
+    }
+
     const getResponse = () => {
         const formData = new FormData();
         formData.append('id', activeThread.emailList[activeThread.emailList.length-1].id.toString());
@@ -173,7 +180,7 @@ export default function InboxPage() {
     return (
         <Grid classNames={{inner: classes.grid_inner, root: classes.grid}} columns={100}>
             <Grid.Col span={25} className={classes.threads} >
-                <Text className={classes.inboxText}>Inbox</Text>
+                <Center className={classes.inboxText}>Inbox</Center>
                 <Stack gap={0} className={classes.threadList}>
                     {threadList}
                 </Stack>
@@ -181,7 +188,8 @@ export default function InboxPage() {
             <Grid.Col span={73} className={classes.thread}>
                 {active !== -1 && (
                     <Box>
-                        <Text className={classes.subjectText}>{activeThread.emailList[0].subject}</Text>
+                        <Center className={classes.subjectText}>{activeThread.emailList[0].subject}</Center>
+                        {/* <Stack className={classes.threadList}> */}
                         <ScrollArea className={classes.threadScroll} h={400} viewportRef={viewport}>
                             {/* TODO(azliu): make help@my.hackmit.org an environment variable */}
                             <Timeline active={Math.max(...activeThread.emailList.filter(email => email.sender === "help@my.hackmit.org").map(email => activeThread.emailList.indexOf(email)))}>
@@ -197,7 +205,7 @@ export default function InboxPage() {
                             {activeThread && !activeThread.resolved && <Group>
                                 <Text>Response Confidence</Text>
                                 <Progress.Root size={30} style={{width: "70%"}}>
-                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={response !== undefined && response.confidence > 0.6 ? "green" : "red"}>
+                                    <Progress.Section value={response === undefined || response.confidence < 0 ? 0: Math.round(response.confidence * 100)} color={computeColor(response?.confidence)}>
                                     <Progress.Label>{response === undefined || response.confidence < 0 ? "0": Math.round(response.confidence * 100)}%</Progress.Label>
                                     </Progress.Section>
                                 </Progress.Root>
@@ -238,6 +246,7 @@ export default function InboxPage() {
                                     <Button color="orange" onClick={open}>Show Sources</Button>
                                 </Group>
                             </Stack>
+                        {/* </Stack> */}
                     </Box>  
                 )}
             </Grid.Col>
