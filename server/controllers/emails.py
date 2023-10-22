@@ -93,7 +93,7 @@ def receive_email():
 
     if email is not None and thread is not None:
         openai_messages = thread_emails_to_openai_messages(thread.emails)
-        openai_res, documents, confidence = generate_response(email.body, openai_messages)
+        openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
         questions, document_ids, document_confidences = document_data(documents)
         db.session.add(email)
         db.session.commit()

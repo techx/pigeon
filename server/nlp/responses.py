@@ -8,13 +8,15 @@ openai.api_key = OPENAI_API_KEY
 
 MODEL = "gpt-3.5-turbo"
 
-def openai_response(thread: list[OpenAIMessage]) -> str:
+def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
     """generate a response from openai
 
     Parameters
     ----------
     thread: :obj:`list` of :obj:`OpenAIMessage`
         previous email thread
+    sender: :obj:`str`
+        hacker email address
 
     Returns
     -------
@@ -22,8 +24,9 @@ def openai_response(thread: list[OpenAIMessage]) -> str:
         email response
     """
 
-    messages = [{"role": "system", "content": "You are an organizer for HackMIT who is responding to an email from a participant. \
+    messages = [{"role": "system", "content": f"You are an organizer for HackMIT who is responding to an email from a participant. \
              Please write an email response to the participant. Begin the email with the header 'Dear [First Name]' where '[First Name]' is the participant's first name and end the email with the footer 'Best regards, The HackMIT Team'. \
+             The participant's email address is {sender}.\
              You receive documents to help you answer the email. Please do not include information that is not explicitly stated in the documents. If possible, keep responses brief."}]
     messages += thread
 
@@ -115,11 +118,13 @@ def generate_context(email : str) -> tuple[list[OpenAIMessage], dict[str, list[R
     contexts.append({"role": "system", "content": message})
     return contexts, docs, confidence_metric(confidences)
 
-def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[str, dict[str, list[RedisDocument]], float]:
+def generate_response(sender: str, email : str, thread : list[OpenAIMessage] = []) -> tuple[str, dict[str, list[RedisDocument]], float]:
     """generate response to email
 
     Parameters
     ----------
+    sender: :obj:`str`
+        hacker email address
     email: :obj:`str`
         newest incoming hacker email
     thread : :obj:`list` of :obj:`OpenAIMessage`, optional
@@ -141,7 +146,7 @@ def generate_response(email : str, thread : list[OpenAIMessage] = []) -> tuple[s
     # generate new response
     thread.append({"role": "user", "content": email})
     thread += contexts
-    return openai_response(thread), docs, confidence
+    return openai_response(thread, sender), docs, confidence
 
 def test():
     thread = []
