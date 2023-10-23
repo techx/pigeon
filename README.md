@@ -57,7 +57,7 @@ pigeon/
     │   ├── response.py
     │   └── thread.py
     └── nlp
-        ├── corpus.json
+        ├── corpus_harvard.json
         ├── corpus_mit.json
         ├── embeddings.json
         ├── embeddings.py
