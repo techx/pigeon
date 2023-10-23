@@ -15,9 +15,7 @@ import Shell from "./components/shell";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route
-      element={<Shell />}
-    >
+    <Route element={<Shell />}>
       <Route index path="/" element={<IndexPage />} />
       <Route index path="/inbox" element={<InboxPage />} />
       <Route index path="/documents" element={<DocumentsPage />} />

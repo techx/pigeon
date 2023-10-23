@@ -1,26 +1,26 @@
 .row:hover {
-    background-color: var(--mantine-color-gray-0); 
+  background-color: var(--mantine-color-gray-0);
 }
 
 .selected {
-    background-color: var(--mantine-primary-color-light-hover);
+  background-color: var(--mantine-primary-color-light-hover);
 }
 
 .selected:hover {
-    background-color: var(--mantine-primary-color-light-hover);
+  background-color: var(--mantine-primary-color-light-hover);
 }
 
 .title {
-    padding-top: 1vh;
-    padding-bottom: 1vh;
-    font-size: 5vh;
-    text-align: center;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  font-size: 5vh;
+  text-align: center;
 }
 
 .search {
-    margin-bottom: 2vh;
+  margin-bottom: 2vh;
 }
 
 .stack {
-    padding-bottom: 5vh;
+  padding-bottom: 5vh;
 }
