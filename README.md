@@ -44,10 +44,8 @@ pigeon/
 │   │   ├── shell.tsx
 │   │   └── vite-env.d.ts
 └── server
-    ├── __init__.py
     ├── config.py
     ├── controllers
-    │   ├── __init__.py
     │   ├── admin.py
     │   ├── emails.py
     │   └── faq.py
@@ -59,7 +57,6 @@ pigeon/
     │   ├── response.py
     │   └── thread.py
     └── nlp
-        ├── __init__.py
         ├── corpus.json
         ├── corpus_mit.json
         ├── embeddings.json
@@ -126,8 +123,8 @@ to close all open Pigeon containers.
 
 All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/). 
 
-[Insert setup instructions here.]
+[Insert setup instructions.]
 
 ## Development
 
-[Insert development notes here.]
+[Insert development notes.]
