@@ -10,7 +10,8 @@ RedisDocument = dict[str, str]
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:2003")
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2000")
 ALLOWED_DOMAINS = [FRONTEND_URL]
-SQLALCHEMY_DATABASE_URI = "postgresql://localhost/pigeon"
+SQLALCHEMY_DATABASE_URI = os.environ.get(
+    "DATABASE_URL", "postgresql://postgres:password@postgresdb/pigeondb")
 
 FLASK_RUN_PORT = 2000
 DEBUG = True

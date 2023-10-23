@@ -1,0 +1,12 @@
+FROM python:3.11
+
+WORKDIR /home/pigeon
+
+COPY requirements.txt .
+COPY .env .
+RUN pip install -r requirements.txt
+
+COPY server/ server/
+
+EXPOSE 2000
+CMD python wsgi.py

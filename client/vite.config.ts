@@ -10,9 +10,10 @@ export default defineConfig(({ command, mode }) => {
     envPrefix: "pigeon",
     server: {
       port: 5173,
+      host: true,
       proxy: {
         "/api": {
-          target: env.BACKEND_URL,
+          target: env.BACKEND_URL_DOCKER,
           changeOrigin: true,
         },
       },

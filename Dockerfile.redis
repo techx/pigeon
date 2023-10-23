@@ -1,0 +1,6 @@
+FROM redis/redis-stack-server:latest
+
+WORKDIR /home/pigeon
+
+EXPOSE 6379
+CMD redis-stack-server
