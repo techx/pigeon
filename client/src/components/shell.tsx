@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AppShell, NavLink, Space, Text, Anchor } from "@mantine/core";
+import { AppShell, NavLink, Text, Anchor } from "@mantine/core";
 import { IconInbox, IconBook } from "@tabler/icons-react";
 const data = [
   { label: "Pigeon", img: "./pigeon.png" },

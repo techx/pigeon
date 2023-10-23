@@ -4,13 +4,10 @@ import {
   Textarea,
   TextInput,
   Button,
-  Title,
-  Card,
   Text,
   Group,
   Stack,
   ScrollArea,
-  Box,
   Table,
   FileButton,
 } from "@mantine/core";
@@ -74,7 +71,7 @@ export default function DocumentsPage() {
       });
       return;
     }
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append("file", file);
     console.log(formData);
     fetch("/api/admin/upload_json", {
@@ -110,7 +107,7 @@ export default function DocumentsPage() {
       return;
     }
 
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append("question", question);
     formData.append("content", content);
     formData.append("source", source);
@@ -149,7 +146,7 @@ export default function DocumentsPage() {
       return;
     }
 
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append("id", id.toString());
     formData.append("question", question);
     formData.append("content", content);
@@ -180,7 +177,7 @@ export default function DocumentsPage() {
 
   const deleteDocument = (id: number) => {
     notifications.clean();
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append("id", id.toString());
     fetch("/api/admin/delete_document", {
       method: "POST",

@@ -123,7 +123,13 @@ to close all open Pigeon containers.
 
 All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/). 
 
-[Insert setup instructions.]
+In order to setup mail forwarding locally, you must expose the backend to the internet with `ngrok`. If you don't have `ngrok` installed, you can view instructions for diffenerent operating systems [here](https://ngrok.com/download). Then run
+
+```sh
+ngrok http 2000
+```
+
+to generate an `ngrok` link that exposes port 2000 to the internet. Then under the `Receiving` tab in the Mailgun dashboard, edit the route that matches the current email address and append your `ngrok` with the endpoint `/api/emails/receive_mail` to the list of forwarding URLs. The URL wil look like  `https://[hash].ngrok-free.app/api/emails/receive_email`.
 
 ## Development
 

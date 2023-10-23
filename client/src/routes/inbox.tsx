@@ -10,7 +10,6 @@ import {
   Timeline,
   ScrollArea,
   Flex,
-  Anchor,
   ThemeIcon,
   Progress,
   Accordion,
@@ -107,7 +106,7 @@ export default function InboxPage() {
     const interval = setInterval(getThreads, 10000);
     return () => clearInterval(interval);
   }, []);
-  const strip: (text: String) => String = (text) => {
+  const strip: (text: string) => string = (text) => {
     return text.replace(/(<([^>]+)>)/gi, "");
   };
   const computeColor = (confidence: number | undefined) => {
@@ -264,7 +263,7 @@ export default function InboxPage() {
     }
   }, [active, threads]);
 
-  const cmpDate: (a: String, b: String) => number = (a, b) => {
+  const cmpDate: (a: string, b: string) => number = (a, b) => {
     const d1 = new Date(a as string | number | Date);
     const d2 = new Date(b as string | number | Date);
     return d1.getTime() < d2.getTime() ? 1 : -1;
