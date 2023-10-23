@@ -4,7 +4,7 @@ class Email(db.Model):
     __tablename__ = "Emails"
 
     id = db.Column(db.Integer, primary_key = True)
-    date = db.Column(db.DateTime)
+    date = db.Column(db.DateTime) # DATE IN UTC
     sender = db.Column(db.Text(), nullable = False)
     subject = db.Column(db.String(100), nullable = False)
     body = db.Column(db.Text(), nullable = True)

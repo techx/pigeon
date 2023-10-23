@@ -13,13 +13,6 @@ admin = APIBlueprint("admin", __name__, url_prefix='/admin', tag='Admin')
 @admin.route('/upload_document', methods=['POST'])
 def upload_text():
     data = request.form
-    # label = data['label']
-    # content = data['content']
-    # embedding = embed_text(content)
-    # pipe = client.pipeline()
-    # pipe.hset(f"document: {label}, index: {random.randint(0, 10**5)}", mapping={"vector": embedding.tobytes(), "content": content})
-    # pipe.execute()
-
     document = Document(data['question'], data['content'], data['source'], data['label'])
     db.session.add(document)
     db.session.commit()

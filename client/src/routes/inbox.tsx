@@ -87,15 +87,16 @@ export default function InboxPage() {
         const green = [0, 255, 0];
         return `rgba(${red[0] + confidence * (green[0] - red[0])}, ${red[1] + confidence * (green[1] - red[1])}, ${red[2] + confidence * (green[2] - red[2])})`
     }
+
+    // dates are stored in UTC in server. display ET on client
     const parseDate = (date : string) => {
-        console.log(date);
         const d = new Date(date);
-        if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString();
-        else return d.toLocaleDateString();
+        if (d.getDay() === new Date().getDay()) return d.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
+        else return d.toLocaleDateString('en-US', { timeZone: 'America/New_York' });
     }
     const parseFullDate = (date : string) => {
         const d = new Date(date);
-        return d.toLocaleString();
+        return d.toLocaleString('en-US', { timeZone: 'America/New_York' });
     }
 
     const getResponse = () => {
@@ -218,11 +219,17 @@ export default function InboxPage() {
         }
     }, [active, threads])
 
+    const cmpDate : (a : String, b : String) => number = (a, b) => {
+        const d1 = new Date((a as string | number | Date));
+        const d2 = new Date((b as string | number | Date));
+        return d1.getTime() < d2.getTime() ? 1 : -1;
+    }
+
     const sortThreads : (a : Thread, b : Thread) => number = (a, b) => {
         if (a.resolved && !b.resolved) return 1;
         if (!a.resolved && b.resolved) return -1;
         if (a.emailList.length > 0 && b.emailList.length > 0 && a.emailList[a.emailList.length-1] && a.emailList[a.emailList.length-1].date && b.emailList[b.emailList.length-1] && b.emailList[b.emailList.length-1].date)
-            return (a.emailList[a.emailList.length-1].date < b.emailList[b.emailList.length-1].date) ? 1 : -1;
+            return cmpDate(a.emailList[a.emailList.length-1].date, b.emailList[b.emailList.length-1].date)
         else return -1;
     }
 

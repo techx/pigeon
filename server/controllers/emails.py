@@ -13,8 +13,7 @@ from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
 from server.nlp.responses import generate_response
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
+from datetime import datetime
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f'{cwd}/../email_template']))
@@ -85,14 +84,13 @@ def receive_email():
         if data["sender"] != MAIL_USERNAME and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
-                email = Email(datetime.now(ZoneInfo("America/New_York")), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
+                email = Email(datetime.utcnow(), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
     else:
         # new email, create new thread
         thread = Thread()
         db.session.add(thread)
         db.session.commit()
-        email = Email(datetime.now(ZoneInfo("America/New_York")), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
-    print(email.date)
+        email = Email(datetime.utcnow(), data["From"], data["Subject"], data["stripped-text"], data["stripped-html"], data["Message-Id"], False, thread.id)
     if email is not None and thread is not None:
         openai_messages = thread_emails_to_openai_messages(thread.emails)
         openai_res, documents, confidence = generate_response(email.sender, email.body, openai_messages)
@@ -132,8 +130,7 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, 'HTML'))
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
-    reply_email = Email(datetime.now(ZoneInfo("America/New_York")), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
-    print(reply_email.date)
+    reply_email = Email(datetime.utcnow(), MAIL_SENDER_TAG, reply_to_email.subject, clean_text, data["body"], message_id, True, thread.id)
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id
