@@ -1,4 +1,4 @@
-# pigeon
+<h1 align="center">Pigeon</h1>
 
 <div align="center">
 	<a href="#overview">Overview</a>
@@ -127,3 +127,7 @@ to close all open Pigeon containers.
 All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/). 
 
 [Insert setup instructions here.]
+
+## Development
+
+[Insert development notes here.]
