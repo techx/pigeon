@@ -245,12 +245,12 @@ export default function DocumentsPage() {
                 </ScrollArea>
             <Stack className={classes.stack}>
                 <Group grow>
-                    <TextInput required value={label} onChange={(e) => setLabel(e.target.value)} label="Label" />
-                    <TextInput value={question} onChange={(e) => setQuestion(e.target.value)} label="Question (optional)"/>
+                    <TextInput required value={label} placeholder="Shower"onChange={(e) => setLabel(e.target.value)} label="Label" />
+                    <TextInput value={question} placeholder="Can we shower at HackMIT?" onChange={(e) => setQuestion(e.target.value)} label="Question (optional)"/>
                 </Group>
                 
-                <Textarea required value={content} onChange={(e) => setContent(e.target.value)} minRows={2} autosize label="Content"/>
-                <TextInput required value={source} onChange={(e) => setSource(e.target.value)} label="Source" />
+                <Textarea required value={content} placeholder="The HackMIT venue will not have showering facilities available for hackers to use." onChange={(e) => setContent(e.target.value)} minRows={2} autosize label="Content"/>
+                <TextInput required value={source} placeholder="https://hackmit.org/" onChange={(e) => setSource(e.target.value)} label="Source" />
                 <Group>
                     {active === -1 ? (<Button onClick={() => uploadDocument()}>Upload New Document</Button>) : (<Button onClick={() => editDocument(active)}>Edit Document</Button>)}
                     {active === -1 ? (<FileButton onChange={(file) => uploadJSON(file) } accept="file/json">{(props) => <Button {...props} color="green">Upload JSON</Button>}</FileButton>) : (<Button color="red" onClick={() => deleteDocument(active)}>Delete Document</Button>) }
