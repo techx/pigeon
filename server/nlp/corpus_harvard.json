@@ -1,266 +1,266 @@
 [
-    {
-        "source": "hacker guide",
-        "question": "What are the major events at HackHarvard? When are the opening and closing ceremonies?",
-        "content": "Opening ceremony will be at 7pm on Friday, October 20th. Closing ceremony ends at 1pm on Sunday October 22nd",
-        "label": "Event Schedule"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What time should I plan to arrive?",
-        "content": "Check-in will be from 4-7pm on Friday, October 20th. If you need to check in late, email team@hackharvard.io",
-        "label": "Arrival Information"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "can I arrive late?",
-        "content": "you are allowed to arrive late. Find the staff member at the help desk when you arrive, and they will check you in. Note that you will have reduced hacking time.",
-        "label": "Late Arrival Policy"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "will we be able to sleep at hackharvard",
-        "content": "Yes, quiet areas have been designated for sleeping. Bring your own sleeping bag. Also, there may be residual light/sound from nearby, so bring earplugs or eye masks as needed.",
-        "label": "Sleeping Arrangements"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "Do I need to bring my own sleeping bag?",
-        "content": "Yes, we have very limited supplies of sleep-related items. Plan to bring your own.",
-        "label": "Sleeping Supplies"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "Will there be showers?",
-        "content": "Unfortunately our venue has no showers.",
-        "label": "No Shower Facilities"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "Where is the venue?",
-        "content": "According to the Hacker Guide, HackHarvard will be held at the Science and Engineering Complex (150 Western Ave. Boston, MA 02134, USA)",
-        "label": "Venue Location"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "I'm driving, where can I park?",
-        "content": "Overnight parking can be bought at the Harvard Business School (HBS) Parking Lot. It's a 5-minute walk from the venue. Information here: https://www.transportation.harvard.edu/parking/daily-permits/harvard-business-school-lot . Buy passes in person at the parking lot - you should see a small building before a gate to the parking lot.",
-        "label": "Parking Information"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "I'm flying in, how can I get to the venue?",
-        "content": "Ubering or using a rideshare app is the fastest, most direct way. Otherwise, you can use public transport. A suggested path is riding the silver line (bus, stops directly at the airport), then switching to the red line (subway), then either switching to a bus at the Central stop or walking from the Harvard stop (~20 minutes). Please consult Google Maps for the best path for your situation.",
-        "label": "Travel Options"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What time should I plan to leave?",
-        "content": "If you are flying back home after the hackathon, we recommend booking a flight that is at least after 4 pm on Sunday.",
-        "label": "Departure Time"
-    },
-    {
-        "source": "hackharvard discord",
-        "question": "Are you taking walk-ins/can we sub in a member of our team?",
-        "content": "Unfortunately hackers are admitted individually, not in teams, so you cannot substitute in a member. We have reached capacity, so we are not taking walk-ins.",
-        "label": "Team Substitution"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Where is the hackathon held this year?",
-        "content": "HackHarvard will be held in the Science and Engineering Complex (SEC), located at 150 Western Ave, Boston, MA 02134.",
-        "label": "Venue Location"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What materials and items should I bring?",
-        "content": "Everyone is required to bring a Laptop + charger, an ID, and a phone to be able to access HackHarvard portal to check-in and phone charger. It is also highly recommended to bring spare clothes, a water bottle, a sleeping bag, and other toiletries.",
-        "label": "Required Items"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Will hardware projects be offered this year?",
-        "content": "Hardware projects are allowed, but you will need to bring your own hardware if you intend to use any (we ARE NOT providing hardware this year)",
-        "label": "Hardware Projects"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "What is the Efficiency Boosters track?",
-        "content": "Efficiency fuels progress in our fast-paced world. If you're a problem solver with a passion for streamlining processes and maximizing productivity, then the Efficiency Boosters track is the perfect platform for you. Join forces with like-minded individuals to develop innovative solutions that optimize workflows, enhance resource management, and boost overall efficiency across various domains. Your ingenuity could revolutionize industries, so let's hack for a more efficient future! Guiding questions Where can we identify bottlenecks or inefficiencies in various industries and processes?\n- How can automation and artificial intelligence be leveraged to streamline workflows?\n- Are there opportunities to optimize resource allocation and reduce waste?\n- What tools and technologies can enhance project management and task coordination?\n- How can we improve energy efficiency and reduce environmental impact through innovation?\n- What solutions can boost productivity and reduce downtime in manufacturing or services?\n- Are there untapped opportunities to make complex systems more user-friendly and efficient?\n\nPrizes\n- Portable chargers!",
-        "label": "Efficiency Solutions"
-    },
-    {
-        "source": "hacker guide",
-        "question": "How can I meet and communicate with hackers and staff?",
-        "content": "Discord is the hub of HackHarvard. In our Discord server, you can interact with other hackers, mentors, sponsors, and staff.",
-        "label": "Communication Hub"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "What is the Health and Fitness track (sponsored by Terra API)?",
-        "content": "Here’s a description of the Health and Fitness (Sponsored by Terra API) track: Are you ready to reshape the future of well-being?\nJoin us in this exhilarating hackathon and empower your innovative spirit! Dive into the world of health and fitness technology, where you'll craft groundbreaking solutions that transform the way we monitor, motivate, and maintain our physical and mental health.\n\nChallenge: Innovate technology that empowers individuals to lead healthier and fitter lives, enhancing their well-being journey, and breaking the barriers to optimal health.\n\nGuiding questions\n- How can technology be harnessed to promote healthier lifestyles and well-being?\n- What innovative solutions can improve access to healthcare for underserved communities?\n- How might wearable technology and data analytics enhance fitness routines and health monitoring?\n- Are there ways to leverage AI and telemedicine to revolutionize healthcare delivery?\n- What opportunities exist for addressing mental health challenges through technology?\n- Can we create tools to encourage healthier eating habits and nutrition choices?\n- How can we use technology to motivate and engage individuals in fitness and wellness programs?\n\nPrizes\n- Invitation to interview for a position in Terra.\n- Garmin Venus 2 Watches!",
-        "label": "Health Innovations"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "What is the Earth and Space track?",
-        "content": "Here’s a description of the Earth and Space track: Embark on a journey beyond our planet and explore the vastness of both Earth and Space in this hackathon track. From addressing environmental challenges on our home planet to pioneering new frontiers in space exploration, this track welcomes visionaries and problem solvers who are eager to make a significant impact on our world, both near and far. Whether you're interested in climate solutions, space technology, or protecting our planet, this hackathon is your launchpad to innovation.\n\nGuiding questions\n- What technologies can help mitigate the effects of climate change and protect the environment?\n- How can we use space technology to monitor and address environmental issues on Earth?\n- What innovations can improve sustainable agriculture and resource management?\n- Are there opportunities to advance space exploration and colonization efforts?\n- How can space technology benefit life on Earth, from communications to resource utilization?\n- What solutions can address space debris and ensure the long-term sustainability of space activities?\n- How can we harness Earth and space data for scientific research and global benefit?\n\nPrizes\n- Drones!",
-        "label": "Space Exploration"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "What is the So You Think You Can Do It Better track?",
-        "content": "Here’s a description of the So You Think You Can Do It Better track: Do you believe you can take existing products, services, or systems and make them infinitely better? If you're an advocate for improving the status quo and have innovative ideas to disrupt industries, this is your chance to shine. In the 'So You Think You Can Do It Better' Hackathon, you'll challenge the conventional and reimagine how things can be done. From upgrading everyday apps to reinventing established processes, bring your game-changing ideas to the table and prove that you can indeed do it better!\n\nGuiding questions\n- What existing products, services, or processes are ready for enhancement or transformation?\n- How can we make everyday tasks and experiences more efficient, user-friendly, or cost-effective?\n- What industries could benefit from a complete overhaul or innovative rethinking?\n- Are there areas where simplification or consolidation could lead to better outcomes?\n- How can we address pain points and inefficiencies in current systems or technologies?\n- What are the most pressing issues where doing things better would have the greatest impact?\n- Can we reimagine traditional business models or approaches to create more value?\n\nPrizes\n- Hydroflasks!",
-        "label": "Innovative Solutions"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Where can I find parking?",
-        "content": "Parking is available at the Harvard Business School Parking lot, a 5-minute walk away from the venue. Find information here: https://www.transportation.harvard.edu/parking/daily-permits/harvard-business-school-lot",
-        "label": "Parking Information"
-    },
-    {
-        "source": "hacker guide",
-        "question": "How many people can be on a team?",
-        "content": "Team size can be no more than 4 people. You can also submit a project by yourself.",
-        "label": "Team Size"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What are the guidelines for the project?",
-        "content": "All submitted projects must have been started and finished between 8 pm ET 10/20 and 8 am ET 10/22. Additional rules can be found on the Devpost at this link: https://hackharvard-2023.devpost.com/",
-        "label": "Project Guidelines"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Can I use my project for or from another hackathon?",
-        "content": "You cannot submit your project cross-hackathon. That is, to be eligible for a HackHarvard prize, you cannot submit your same project to multiple hackathons.",
-        "label": "Project Usage"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Will I need to demonstrate my project in front of judges?",
-        "content": "You must do a live-demo of your project in our judging space. Uploading an additional link to a video demoing your project under 3 minutes is optional, but recommended.",
-        "label": "Project Demonstration"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Can I use code that I have written before for my project?",
-        "content": "You may not start coding on your project until after the opening ceremony, but coming up with an idea before the hackathon is allowed. If you are going to reuse significant amounts of code, you must in your demo/video clearly show how you have added value to it,",
-        "label": "Code Reuse Policy"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What if I don’t have a team?",
-        "content": "If you don't already have a team coming into HackHarvard, don't worry! We have many resources and events available for you to find teammates. Join our #team-formation Discord channel to find a team or simply network with other people. Feel free to send out an introduction about yourself and what you are interested in working on during the hackathon to find others with similar interests.",
-        "label": "Team Formation"
-    },
-    {
-        "source": "hacker guide",
-        "question": "How do I register my team?",
-        "content": "To register your team, you should do so through Devpost at this link: https://hackharvard-2023.devpost.com/",
-        "label": "Team Registration"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What are the rules for project submission?",
-        "content": "You must submit a link to a public GitHub repo that was created during the dates of Oct 20-22. You must prepare for a live presentation of your project on October 22nd during your judging round. You will have 3 minutes for your live presentation. You can (optional) submit a link to a video demoing your project in under 3 minutes. Also, please select the appropriate tracks and prizes your project is competing for on Devpost.",
-        "label": "Project Submission Rules"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What is a demonstration video?",
-        "content": "You can submit a 3-minute (max) length demo video of your hack on Devpost if you believe it will help judges understand your project. Please remember to leave time to upload your video to YouTube/any other platform and add the link to your video to your Devpost submission. Successful demo videos should clearly indicate the problem your hack attempts to solve and a walkthrough of your hack's functionality.",
-        "label": "Demonstration Video"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Will there be tracks to submit a project to, and what are they?",
-        "content": "HackHarvard has 4 specific tracks you can enter to be eligible for track-specific prizes. These will be unveiled once the hackathon begins. You can only submit to 1 of these tracks or no track at all. If you choose not to submit to a track, you will not be eligible to win any track-specific prizes. Please follow the instructions on Devpost for submitting a project. If you would like to enter your project in 1 of our 4 tracks, clearly indicate on Devpost that you would like to be considered for your track's prize. The four tracks are Health and Fitness, Earth and Space, So You Think You Can Do It Better, and Efficiency Boosters.",
-        "label": "Hackathon Tracks"
-    },
-    {
-        "source": "hacker guide",
-        "question": "How can I make sure I am eligible for a prize?",
-        "content": "To be eligible for our other opt-in prizes, please also clearly indicate that you are opting in for these prizes when you submit your project on Devpost. We reserve the right to revoke prize eligibility.",
-        "label": "Prize Eligibility"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What is the judging schedule?",
-        "content": "All projects must be submitted to the Devpost by 8 am Sunday October 22nd ET. Live judging will begin at 8:30 am ET and end at 11:30 am ET. Take care to note which Judging Round you are assigned to! Expo judging will be at 8:30 AM on Sunday. Each team will be assigned a table, and judges will come to your table and ask you about your project. Some teams may be selected for panel judging where you present in front of a panel of judges. Not getting selected for panel judging is NOT an indication of your not winning. Being selected for panel judging is simply an indication that not enough of the panel judges have not seen your projects and no one was able to vouch for your team directly.",
-        "label": "Judging Schedule"
-    },
-    {
-        "source": "hacker guide",
-        "question": "What is the criteria that projects are judged on?",
-        "content": "All projects will be judged based on four criteria. Each category is weighted the same, but a bias in the following listed order will be used to break ties. The categories are Innovation, Creativity and Impact, Technical Complexity, Functionality and Usability,  and Teamwork and Collaboration and Learning",
-        "label": "Judging Criteria"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Does HackHarvard have a code of conduct?",
-        "content": "By attending this event via any and all of our platforms (Discord, Zoom, etc.), you are hereby accepting to abide by all policies as outlined in the MLH Code of Conduct. By turning on your video/audio in any HackHarvard official event, you hereby consent to and waive any claims to the reproduction and usage of the video content.",
-        "label": "Code of Conduct"
-    },
-    {
-        "source": "hacker guide",
-        "question": "Is there an FAQ that I can use if I have any questions?",
-        "content": "You can find lots of useful information in the Hacker Guide. Be sure to take a look at it before hacking!",
-        "label": "FAQ Resource"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "When is check-in?",
-        "content": "Check-in is on Friday, October 20 from 4 PM to 7 PM",
-        "label": "Check-In Time"
-    },
-    {
-        "source": "dayof.hackharvard.io",
-        "question": "Who are the speakers for the event?",
-        "content": "RICHARD STALLMAN, Software Engineer & Activist: Richard Stallman is an American free software movement activist and programmer. He campaigns for software to be distributed in such a manner that its users have the freedom to use, study, distribute, and modify that software HUSAIN AL-MOHSENN, Director of AI, Walmart: Husain Al-Mohsenn is Director of AI at Walmart/Alert Innovation. He prides himself in mastering the trade-offs needed to build software and data-driven systems that deliver value, quickly, accurately and with minimal complexity.",
-        "label": "Event Speakers"
-    },
-    {
-        "source": "https://hackharvard-2023.devpost.com/",
-        "question": "who can participate in hackharvard?",
-        "content": "HackHarvard is for college students only. All participants must be 18 years or older.",
-        "label": "Eligible Participants"
-    },
-    {
-        "source": "https://hackharvard-2023.devpost.com/",
-        "question": "",
-        "content": "Welcome to HackHarvard 2023! Join us for the eighth iteration of HackHarvard, a completely free 36-hour hackathon hosted by Harvard University students. For more information, check out our website: https://hackharvard.io/",
-        "label": "Welcome Message"
-    },
-    {
-        "source": "https://hackharvard-2023.devpost.com/",
-        "question": "How can we participate and receive prizes?",
-        "content": "In order to participate and be eligible for prizes, you must have applied through our application form and have received an acceptance/confirmation email from us.",
-        "label": "Participation and Prizes"
-    },
-    {
-        "source": "https://hackharvard-2023.devpost.com/",
-        "question": "When are submissions due?",
-        "content": "All submissions are due here on Devpost 8AM ET, Sunday October 22nd. Also, you must fill out the presubmission form due Saturday at midnight to be eligible for prizes with the following link: https://forms.gle/Nf8mEM3WESY3aCME8",
-        "label": "Submission Deadlines"
-    },
-    {
-        "source": "https://hackharvard-2023.devpost.com/",
-        "question": "Who can I contact for general inquiries?",
-        "content": "You can email team@hackharvard.io with any questions or concerns.",
-        "label": "Contact Information"
-    },
- {
-        "source": "https://dayof.hackharvard.io/",
-        "question": "What challenges can I submit to?",
-        "content": "There are many challenges you can submit to. The sponsor challenges are: Terra API, BGP Group, Nucleus Genomics, CareYaya Health Technologies, MathWorks, Google Cloud, GitHub, GoDaddy, MATLAB, Fidelity, Circle, and Redis Cloud.",
-        "label": "Sponsor Challenges"
-    },
-{
-        "source": "https://dayof.hackharvard.io/",
-        "question": "Where can I find the event schedule for HackHarvard?",
-        "content": "The event schedule for HackHarvard is located on our day-of site at https://dayof.hackharvard.io/. You can also ask HackHarvard staff or email team@hackharvard.io with any questions or concerns.",
-        "label": "Event Schedule"
-    }
+  {
+    "source": "hacker guide",
+    "question": "What are the major events at HackHarvard? When are the opening and closing ceremonies?",
+    "content": "Opening ceremony will be at 7pm on Friday, October 20th. Closing ceremony ends at 1pm on Sunday October 22nd",
+    "label": "Event Schedule"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What time should I plan to arrive?",
+    "content": "Check-in will be from 4-7pm on Friday, October 20th. If you need to check in late, email team@hackharvard.io",
+    "label": "Arrival Information"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "can I arrive late?",
+    "content": "you are allowed to arrive late. Find the staff member at the help desk when you arrive, and they will check you in. Note that you will have reduced hacking time.",
+    "label": "Late Arrival Policy"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "will we be able to sleep at hackharvard",
+    "content": "Yes, quiet areas have been designated for sleeping. Bring your own sleeping bag. Also, there may be residual light/sound from nearby, so bring earplugs or eye masks as needed.",
+    "label": "Sleeping Arrangements"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "Do I need to bring my own sleeping bag?",
+    "content": "Yes, we have very limited supplies of sleep-related items. Plan to bring your own.",
+    "label": "Sleeping Supplies"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "Will there be showers?",
+    "content": "Unfortunately our venue has no showers.",
+    "label": "No Shower Facilities"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "Where is the venue?",
+    "content": "According to the Hacker Guide, HackHarvard will be held at the Science and Engineering Complex (150 Western Ave. Boston, MA 02134, USA)",
+    "label": "Venue Location"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "I'm driving, where can I park?",
+    "content": "Overnight parking can be bought at the Harvard Business School (HBS) Parking Lot. It's a 5-minute walk from the venue. Information here: https://www.transportation.harvard.edu/parking/daily-permits/harvard-business-school-lot . Buy passes in person at the parking lot - you should see a small building before a gate to the parking lot.",
+    "label": "Parking Information"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "I'm flying in, how can I get to the venue?",
+    "content": "Ubering or using a rideshare app is the fastest, most direct way. Otherwise, you can use public transport. A suggested path is riding the silver line (bus, stops directly at the airport), then switching to the red line (subway), then either switching to a bus at the Central stop or walking from the Harvard stop (~20 minutes). Please consult Google Maps for the best path for your situation.",
+    "label": "Travel Options"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What time should I plan to leave?",
+    "content": "If you are flying back home after the hackathon, we recommend booking a flight that is at least after 4 pm on Sunday.",
+    "label": "Departure Time"
+  },
+  {
+    "source": "hackharvard discord",
+    "question": "Are you taking walk-ins/can we sub in a member of our team?",
+    "content": "Unfortunately hackers are admitted individually, not in teams, so you cannot substitute in a member. We have reached capacity, so we are not taking walk-ins.",
+    "label": "Team Substitution"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Where is the hackathon held this year?",
+    "content": "HackHarvard will be held in the Science and Engineering Complex (SEC), located at 150 Western Ave, Boston, MA 02134.",
+    "label": "Venue Location"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What materials and items should I bring?",
+    "content": "Everyone is required to bring a Laptop + charger, an ID, and a phone to be able to access HackHarvard portal to check-in and phone charger. It is also highly recommended to bring spare clothes, a water bottle, a sleeping bag, and other toiletries.",
+    "label": "Required Items"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Will hardware projects be offered this year?",
+    "content": "Hardware projects are allowed, but you will need to bring your own hardware if you intend to use any (we ARE NOT providing hardware this year)",
+    "label": "Hardware Projects"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "What is the Efficiency Boosters track?",
+    "content": "Efficiency fuels progress in our fast-paced world. If you're a problem solver with a passion for streamlining processes and maximizing productivity, then the Efficiency Boosters track is the perfect platform for you. Join forces with like-minded individuals to develop innovative solutions that optimize workflows, enhance resource management, and boost overall efficiency across various domains. Your ingenuity could revolutionize industries, so let's hack for a more efficient future! Guiding questions Where can we identify bottlenecks or inefficiencies in various industries and processes?\n- How can automation and artificial intelligence be leveraged to streamline workflows?\n- Are there opportunities to optimize resource allocation and reduce waste?\n- What tools and technologies can enhance project management and task coordination?\n- How can we improve energy efficiency and reduce environmental impact through innovation?\n- What solutions can boost productivity and reduce downtime in manufacturing or services?\n- Are there untapped opportunities to make complex systems more user-friendly and efficient?\n\nPrizes\n- Portable chargers!",
+    "label": "Efficiency Solutions"
+  },
+  {
+    "source": "hacker guide",
+    "question": "How can I meet and communicate with hackers and staff?",
+    "content": "Discord is the hub of HackHarvard. In our Discord server, you can interact with other hackers, mentors, sponsors, and staff.",
+    "label": "Communication Hub"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "What is the Health and Fitness track (sponsored by Terra API)?",
+    "content": "Here’s a description of the Health and Fitness (Sponsored by Terra API) track: Are you ready to reshape the future of well-being?\nJoin us in this exhilarating hackathon and empower your innovative spirit! Dive into the world of health and fitness technology, where you'll craft groundbreaking solutions that transform the way we monitor, motivate, and maintain our physical and mental health.\n\nChallenge: Innovate technology that empowers individuals to lead healthier and fitter lives, enhancing their well-being journey, and breaking the barriers to optimal health.\n\nGuiding questions\n- How can technology be harnessed to promote healthier lifestyles and well-being?\n- What innovative solutions can improve access to healthcare for underserved communities?\n- How might wearable technology and data analytics enhance fitness routines and health monitoring?\n- Are there ways to leverage AI and telemedicine to revolutionize healthcare delivery?\n- What opportunities exist for addressing mental health challenges through technology?\n- Can we create tools to encourage healthier eating habits and nutrition choices?\n- How can we use technology to motivate and engage individuals in fitness and wellness programs?\n\nPrizes\n- Invitation to interview for a position in Terra.\n- Garmin Venus 2 Watches!",
+    "label": "Health Innovations"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "What is the Earth and Space track?",
+    "content": "Here’s a description of the Earth and Space track: Embark on a journey beyond our planet and explore the vastness of both Earth and Space in this hackathon track. From addressing environmental challenges on our home planet to pioneering new frontiers in space exploration, this track welcomes visionaries and problem solvers who are eager to make a significant impact on our world, both near and far. Whether you're interested in climate solutions, space technology, or protecting our planet, this hackathon is your launchpad to innovation.\n\nGuiding questions\n- What technologies can help mitigate the effects of climate change and protect the environment?\n- How can we use space technology to monitor and address environmental issues on Earth?\n- What innovations can improve sustainable agriculture and resource management?\n- Are there opportunities to advance space exploration and colonization efforts?\n- How can space technology benefit life on Earth, from communications to resource utilization?\n- What solutions can address space debris and ensure the long-term sustainability of space activities?\n- How can we harness Earth and space data for scientific research and global benefit?\n\nPrizes\n- Drones!",
+    "label": "Space Exploration"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "What is the So You Think You Can Do It Better track?",
+    "content": "Here’s a description of the So You Think You Can Do It Better track: Do you believe you can take existing products, services, or systems and make them infinitely better? If you're an advocate for improving the status quo and have innovative ideas to disrupt industries, this is your chance to shine. In the 'So You Think You Can Do It Better' Hackathon, you'll challenge the conventional and reimagine how things can be done. From upgrading everyday apps to reinventing established processes, bring your game-changing ideas to the table and prove that you can indeed do it better!\n\nGuiding questions\n- What existing products, services, or processes are ready for enhancement or transformation?\n- How can we make everyday tasks and experiences more efficient, user-friendly, or cost-effective?\n- What industries could benefit from a complete overhaul or innovative rethinking?\n- Are there areas where simplification or consolidation could lead to better outcomes?\n- How can we address pain points and inefficiencies in current systems or technologies?\n- What are the most pressing issues where doing things better would have the greatest impact?\n- Can we reimagine traditional business models or approaches to create more value?\n\nPrizes\n- Hydroflasks!",
+    "label": "Innovative Solutions"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Where can I find parking?",
+    "content": "Parking is available at the Harvard Business School Parking lot, a 5-minute walk away from the venue. Find information here: https://www.transportation.harvard.edu/parking/daily-permits/harvard-business-school-lot",
+    "label": "Parking Information"
+  },
+  {
+    "source": "hacker guide",
+    "question": "How many people can be on a team?",
+    "content": "Team size can be no more than 4 people. You can also submit a project by yourself.",
+    "label": "Team Size"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What are the guidelines for the project?",
+    "content": "All submitted projects must have been started and finished between 8 pm ET 10/20 and 8 am ET 10/22. Additional rules can be found on the Devpost at this link: https://hackharvard-2023.devpost.com/",
+    "label": "Project Guidelines"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Can I use my project for or from another hackathon?",
+    "content": "You cannot submit your project cross-hackathon. That is, to be eligible for a HackHarvard prize, you cannot submit your same project to multiple hackathons.",
+    "label": "Project Usage"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Will I need to demonstrate my project in front of judges?",
+    "content": "You must do a live-demo of your project in our judging space. Uploading an additional link to a video demoing your project under 3 minutes is optional, but recommended.",
+    "label": "Project Demonstration"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Can I use code that I have written before for my project?",
+    "content": "You may not start coding on your project until after the opening ceremony, but coming up with an idea before the hackathon is allowed. If you are going to reuse significant amounts of code, you must in your demo/video clearly show how you have added value to it,",
+    "label": "Code Reuse Policy"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What if I don’t have a team?",
+    "content": "If you don't already have a team coming into HackHarvard, don't worry! We have many resources and events available for you to find teammates. Join our #team-formation Discord channel to find a team or simply network with other people. Feel free to send out an introduction about yourself and what you are interested in working on during the hackathon to find others with similar interests.",
+    "label": "Team Formation"
+  },
+  {
+    "source": "hacker guide",
+    "question": "How do I register my team?",
+    "content": "To register your team, you should do so through Devpost at this link: https://hackharvard-2023.devpost.com/",
+    "label": "Team Registration"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What are the rules for project submission?",
+    "content": "You must submit a link to a public GitHub repo that was created during the dates of Oct 20-22. You must prepare for a live presentation of your project on October 22nd during your judging round. You will have 3 minutes for your live presentation. You can (optional) submit a link to a video demoing your project in under 3 minutes. Also, please select the appropriate tracks and prizes your project is competing for on Devpost.",
+    "label": "Project Submission Rules"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What is a demonstration video?",
+    "content": "You can submit a 3-minute (max) length demo video of your hack on Devpost if you believe it will help judges understand your project. Please remember to leave time to upload your video to YouTube/any other platform and add the link to your video to your Devpost submission. Successful demo videos should clearly indicate the problem your hack attempts to solve and a walkthrough of your hack's functionality.",
+    "label": "Demonstration Video"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Will there be tracks to submit a project to, and what are they?",
+    "content": "HackHarvard has 4 specific tracks you can enter to be eligible for track-specific prizes. These will be unveiled once the hackathon begins. You can only submit to 1 of these tracks or no track at all. If you choose not to submit to a track, you will not be eligible to win any track-specific prizes. Please follow the instructions on Devpost for submitting a project. If you would like to enter your project in 1 of our 4 tracks, clearly indicate on Devpost that you would like to be considered for your track's prize. The four tracks are Health and Fitness, Earth and Space, So You Think You Can Do It Better, and Efficiency Boosters.",
+    "label": "Hackathon Tracks"
+  },
+  {
+    "source": "hacker guide",
+    "question": "How can I make sure I am eligible for a prize?",
+    "content": "To be eligible for our other opt-in prizes, please also clearly indicate that you are opting in for these prizes when you submit your project on Devpost. We reserve the right to revoke prize eligibility.",
+    "label": "Prize Eligibility"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What is the judging schedule?",
+    "content": "All projects must be submitted to the Devpost by 8 am Sunday October 22nd ET. Live judging will begin at 8:30 am ET and end at 11:30 am ET. Take care to note which Judging Round you are assigned to! Expo judging will be at 8:30 AM on Sunday. Each team will be assigned a table, and judges will come to your table and ask you about your project. Some teams may be selected for panel judging where you present in front of a panel of judges. Not getting selected for panel judging is NOT an indication of your not winning. Being selected for panel judging is simply an indication that not enough of the panel judges have not seen your projects and no one was able to vouch for your team directly.",
+    "label": "Judging Schedule"
+  },
+  {
+    "source": "hacker guide",
+    "question": "What is the criteria that projects are judged on?",
+    "content": "All projects will be judged based on four criteria. Each category is weighted the same, but a bias in the following listed order will be used to break ties. The categories are Innovation, Creativity and Impact, Technical Complexity, Functionality and Usability,  and Teamwork and Collaboration and Learning",
+    "label": "Judging Criteria"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Does HackHarvard have a code of conduct?",
+    "content": "By attending this event via any and all of our platforms (Discord, Zoom, etc.), you are hereby accepting to abide by all policies as outlined in the MLH Code of Conduct. By turning on your video/audio in any HackHarvard official event, you hereby consent to and waive any claims to the reproduction and usage of the video content.",
+    "label": "Code of Conduct"
+  },
+  {
+    "source": "hacker guide",
+    "question": "Is there an FAQ that I can use if I have any questions?",
+    "content": "You can find lots of useful information in the Hacker Guide. Be sure to take a look at it before hacking!",
+    "label": "FAQ Resource"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "When is check-in?",
+    "content": "Check-in is on Friday, October 20 from 4 PM to 7 PM",
+    "label": "Check-In Time"
+  },
+  {
+    "source": "dayof.hackharvard.io",
+    "question": "Who are the speakers for the event?",
+    "content": "RICHARD STALLMAN, Software Engineer & Activist: Richard Stallman is an American free software movement activist and programmer. He campaigns for software to be distributed in such a manner that its users have the freedom to use, study, distribute, and modify that software HUSAIN AL-MOHSENN, Director of AI, Walmart: Husain Al-Mohsenn is Director of AI at Walmart/Alert Innovation. He prides himself in mastering the trade-offs needed to build software and data-driven systems that deliver value, quickly, accurately and with minimal complexity.",
+    "label": "Event Speakers"
+  },
+  {
+    "source": "https://hackharvard-2023.devpost.com/",
+    "question": "who can participate in hackharvard?",
+    "content": "HackHarvard is for college students only. All participants must be 18 years or older.",
+    "label": "Eligible Participants"
+  },
+  {
+    "source": "https://hackharvard-2023.devpost.com/",
+    "question": "",
+    "content": "Welcome to HackHarvard 2023! Join us for the eighth iteration of HackHarvard, a completely free 36-hour hackathon hosted by Harvard University students. For more information, check out our website: https://hackharvard.io/",
+    "label": "Welcome Message"
+  },
+  {
+    "source": "https://hackharvard-2023.devpost.com/",
+    "question": "How can we participate and receive prizes?",
+    "content": "In order to participate and be eligible for prizes, you must have applied through our application form and have received an acceptance/confirmation email from us.",
+    "label": "Participation and Prizes"
+  },
+  {
+    "source": "https://hackharvard-2023.devpost.com/",
+    "question": "When are submissions due?",
+    "content": "All submissions are due here on Devpost 8AM ET, Sunday October 22nd. Also, you must fill out the presubmission form due Saturday at midnight to be eligible for prizes with the following link: https://forms.gle/Nf8mEM3WESY3aCME8",
+    "label": "Submission Deadlines"
+  },
+  {
+    "source": "https://hackharvard-2023.devpost.com/",
+    "question": "Who can I contact for general inquiries?",
+    "content": "You can email team@hackharvard.io with any questions or concerns.",
+    "label": "Contact Information"
+  },
+  {
+    "source": "https://dayof.hackharvard.io/",
+    "question": "What challenges can I submit to?",
+    "content": "There are many challenges you can submit to. The sponsor challenges are: Terra API, BGP Group, Nucleus Genomics, CareYaya Health Technologies, MathWorks, Google Cloud, GitHub, GoDaddy, MATLAB, Fidelity, Circle, and Redis Cloud.",
+    "label": "Sponsor Challenges"
+  },
+  {
+    "source": "https://dayof.hackharvard.io/",
+    "question": "Where can I find the event schedule for HackHarvard?",
+    "content": "The event schedule for HackHarvard is located on our day-of site at https://dayof.hackharvard.io/. You can also ask HackHarvard staff or email team@hackharvard.io with any questions or concerns.",
+    "label": "Event Schedule"
+  }
 ]

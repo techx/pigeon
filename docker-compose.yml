@@ -1,12 +1,12 @@
-version: '3.9'
+version: "3.9"
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    depends_on: 
+    depends_on:
       - backend
-    ports: 
+    ports:
       - "5173:5173"
     volumes:
       - .:/home/pigeon
@@ -17,11 +17,11 @@ services:
     depends_on:
       - redis
     ports:
-       - "2000:2000"
+      - "2000:2000"
     volumes:
       - .:/home/pigeon
-    environment: 
-    # print directly to terminal
+    environment:
+      # print directly to terminal
       - PYTHONUNBUFFERED=1
   redis:
     build:

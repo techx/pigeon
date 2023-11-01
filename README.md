@@ -7,7 +7,7 @@
   <span> • </span>
     	<a href="#development">Development</a>
   <p></p>
-</div> 
+</div>
 
 Pigeon is HackMIT's AI email assistant. Pigeon helps automates the help email workflow.
 
@@ -20,7 +20,7 @@ Pigeon uses [Flask](https://flask.palletsprojects.com/en/2.2.x/) for its backend
 ```
 pigeon/
 ├── Dockerfile.backend
-├── Dockerfile.frontend           
+├── Dockerfile.frontend
 ├── Dockerfile.redis
 ├── docker-compose.yml
 ├── README.md
@@ -72,7 +72,8 @@ pigeon/
 
 ### Env
 
-Fill in the `.env` file (should be able to find it on Slack). 
+Fill in the `.env` file (should be able to find it on Slack).
+
 ```env
 FRONTEND_URL=""
 BACKEND_URL=""
@@ -84,23 +85,23 @@ OPENAI_API_KEY=""
 
 ### Docker
 
-Docker is a way to provision identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up postgres/redis, etc. 
+Docker is a way to provision identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up postgres/redis, etc.
 
-To use Docker, install it [here](https://docs.docker.com/get-docker/). To check if your installation is working, try running 
+To use Docker, install it [here](https://docs.docker.com/get-docker/). To check if your installation is working, try running
 
 ```sh
 docker run hello-world
 ```
 
-If you get a message on your screen that starts with "Hello from Docker!", your installation is working. 
+If you get a message on your screen that starts with "Hello from Docker!", your installation is working.
 
-To begin development, cd into your `/postgres` directory and run: 
+To begin development, cd into your `/postgres` directory and run:
 
 ```sh
 docker compose up
 ```
 
-This command will install every React, Flask, Postgres, and Redis dependency you need to run Pigeon into containers that interact with each other separately from the rest of your machine. To know when Pigeon is ready to run, you should look for four messages: 
+This command will install every React, Flask, Postgres, and Redis dependency you need to run Pigeon into containers that interact with each other separately from the rest of your machine. To know when Pigeon is ready to run, you should look for four messages:
 
 ```sh
 pigeon-postgresdb-1  | ... database system is ready to accept connections
@@ -111,17 +112,17 @@ pigeon-frontend-1    | ... ready in 1486 ms
 
 If it is your first time starting up Pigeon, it may take a while for all four of these messages to show up (on the order of tens of minutes). Once everything is running, navigate to `http://localhost:5173` to see Pigeon's homepage.
 
-Once you are done, you can Ctrl+C or run 
+Once you are done, you can Ctrl+C or run
 
 ```sh
 docker compose down
 ```
 
-to close all open Pigeon containers. 
+to close all open Pigeon containers.
 
 ### Mailgun
 
-All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/). 
+All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/).
 
 In order to setup mail forwarding locally, you must expose the backend to the internet with `ngrok`. If you don't have `ngrok` installed, you can view instructions for diffenerent operating systems [here](https://ngrok.com/download). Then run
 
@@ -129,7 +130,7 @@ In order to setup mail forwarding locally, you must expose the backend to the in
 ngrok http 2000
 ```
 
-to generate an `ngrok` link that exposes port 2000 to the internet. Then under the `Receiving` tab in the Mailgun dashboard, edit the route that matches the current email address and append your `ngrok` with the endpoint `/api/emails/receive_mail` to the list of forwarding URLs. The URL wil look like  `https://[hash].ngrok-free.app/api/emails/receive_email`.
+to generate an `ngrok` link that exposes port 2000 to the internet. Then under the `Receiving` tab in the Mailgun dashboard, edit the route that matches the current email address and append your `ngrok` with the endpoint `/api/emails/receive_mail` to the list of forwarding URLs. The URL wil look like `https://[hash].ngrok-free.app/api/emails/receive_email`.
 
 ## Development
 

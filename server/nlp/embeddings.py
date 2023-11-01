@@ -26,17 +26,18 @@ cwd = os.path.dirname(__file__)
 VECTOR_DIMENSION = 768
 
 # load redis client
-client = redis.Redis(host='redis', port=6379, decode_responses=True)
+client = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 # load corpus
 # with open('corpus.json', 'r') as f:
 #     corpus = json.load(f)
 
 # load embedding model
-embedder = SentenceTransformer('msmarco-distilbert-base-v4')
+embedder = SentenceTransformer("msmarco-distilbert-base-v4")
+
 
 def load_corpus(corpus: list[RedisDocument]):
-    """ loads given corpus into redis
+    """loads given corpus into redis
 
     PARAMETERS
     ----------
@@ -52,18 +53,17 @@ def load_corpus(corpus: list[RedisDocument]):
 
     pipeline = client.pipeline()
     for i, doc in enumerate(corpus, start=1):
-        redis_key = f'documents:{i:03}'
+        redis_key = f"documents:{i:03}"
         pipeline.json().set(redis_key, "$", doc)
     res = pipeline.execute()
 
     if not all(res):
-        raise Exception('failed to load some documents')
+        raise Exception("failed to load some documents")
     print("successfully loaded all documents")
 
 
 def compute_embeddings():
-    """ compute embeddings from redis documents
-    """
+    """compute embeddings from redis documents"""
     print("computing embeddings...")
 
     # get keys, questions, content
@@ -71,16 +71,16 @@ def compute_embeddings():
     questions = client.json().mget(keys, "$.question")
     content = client.json().mget(keys, "$.content")
 
-    assert(len(questions) == len(content))
+    assert len(questions) == len(content)
 
     # compute embeddings
-    question_and_content = [questions[i][0] + " " +
-                            content[i][0] for i in range(len(questions))]
-    embeddings = embedder.encode(
-        question_and_content).astype(np.float32).tolist()
+    question_and_content = [
+        questions[i][0] + " " + content[i][0] for i in range(len(questions))
+    ]
+    embeddings = embedder.encode(question_and_content).astype(np.float32).tolist()
 
     # save embeddings
-    with open(f'{cwd}/embeddings.json', 'w') as f:
+    with open(f"{cwd}/embeddings.json", "w") as f:
         json.dump(embeddings, f)
 
     VECTOR_DIMENSION = len(embeddings[0])
@@ -88,8 +88,9 @@ def compute_embeddings():
     print("successfully computed embeddings")
     return embeddings
 
-def load_embeddings(embeddings : list[list[float]]):
-    """ load embeddings into redis
+
+def load_embeddings(embeddings: list[list[float]]):
+    """load embeddings into redis
 
     PARAMETERS
     ----------
@@ -106,17 +107,18 @@ def load_embeddings(embeddings : list[list[float]]):
     # load embeddings into redis
     pipeline = client.pipeline()
     for i, embedding in enumerate(embeddings, start=1):
-        redis_key = f'documents:{i:03}'
+        redis_key = f"documents:{i:03}"
         pipeline.json().set(redis_key, "$.question_and_content_embeddings", embedding)
     res = pipeline.execute()
-    
+
     if not all(res):
-        raise Exception('failed to load embeddings')
-    
+        raise Exception("failed to load embeddings")
+
     print("successfully loaded all embeddings")
 
-def create_index(corpus_len : int):
-    """ create search index in redis
+
+def create_index(corpus_len: int):
+    """create search index in redis
     assumes that documents and embeddings have already been loaded into redis
 
     PARAMETERS
@@ -151,35 +153,41 @@ def create_index(corpus_len : int):
     res = client.ft("idx:documents_vss").create_index(
         fields=schema, definition=definition
     )
-    
-    if (res == "OK"):
+
+    if res == "OK":
         start = time.time()
-        while(1):
-            if str(client.ft("idx:documents_vss").info()['num_docs']) == str(corpus_len):
+        while 1:
+            if str(client.ft("idx:documents_vss").info()["num_docs"]) == str(
+                corpus_len
+            ):
                 info = client.ft("idx:documents_vss").info()
                 num_docs = info["num_docs"]
                 indexing_failures = info["hash_indexing_failures"]
                 print("num_docs", num_docs, "indexing_failures", indexing_failures)
                 return
             if time.time() - start >= 60:
-                raise Exception('time out')
-    raise Exception('failed to create index')
+                raise Exception("time out")
+    raise Exception("failed to create index")
 
-def create_query(k : int):
-    """ create k-NN redis query
+
+def create_query(k: int):
+    """create k-NN redis query
 
     PARAMETERS
     ----------
     k : :obj:`int`
         number of nearest neighbors to return
     """
-    return Query(f'(*)=>[KNN {k} @vector $query_vector AS vector_score]') \
-        .sort_by('vector_score') \
-        .return_fields('vector_score', 'source', 'question', 'content', 'sql_id') \
+    return (
+        Query(f"(*)=>[KNN {k} @vector $query_vector AS vector_score]")
+        .sort_by("vector_score")
+        .return_fields("vector_score", "source", "question", "content", "sql_id")
         .dialect(2)
+    )
 
-def queries(query, queries : list[str]) -> list[dict]:
-    """ run queries against redis
+
+def queries(query, queries: list[str]) -> list[dict]:
+    """run queries against redis
 
     PARAMETERS
     ----------
@@ -205,11 +213,7 @@ def queries(query, queries : list[str]) -> list[dict]:
             client.ft("idx:documents_vss")
             .search(
                 query,
-                {
-                    "query_vector": np.array(
-                        encoded_query, dtype=np.float32
-                    ).tobytes()
-                },
+                {"query_vector": np.array(encoded_query, dtype=np.float32).tobytes()},
             )
             .docs
         )
@@ -230,7 +234,8 @@ def queries(query, queries : list[str]) -> list[dict]:
     print("done running query")
     return results_list
 
-def query_all(k : int, questions : list[str]):
+
+def query_all(k: int, questions: list[str]):
     """return k most similar documents for each query
 
     PARAMETERS
@@ -239,7 +244,7 @@ def query_all(k : int, questions : list[str]):
         number of nearest neighbors to return
     questions : :obj:`list` of :obj:`str`
         list of question queries
-    
+
     RETURNS
     -------
     :obj:`list` of :obj:`dict`
@@ -248,8 +253,9 @@ def query_all(k : int, questions : list[str]):
     redis_query = create_query(k)
     return queries(redis_query, questions)
 
-def embed_corpus(corpus : list[RedisDocument]):
-    """ load corpus, compute embeddings, load embeddings into redis   
+
+def embed_corpus(corpus: list[RedisDocument]):
+    """load corpus, compute embeddings, load embeddings into redis
 
     PARAMETERS
     ----------
@@ -274,33 +280,36 @@ def embed_corpus(corpus : list[RedisDocument]):
     load_embeddings(embeddings)
     create_index(len(corpus))
 
+
 def test():
     try:
         embed_corpus()
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         raise
-    
-    questions = ['What is the deadline to apply for the hackathon?',
-               'When is HackMIT?',
-               'What are the challenges?',
-               'How does judging work?',
-               'What building should I go to during the event?',
-               'What prizes are available?',
-               'How many people are allowed on a team?',
-               'What is HackMIT?',
-               'Can I attend HackMIT if I am an MIT grad student?',
-               'Can I attend HackMIT if I am a sophomore in high school?',
-               'I\'m a high school student, but I\'m really advanced. Can I attend HackMIT?',
-               'Do I need to bring money to the event?',
-               'Will we be able to sleep at the event?',
-               'Will we be able to stay overnight at the event?',
-               'What should I do if I am a beginner at the event?']
+
+    questions = [
+        "What is the deadline to apply for the hackathon?",
+        "When is HackMIT?",
+        "What are the challenges?",
+        "How does judging work?",
+        "What building should I go to during the event?",
+        "What prizes are available?",
+        "How many people are allowed on a team?",
+        "What is HackMIT?",
+        "Can I attend HackMIT if I am an MIT grad student?",
+        "Can I attend HackMIT if I am a sophomore in high school?",
+        "I'm a high school student, but I'm really advanced. Can I attend HackMIT?",
+        "Do I need to bring money to the event?",
+        "Will we be able to sleep at the event?",
+        "Will we be able to stay overnight at the event?",
+        "What should I do if I am a beginner at the event?",
+    ]
     results = query_all(3, questions)
 
     for result in results:
-        print(result['query'])
-        for doc in result['result']:
+        print(result["query"])
+        for doc in result["result"]:
             print(f"Score: {doc['score']}")
             print(f"Source: {doc['source']}")
             print(f"Q: {doc['question']}")
