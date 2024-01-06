@@ -394,16 +394,15 @@ export default function InboxPage() {
       classNames={{ inner: classes.grid_inner, root: classes.grid }}
       columns={100}
     >
-      {!sourceActive && (
-        <Grid.Col span={30} className={classes.threads}>
-          <Text className={classes.inboxText}>Inbox</Text>
-          <Stack gap={0} className={classes.threadList}>
-            {threadList}
-          </Stack>
-        </Grid.Col>
-      )}
+      
+      <Grid.Col span={sourceActive ? 25 : 30} className={classes.threads}>
+        <Text className={classes.inboxText}>Inbox</Text>
+        <Stack gap={0} className={classes.threadList}>
+          {threadList}
+        </Stack>
+      </Grid.Col>
 
-      <Grid.Col span={sourceActive ? 58 : 68} className={classes.thread}>
+      <Grid.Col span={sourceActive ? 48 : 68} className={classes.thread}>
         {active !== -1 && (
           <Box>
             <Center className={classes.subjectText}>
@@ -533,7 +532,7 @@ export default function InboxPage() {
         )}
       </Grid.Col>
       {sourceActive && (
-        <Grid.Col span={42} className={classes.threads}>
+        <Grid.Col span={27} className={classes.threads}>
           <Text className={classes.inboxText}>Sources</Text>
           <ScrollArea h="95vh">{sourceList}</ScrollArea>
         </Grid.Col>
