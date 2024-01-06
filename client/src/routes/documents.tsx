@@ -71,9 +71,9 @@ export default function DocumentsPage() {
       });
       return;
     }
-    const formData = new FormData();
-    formData.append("file", file);
-    console.log(formData);
+    // const formData = new FormData();
+    // formData.append("file", file);
+    // console.log(formData);
     fetch("/api/admin/upload_json", {
       method: "POST",
       body: file,
@@ -96,6 +96,43 @@ export default function DocumentsPage() {
       })
       .then(updateEmbeddings);
   };
+
+  const importCSV = (file: File | null) => {
+    notifications.clean();
+    if (!file) {
+      notifications.show({
+        title: "Error!",
+        color: "red",
+        message: "No file selected!",
+      });
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    // console.log(formData);
+    fetch("/api/admin/import_csv", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        notifications.show({
+          title: "Error!",
+          color: "red",
+          message: "Something went wrong!",
+        });
+      })
+      .then((data) => {
+        clearContent();
+        notifications.show({
+          title: "Success!",
+          color: "green",
+          message: data.message,
+        });
+      })
+      .then(updateEmbeddings);
+  };
+
   const uploadDocument = () => {
     notifications.clean();
     if (!content || !source || !label) {
@@ -112,6 +149,7 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
+    console.log(formData)
     fetch("/api/admin/upload_document", {
       method: "POST",
       body: formData,
@@ -334,16 +372,28 @@ export default function DocumentsPage() {
               onChange={(file) => uploadJSON(file)}
               accept="file/json"
             >
-              {(props) => (
-                <Button {...props} color="green">
+              {(props) => {
+                return <Button {...props} color="green">
                   Upload JSON
                 </Button>
-              )}
+              }}
             </FileButton>
           ) : (
             <Button color="red" onClick={() => deleteDocument(active)}>
               Delete Document
             </Button>
+          )}
+          {active === -1 && (
+            <FileButton
+              onChange={(file) => importCSV(file)}
+              accept="file/csv"
+            >
+              {(props) => {
+                return <Button {...props} color="cyan">
+                  Import CSV
+                </Button>
+              }}
+            </FileButton>
           )}
           {active === -1 && (
             <Button color="orange" onClick={() => clearDocuments()}>

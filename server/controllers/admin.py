@@ -6,6 +6,10 @@ from server.models.response import Response
 from server.nlp.embeddings import embed_corpus
 from ast import literal_eval
 import json
+import pandas as pd
+import numpy as np
+import csv
+import io
 
 
 admin = APIBlueprint("admin", __name__, url_prefix="/admin", tag="Admin")
@@ -66,7 +70,7 @@ def update_embeddings():
     return {"message": "Embeddings updated"}
 
 
-@admin.route("upload_json", methods=["POST"])
+@admin.route("/upload_json", methods=["POST"])
 def upload_json():
     try:
         file = request.data
@@ -85,7 +89,27 @@ def upload_json():
     return {"message": "Documents imported"}
 
 
-@admin.route("clear_documents", methods=["POST"])
+@admin.route("/import_csv", methods=["POST"])
+def import_csv():
+    try:
+        file = request.files["file"]
+        df = pd.read_csv(file.stream)
+
+        for _, row in df.iterrows():
+            document = Document(
+                "" if pd.isna(row["question"]) else row['question'],
+                row['content'],
+                row['source'],
+                "" if pd.isna(row["label"]) else row['label']
+            )
+            db.session.add(document)
+        db.session.commit()
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}, 400
+    return {"message": "Documents imported"}
+
+
+@admin.route("/clear_documents", methods=["POST"])
 def clear_documents():
     try:
         Document.query.delete()
