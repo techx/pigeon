@@ -1,11 +1,14 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Container,
-  Button,
-  Paper,
-  Title,
   TextInput,
   PasswordInput,
+  Divider,
+  Anchor,
+  Paper,
+  Title,
+  Text,
+  Container,
+  Button,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -14,37 +17,18 @@ import {
   cleanNotifications,
 } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
-import { useLoaderData } from "react-router-dom";
-import { useAuth } from "./auth";
+import { FcGoogle } from "react-icons/fc";
+import classes from "./login.module.css";
 
-interface LoginResponse {
-  status: number;
-  statusText: string;
-  text: () => Promise<string>;
-  json: () => Promise<{ new_url: string }>;
-}
-
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
-
-export async function whoami() {
-  const res = await fetch("/api/auth/whoami");
-  const data = await res.json();
-  if (data.auth) return data.auth;
-  return null;
-}
-
-export async function loginLoader() {
-  return await whoami();
+export function GoogleButton(props: any) {
+  return <Button leftSection={<FcGoogle />} variant="light" {...props} />;
 }
 
 export default function LoginPage() {
-  const { setAuthorized } = useAuth();
+  const [adminLoginModal, setAdminLoginModal] = useState(false);
 
-  async function login(username: string, password: string) {
-    return await fetch("/api/auth/login_admin", {
+  const adminLogin = async (username: string, password: string) => {
+    return await fetch(`/api/auth/login_admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,55 +38,58 @@ export default function LoginPage() {
         password: password,
       }),
     });
+  };
+
+  function handleGoogleSubmit() {
+    window.location.replace(`/api/auth/login`);
   }
 
-  useEffect(() => {
-    whoami().then((isAuthenticated) => {
-      if (isAuthenticated) {
-        window.location.replace("/inbox");
-      }
-    });
-  }, []);
-
-  async function onLoginSubmit({ username, password }: LoginCredentials) {
+  async function onAdminLoginSubmit({
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+  }) {
     cleanNotifications();
     showNotification({
       id: "login",
       loading: true,
-      title: `logging in`,
-      message: "processing credentials...",
+      title: `Logging in`,
+      message: "Processing credentials...",
       autoClose: false,
-      // disallowClose: true,
-    });
-    updateNotification({
-      id: "login",
-      loading: true,
-      title: `logging in`,
-      message: "processing credentials...",
-      autoClose: false,
-      // disallowClose: true,
     });
 
-    const response: LoginResponse = await login(username, password);
+    const response = await adminLogin(username, password);
+
     loginForm.setValues({
       password: "",
     });
 
     if (response.status >= 400) {
       const response_text = await response.text();
-      const message = response_text || response.statusText;
-      updateNotification({
-        id: "login",
-        color: "red",
-        title: "failed to log in",
-        message: `reason: ${message}`,
-        icon: <IconX size={16} />,
-        autoClose: false,
-        // disallowClose: false,
-      });
+      const message = JSON.parse(response_text).message || response.statusText;
+      if (message === "incorrect password") {
+        updateNotification({
+          id: "login",
+          color: "red",
+          title: `Failed to log in`,
+          message: `Reason: ${message}`,
+          icon: <IconX size={16} />,
+          autoClose: 2000,
+        });
+      } else {
+        updateNotification({
+          id: "login",
+          color: "red",
+          title: `Failed to log in`,
+          message: `Reason: ${message}`,
+          icon: <IconX size={16} />,
+          autoClose: false,
+        });
+      }
       return;
     }
-    setAuthorized(true);
   }
 
   const loginForm = useForm({
@@ -111,39 +98,66 @@ export default function LoginPage() {
       password: "",
     },
     validate: {
-      username: (value: string) =>
-        value.length === 0 ? "username required" : null,
-      password: (value: string) =>
-        value.length === 0 ? "password required" : null,
+      username: (value) => (value.length === 0 ? "Username required" : null),
+      password: (value) => (value.length === 0 ? "Password required" : null),
     },
   });
 
   return (
-    <Container className="loginContainer">
-      <Container style={{ width: 420 }} className="">
-        <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-          <Title style={{ align: "center" }}>login</Title>
-          <form onSubmit={loginForm.onSubmit(onLoginSubmit)}>
-            <TextInput
-              label="username"
-              placeholder="bobby"
-              autoComplete="off"
-              withAsterisk
-              {...loginForm.getInputProps("username")}
+    <>
+      <Container className={classes.loginContainer}>
+        <Container className={classes.loginModal}>
+          <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+            <Title ta="center">Login</Title>
+            <GoogleButton
+              fullWidth
+              radius="md"
+              my="md"
+              onClick={() => handleGoogleSubmit()}
+            >
+              Log in with Google
+            </GoogleButton>
+            <Divider
+              label="Use admin credentials"
+              labelPosition="center"
+              mt={24}
+              mb={adminLoginModal ? 16 : 0}
+              className={classes.pointer}
+              onClick={() => setAdminLoginModal(!adminLoginModal)}
             />
-            <PasswordInput
-              label="password"
-              placeholder="imbobby"
-              mt="md"
-              withAsterisk
-              {...loginForm.getInputProps("password")}
-            />
-            <Button fullWidth mt="xl" type="submit">
-              log in
-            </Button>
-          </form>
-        </Paper>
+            {adminLoginModal && (
+              <form onSubmit={loginForm.onSubmit(onAdminLoginSubmit)}>
+                <TextInput
+                  label="Username"
+                  placeholder="Username"
+                  autoComplete="off"
+                  withAsterisk
+                  {...loginForm.getInputProps("username")}
+                />
+                <PasswordInput
+                  label="Password"
+                  placeholder="Password"
+                  mt="md"
+                  withAsterisk
+                  {...loginForm.getInputProps("password")}
+                />
+                <Button fullWidth mt="xl" type="submit">
+                  Log in
+                </Button>
+              </form>
+            )}
+          </Paper>
+        </Container>
       </Container>
-    </Container>
+    </>
   );
 }
+
+export const whoami = async () => {
+  const res = await fetch(`/api/auth/whoami`);
+  return await res.text();
+};
+
+export const loginLoader = async () => {
+  return await whoami();
+};

@@ -5,6 +5,8 @@ from authlib.integrations.flask_client import OAuth
 
 auth = APIBlueprint("auth", __name__, url_prefix="/auth", tag="Auth")
 
+app.secret_key = app.config["SESSION_SECRET"]
+
 oauth = OAuth(app)
 google = oauth.register(
     name="google",
@@ -58,7 +60,7 @@ def login():
     launches google authentication.
     """
     google = oauth.create_client("google")
-    redirect_uri = url_for("v2.auth.authorize", _external=True)
+    redirect_uri = url_for("api.auth.authorize", _external=True)
     if app.config["ENV"] == "development":
         # docker url is backend:2000, but google auth requires a public url
         redirect_uri = "http://localhost:2000/api/auth/authorize"
@@ -87,8 +89,8 @@ def login_admin():
     data = request.get_json()
     username = data["username"]
     password = data["password"]
-    if (username == app.config["ADMIN_USERNAME"]) and (
-        password == app.config["ADMIN_PASSWORD"]
+    if (username == app.config["AUTH_USERNAME"]) and (
+        password == app.config["AUTH_PASSWORD"]
     ):
         session["user"] = {"role": "Admin"}
         return redirect(app.config["FRONTEND_URL"] + "/inbox")

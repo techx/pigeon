@@ -31,6 +31,7 @@ MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
 
 AUTH_CLIENT_ID = os.environ.get("AUTH_CLIENT_ID")
 AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
+SESSION_SECRET = os.environ.get("SESSION_SECRET")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 

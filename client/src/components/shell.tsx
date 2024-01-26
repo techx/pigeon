@@ -1,11 +1,16 @@
 import { ReactElement, useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { IconHome, IconInbox, IconBook, IconLogin, IconLogout } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconInbox,
+  IconBook,
+  IconLogin,
+  IconLogout,
+} from "@tabler/icons-react";
 import { AppShell, Box, Anchor, NavLink, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { whoami } from "./login";
 import { useAuth } from "./auth";
-
 
 interface LinkData {
   label: string;
@@ -18,20 +23,19 @@ export default function Shell() {
   const inboxPath = document.location.pathname === "/inbox";
   const documentsPath = document.location.pathname === "/documents";
   const loginPath = document.location.pathname === "/login";
-  const [active, setActive] = useState(+inboxPath + 2 * +documentsPath + 3 * +loginPath);
+  const [active, setActive] = useState(
+    +inboxPath + 2 * +documentsPath + 3 * +loginPath
+  );
   const navigate = useNavigate();
   const { authorized, setAuthorized } = useAuth();
   const [links, setLinks] = useState<ReactElement[]>([]);
 
   const handleLogout = async () => {
-    const response = await fetch(
-      '/api/auth/logout',
-      { method: 'POST' },
-    );
+    const response = await fetch("/api/auth/logout", { method: "POST" });
     if (response.ok) {
       setAuthorized(false);
       window.location.replace("/login");
-      return response.json()
+      return response.json();
     } else {
       notifications.show({
         title: "Error!",
@@ -39,27 +43,31 @@ export default function Shell() {
         message: "Something went wrong!",
       });
     }
-  }
+  };
 
   useEffect(() => {
-    const commonLinks: LinkData[] = [{ label: 'Home', icon: IconHome, link: '/' }];
+    const commonLinks: LinkData[] = [
+      { label: "Home", icon: IconHome, link: "/" },
+    ];
 
     const authLinks: LinkData[] = [
-      { label: 'Inbox', icon: IconInbox, link: '/inbox' },
-      { label: 'Documents', icon: IconBook, link: '/documents' },
+      { label: "Inbox", icon: IconInbox, link: "/inbox" },
+      { label: "Documents", icon: IconBook, link: "/documents" },
       {
-        label: 'Log Out',
+        label: "Log Out",
         icon: IconLogout,
         onClick: handleLogout,
       },
     ];
 
     const unauthLinks: LinkData[] = [
-      { label: 'Log In', icon: IconLogin, link: '/login' },
+      { label: "Log In", icon: IconLogin, link: "/login" },
     ];
 
     // Combining common links with either authenticated or unauthenticated links
-    const linkDataAll: LinkData[] = authorized ? [...commonLinks, ...authLinks] : [...commonLinks, ...unauthLinks];
+    const linkDataAll: LinkData[] = authorized
+      ? [...commonLinks, ...authLinks]
+      : [...commonLinks, ...unauthLinks];
 
     const linksComponents = linkDataAll.map((item, index) => (
       <NavLink
@@ -79,7 +87,6 @@ export default function Shell() {
     ));
     setLinks(linksComponents);
   }, [authorized]);
-
 
   return (
     <AppShell navbar={{ width: 200, breakpoint: "sm" }}>
