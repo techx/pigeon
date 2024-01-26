@@ -36,3 +36,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+
+export const whoami = async () => {
+  const res = await fetch(`/api/auth/whoami`);
+  return await res.text();
+};
+
+export const authLoader = async () => {
+  return await whoami();
+};

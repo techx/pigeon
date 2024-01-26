@@ -95,7 +95,7 @@ def login_admin():
         password == app.config["AUTH_PASSWORD"]
     ):
         session["user"] = {"role": "Admin"}
-        return redirect(app.config["FRONTEND_URL"] + "/inbox")
+        return {}
     message = "incorrect username or password"
     abort(400, message)
 

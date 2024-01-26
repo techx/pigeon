@@ -12,18 +12,19 @@ import InboxPage from "./routes/inbox";
 import IndexPage from "./routes/index";
 import DocumentsPage from "./routes/documents";
 import Shell from "./components/shell";
-import LoginPage, { loginLoader } from "./components/login";
-import { AuthProvider } from "./components/auth";
+import LoginPage from "./components/login";
+import { AuthProvider, authLoader } from "./components/auth";
 import { ProtectedAuthRoute, ProtectedNonAuthRoute } from "./routes/protected";
 import RestrictedPage from "./routes/restricted";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Shell />}>
-      <Route index path="/" element={<IndexPage />} />
-      <Route path="/login" loader={loginLoader} element={<LoginPage />} />
+      <Route index path="/" loader={authLoader} element={<IndexPage />} />
+      <Route path="/login" loader={authLoader} element={<LoginPage />} />
       <Route
         path="/inbox"
+        loader={authLoader}
         element={
           <ProtectedAuthRoute>
             <InboxPage />
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
       />
       <Route
         path="/documents"
+        loader={authLoader}
         element={
           <ProtectedAuthRoute>
             <DocumentsPage />
@@ -40,6 +42,7 @@ const router = createBrowserRouter(
       />
       <Route
         path="/restricted"
+        loader={authLoader}
         element={
           <ProtectedNonAuthRoute>
             <RestrictedPage />

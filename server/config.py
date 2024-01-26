@@ -40,7 +40,7 @@ AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
-    {"name": "Andrew Liu", "email": "azliu@mit.edu"},
+    {"name": "Andrew Z Liu", "email": "azliu@mit.edu"},
     {"name": "Richard Chen", "email": "richen@mit.edu"},
     {"name": "Annie Wang", "email": "anniewang2023@gmail.com"},
     {"name": "Eddie Qiao", "email": "eqiao@mit.edu"},

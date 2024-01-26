@@ -16,6 +16,8 @@ import {
 } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./auth";
 import classes from "./login.module.css";
 
 export function GoogleButton(props: any) {
@@ -24,6 +26,8 @@ export function GoogleButton(props: any) {
 
 export default function LoginPage() {
   const [adminLoginModal, setAdminLoginModal] = useState(false);
+  const { setAuthorized } = useAuth();
+  const navigate = useNavigate();
 
   const adminLogin = async (username: string, password: string) => {
     return await fetch(`/api/auth/login_admin`, {
@@ -67,26 +71,20 @@ export default function LoginPage() {
     if (response.status >= 400) {
       const response_text = await response.text();
       const message = JSON.parse(response_text).message || response.statusText;
-      if (message === "incorrect password") {
-        updateNotification({
-          id: "login",
-          color: "red",
-          title: `Failed to log in`,
-          message: `Reason: ${message}`,
-          icon: <IconX size={16} />,
-          autoClose: 2000,
-        });
-      } else {
-        updateNotification({
-          id: "login",
-          color: "red",
-          title: `Failed to log in`,
-          message: `Reason: ${message}`,
-          icon: <IconX size={16} />,
-          autoClose: false,
-        });
-      }
+      updateNotification({
+        id: "login",
+        color: "red",
+        title: `Failed to log in`,
+        message: `Reason: ${message}`,
+        icon: <IconX size={16} />,
+        autoClose: false,
+        loading: false,
+      });
       return;
+    } else {
+      cleanNotifications();
+      setAuthorized(true);
+      navigate("/inbox");
     }
   }
 
@@ -150,12 +148,3 @@ export default function LoginPage() {
     </>
   );
 }
-
-export const whoami = async () => {
-  const res = await fetch(`/api/auth/whoami`);
-  return await res.text();
-};
-
-export const loginLoader = async () => {
-  return await whoami();
-};

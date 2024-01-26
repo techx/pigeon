@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Box,
   Container,
@@ -9,8 +10,17 @@ import {
   List,
 } from "@mantine/core";
 import classes from "./index.module.css";
+import { useLoaderData } from "react-router-dom";
+import { useAuth } from "../components/auth";
 
 export default function IndexPage() {
+  const user = useLoaderData();
+  const { authorized, setAuthorized } = useAuth();
+
+  useEffect(() => {
+    console.log(user);
+  }, [user, authorized]);
+
   return (
     <Flex direction="column">
       <Space h="xl"></Space>

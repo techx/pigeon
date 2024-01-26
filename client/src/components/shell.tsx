@@ -27,8 +27,7 @@ export default function Shell() {
     const response = await fetch("/api/auth/logout", { method: "POST" });
     if (response.ok) {
       setAuthorized(false);
-      window.location.replace("/login");
-      return response.json();
+      navigate("/login");
     } else {
       notifications.show({
         title: "Error!",
