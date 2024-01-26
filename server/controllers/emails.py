@@ -20,6 +20,7 @@ from server.models.thread import Thread
 from server.models.response import Response
 from server.nlp.responses import generate_response
 from datetime import datetime
+import quopri
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
@@ -243,3 +244,41 @@ def get_threads():
         for thread in thread_list
     ]
     return email_list
+
+@emails.route("/test", methods=["POST"])
+def testing():
+    file_dict = request.form
+    mailobject = email.message_from_string(file_dict['file'])
+
+    text = ""
+    html = ""
+    for x in mailobject.walk():
+        if x.get_content_type() == 'text/plain':
+            # text = quopri.decodestring(x.get_payload()).decode('utf-8')
+            text = x.get_payload()
+        if x.get_content_type() == 'text/html':
+            # html = quopri.decodestring(x.get_payload()).decode('utf-8') idk theres like characters that dont get decoded
+            html = x.get_payload()
+
+    print(text)
+    print(html)
+        
+    thread = Thread()
+    db.session.add(thread)
+    db.session.commit()
+    new_email = Email(
+        datetime.utcnow(),
+        mailobject["From"],
+        mailobject["Subject"],
+        text,
+        html,
+        mailobject["Message-ID"],
+        False,
+        thread.id,
+    )
+    db.session.add(new_email)
+    db.session.commit()
+    return {"message": "good"}, 200
+
+
+
