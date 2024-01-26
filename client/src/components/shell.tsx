@@ -9,7 +9,6 @@ import {
 } from "@tabler/icons-react";
 import { AppShell, Box, Anchor, NavLink, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { whoami } from "./login";
 import { useAuth } from "./auth";
 
 interface LinkData {
@@ -20,12 +19,6 @@ interface LinkData {
 }
 
 export default function Shell() {
-  const inboxPath = document.location.pathname === "/inbox";
-  const documentsPath = document.location.pathname === "/documents";
-  const loginPath = document.location.pathname === "/login";
-  const [active, setActive] = useState(
-    +inboxPath + 2 * +documentsPath + 3 * +loginPath
-  );
   const navigate = useNavigate();
   const { authorized, setAuthorized } = useAuth();
   const [links, setLinks] = useState<ReactElement[]>([]);
@@ -69,14 +62,13 @@ export default function Shell() {
       ? [...commonLinks, ...authLinks]
       : [...commonLinks, ...unauthLinks];
 
-    const linksComponents = linkDataAll.map((item, index) => (
+    const linksComponents = linkDataAll.map((item) => (
       <NavLink
         key={item.label}
         active={location.pathname === item.link}
         label={<Text size="lg">{item.label}</Text>}
         leftSection={<item.icon height="1.5rem" width="1.5rem" stroke="2" />}
         onClick={() => {
-          setActive(index);
           if (item.onClick) {
             item.onClick();
           } else if (item.link) {
@@ -86,7 +78,7 @@ export default function Shell() {
       />
     ));
     setLinks(linksComponents);
-  }, [authorized]);
+  }, [authorized, location.pathname]);
 
   return (
     <AppShell navbar={{ width: 200, breakpoint: "sm" }}>
@@ -95,7 +87,6 @@ export default function Shell() {
           style={{ paddingTop: "20px", paddingLeft: "20px" }}
           key="Home"
           onClick={() => {
-            setActive(0);
             navigate("/");
           }}
         >
