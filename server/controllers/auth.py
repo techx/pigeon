@@ -80,7 +80,7 @@ def authorize():
 
 @auth.post("/login_admin")
 @auth.doc(tags=["Auth"])
-def login():
+def login_admin():
     """POST /login_admin
     log in with admin credentials
     """

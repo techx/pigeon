@@ -26,13 +26,14 @@ interface LoginResponse {
 
 interface LoginCredentials {
   username: string;
-  password: string
+  password: string;
 }
 
 export async function whoami() {
   const res = await fetch("/api/auth/whoami");
   const data = await res.json();
-  return data.auth;
+  if (data.auth) return data.auth;
+  return null;
 }
 
 export async function loginLoader() {
@@ -43,7 +44,7 @@ export default function LoginPage() {
   const { setAuthorized } = useAuth();
 
   async function login(username: string, password: string) {
-    return await fetch("/api/auth/login", {
+    return await fetch("/api/auth/login_admin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,13 +57,13 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    whoami().then(isAuthenticated => {
+    whoami().then((isAuthenticated) => {
       if (isAuthenticated) {
         window.location.replace("/inbox");
       }
     });
   }, []);
-  
+
   async function onLoginSubmit({ username, password }: LoginCredentials) {
     cleanNotifications();
     showNotification({
@@ -91,20 +92,18 @@ export default function LoginPage() {
       const response_text = await response.text();
       const message = response_text || response.statusText;
       updateNotification({
-          id: "login",
-          color: "red",
-          title: "failed to log in",
-          message: `reason: ${message}`,
-          icon: <IconX size={16} />,
-          autoClose: false,
-          // disallowClose: false,
+        id: "login",
+        color: "red",
+        title: "failed to log in",
+        message: `reason: ${message}`,
+        icon: <IconX size={16} />,
+        autoClose: false,
+        // disallowClose: false,
       });
       return;
     }
     setAuthorized(true);
-    const new_url = await response.json();
-    window.location.replace(new_url.new_url);
-  };
+  }
 
   const loginForm = useForm({
     initialValues: {
@@ -112,16 +111,18 @@ export default function LoginPage() {
       password: "",
     },
     validate: {
-      username: (value: string) => (value.length === 0 ? "username required" : null),
-      password: (value: string) => (value.length === 0 ? "password required" : null),
-    }
+      username: (value: string) =>
+        value.length === 0 ? "username required" : null,
+      password: (value: string) =>
+        value.length === 0 ? "password required" : null,
+    },
   });
 
   return (
     <Container className="loginContainer">
-      <Container style={{width:420}} className="">
+      <Container style={{ width: 420 }} className="">
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-          <Title style={{align:"center"}}>login</Title>
+          <Title style={{ align: "center" }}>login</Title>
           <form onSubmit={loginForm.onSubmit(onLoginSubmit)}>
             <TextInput
               label="username"

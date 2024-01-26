@@ -1,24 +1,28 @@
-import { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../components/auth';
+import { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../components/auth";
 
-export const ProtectedAuthRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ProtectedAuthRoute: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const { authorized } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
 
   if (!authorized) {
-    return <Navigate to="/restricted" state={{ from: location }} replace />;
+    navigate("/restricted");
   }
 
   return children;
 };
 
-export const ProtectedNonAuthRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ProtectedNonAuthRoute: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const { authorized } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
 
   if (authorized) {
-    return <Navigate to="/inbox" state={{ from: location }} replace />;
+    navigate("/inbox");
   }
 
   return children;
