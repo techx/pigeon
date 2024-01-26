@@ -7,6 +7,8 @@ load_dotenv(os.path.dirname(__file__) / Path("../.env"))
 OpenAIMessage = dict[str, str]
 RedisDocument = dict[str, str]
 
+ENV = os.environ.get("ENV", "development")
+
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:2003")
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2000")
 ALLOWED_DOMAINS = [FRONTEND_URL]
@@ -31,3 +33,12 @@ AUTH_CLIENT_ID = os.environ.get("AUTH_CLIENT_ID")
 AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+AUTH_ADMINS = [
+    {"name": "HackMIT", "email": "admin@hackmit.org"},
+    {"name": "Andrew Liu", "email": "azliu@mit.edu"},
+    {"name": "Richard Chen", "email": "richen@mit.edu"},
+    {"name": "Annie Wang", "email": "anniewang2023@gmail.com"},
+    {"name": "Albert Tam", "email": "altam@mit.edu"},
+    {"name": "Eddie Qiao", "email": "eqiao@mit.edu"},
+]

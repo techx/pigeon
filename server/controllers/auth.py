@@ -1,5 +1,5 @@
 from server import db
-from flask import current_app as app, request, session, redirect
+from flask import current_app as app, request, session, redirect, url_for
 from apiflask import APIBlueprint, abort
 from authlib.integrations.flask_client import OAuth
 
@@ -42,28 +42,46 @@ def auth_required_decorator(roles):
     return auth_required
 
 
-@auth.route("/whoami", methods=["GET"])
+@auth.route("/whoami")
 def whoami():
-    is_authenticated = "user" in session
-    return {"auth": is_authenticated}
+    """GET /whoami
+    Returns user if they are logged in, otherwise returns nothing.
+    """
+    if dict(session).get("user", 0):
+        return session["user"]
+    return {}
 
 
-@auth.route("/login", methods=["POST"])
+@auth.route("/login")
 def login():
-    data = request.get_json()
-    username = data["username"]
-    password = data["password"]
-    if (
-        username == current_app.config["PIGEON_USERNAME"]
-        and password == current_app.config["PIGEON_PASSWORD"]
-    ):
-        session["user"] = username
-        return {"new_url": "/inbox"}
-    message = "incorrect username or password"
-    abort(400, message)
+    """GET /login
+    launches google authentication.
+    """
+    google = oauth.create_client("google")
+    redirect_uri = url_for("v2.auth.authorize", _external=True)
+    if app.config["ENV"] == "development":
+        # docker url is backend:2000, but google auth requires a public url
+        redirect_uri = "http://localhost:2000/api/auth/authorize"
+    return google.authorize_redirect(redirect_uri)
+
+
+@auth.route("/authorize")
+def authorize():
+    """GET /authorize
+    callback function after google authentication. verifies user token, then returns user data if it is in the database.
+    """
+    google = oauth.create_client("google")
+    token = google.authorize_access_token()
+    user_info = oauth.google.userinfo(token=token)
+    print(user_info)
+    print(app.config["AUTH_ADMINS"])
+    return redirect(app.config["FRONTEND_URL"] + "/inbox")
 
 
 @auth.route("/logout", methods=["POST"])
 def logout():
-    session.pop("user", None)
-    return {"message": "Logged out successfully"}
+    """POST /logout
+    clears current user session
+    """
+    session.clear()
+    return redirect(app.config["FRONTEND_URL"])
