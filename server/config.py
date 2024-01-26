@@ -27,8 +27,7 @@ MAIL_MAX_EMAILS = 40
 
 MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
 
-PIGEON_USERNAME = os.environ.get("PIGEON_USERNAME")
-PIGEON_PASSWORD = os.environ.get("PIGEON_PASSWORD")
-SECRET_KEY = os.environ.get("SECRET_KEY")
+AUTH_CLIENT_ID = os.environ.get("AUTH_CLIENT_ID")
+AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
