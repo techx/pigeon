@@ -46,6 +46,8 @@ const router = createBrowserRouter(
           </ProtectedNonAuthRoute>
         }
       />
+
+      <Route path="*" element={<RestrictedPage />} />
     </Route>
   )
 );

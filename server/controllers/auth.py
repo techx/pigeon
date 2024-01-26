@@ -75,9 +75,11 @@ def authorize():
     google = oauth.create_client("google")
     token = google.authorize_access_token()
     user_info = oauth.google.userinfo(token=token)
-    print(user_info)
-    print(app.config["AUTH_ADMINS"])
-    return redirect(app.config["FRONTEND_URL"] + "/inbox")
+    for admin in app.config["AUTH_ADMINS"]:
+        if admin["email"] == user_info["email"] and admin["name"] == user_info["name"]:
+            session["user"] = {"role": "Admin"}
+            return redirect(app.config["FRONTEND_URL"] + "/inbox")
+    return redirect(app.config["FRONTEND_URL"] + "/restricted")
 
 
 @auth.post("/login_admin")

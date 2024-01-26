@@ -1,5 +1,10 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface AuthContextType {
   authorized: boolean;
@@ -10,13 +15,15 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [authorized, setAuthorized] = useState<boolean>(false);
 
   const checkAuthStatus = async () => {
-    const response = await fetch('/api/auth/whoami');
+    const response = await fetch("/api/auth/whoami");
     const data = await response.json();
-    setAuthorized(data.auth);
+    setAuthorized(data.role === "admin");
   };
 
   useEffect(() => {

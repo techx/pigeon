@@ -3,10 +3,8 @@ import {
   TextInput,
   PasswordInput,
   Divider,
-  Anchor,
   Paper,
   Title,
-  Text,
   Container,
   Button,
 } from "@mantine/core";
