@@ -49,7 +49,7 @@ export default function IndexPage() {
             <Text className={classes.text + " " + classes.bottom}>
               If you run into any other issues please email us at{" "}
               <Anchor target="_blank" href="mailto:help@hackmit.org" c="blue">
-                help@my.hackmit.org
+                help@hackmit.org
               </Anchor>
               .
             </Text>
