@@ -78,7 +78,25 @@ def authorize():
     return redirect(app.config["FRONTEND_URL"] + "/inbox")
 
 
-@auth.route("/logout", methods=["POST"])
+@auth.post("/login_admin")
+@auth.doc(tags=["Auth"])
+def login():
+    """POST /login_admin
+    log in with admin credentials
+    """
+    data = request.get_json()
+    username = data["username"]
+    password = data["password"]
+    if (username == app.config["ADMIN_USERNAME"]) and (
+        password == app.config["ADMIN_PASSWORD"]
+    ):
+        session["user"] = {"role": "Admin"}
+        return redirect(app.config["FRONTEND_URL"] + "/inbox")
+    message = "incorrect username or password"
+    abort(400, message)
+
+
+@auth.post("/logout")
 def logout():
     """POST /logout
     clears current user session

@@ -34,11 +34,14 @@ AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
+AUTH_USERNAME = os.environ.get("AUTH_USERNAME")
+AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
+
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
     {"name": "Andrew Liu", "email": "azliu@mit.edu"},
     {"name": "Richard Chen", "email": "richen@mit.edu"},
     {"name": "Annie Wang", "email": "anniewang2023@gmail.com"},
-    {"name": "Albert Tam", "email": "altam@mit.edu"},
     {"name": "Eddie Qiao", "email": "eqiao@mit.edu"},
+    {"name": "Albert Tam", "email": "altam@mit.edu"},
 ]
