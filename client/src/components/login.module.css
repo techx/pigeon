@@ -1,0 +1,16 @@
+.loginContainer {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}
+
+.loginModal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 420px;
+}
+
+.pointer {
+  cursor: pointer
+}
