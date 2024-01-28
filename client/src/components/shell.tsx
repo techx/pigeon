@@ -20,7 +20,7 @@ interface LinkData {
 
 export default function Shell() {
   const navigate = useNavigate();
-  const { authorized, setAuthorized } = useAuth();
+  const { authorized } = useAuth();
   const [links, setLinks] = useState<ReactElement[]>([]);
 
   const handleLogout = async () => {
