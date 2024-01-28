@@ -49,6 +49,7 @@ def whoami():
     """GET /whoami
     Returns user if they are logged in, otherwise returns nothing.
     """
+    print(session, flush=True)
     if dict(session).get("user", 0):
         return session["user"]
     return {}
@@ -95,6 +96,7 @@ def login_admin():
         password == app.config["AUTH_PASSWORD"]
     ):
         session["user"] = {"role": "Admin"}
+        print(session, flush=True)
         return {}
     message = "incorrect username or password"
     abort(400, message)
