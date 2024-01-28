@@ -80,8 +80,9 @@ def document_data(
     return questions, doc_ids, doc_confidences
 
 
-@emails.route("/receive_email", methods=["POST"])
-def receive_email():
+# not used as of 1/28/2024
+@emails.route("/receive_email_mailgun", methods=["POST"])
+def receive_email_mailgun():
     data = request.form
 
     if (
@@ -123,6 +124,86 @@ def receive_email():
             data["Subject"],
             data["stripped-text"],
             data["stripped-html"],
+            data["Message-Id"],
+            False,
+            thread.id,
+        )
+    if email is not None and thread is not None:
+        openai_messages = thread_emails_to_openai_messages(thread.emails)
+        openai_res, documents, confidence = generate_response(
+            email.sender, email.body, openai_messages
+        )
+        questions, document_ids, document_confidences = document_data(documents)
+        db.session.add(email)
+        db.session.commit()
+        r = Response(
+            openai_res,
+            questions,
+            document_ids,
+            document_confidences,
+            confidence,
+            email.id,
+        )
+        db.session.add(r)
+        thread.last_email = email.id
+        thread.resolved = False
+        db.session.commit()
+    return data
+
+
+@emails.route("/receive_email", methods=["POST"])
+def receive_email():
+    data = request.form
+
+    if (
+        "From" not in data
+        or "Subject" not in data
+        or "stripped-text" not in data
+        or "Message-Id" not in data
+    ):
+        return {"message": "Missing fields"}, 400
+
+    print(data)
+
+    # by default, body contains the full email bodies of all previous emails in the thread
+    # here, we filter out previous emails so that only the body of the current email is used
+    # this filtering is purposely not done on AWS because of potentially needing context for the TODO below
+    body = data["stripped-text"]
+    body = str(body)
+    start_of_reply = body.find("________________________________")
+
+    if start_of_reply != -1:
+        body = body[:start_of_reply]
+
+    email = None
+    thread = None
+
+    if "In-Reply-To" in data:
+        # reply to existing email, add to existing thread
+        replied_to_email = Email.query.filter_by(message_id=data["In-Reply-To"]).first()
+        if MAIL_USERNAME not in data["From"] and replied_to_email:
+            thread = Thread.query.get(replied_to_email.thread_id)
+            if thread:
+                email = Email(
+                    datetime.utcnow(),
+                    data["From"],
+                    data["Subject"],
+                    body,
+                    data["Message-Id"],
+                    False,
+                    thread.id,
+                )
+        # TODO(#5): this ignores case where user responds to an email that isn't in the database. should we handle this?
+    else:
+        # new email, create new thread
+        thread = Thread()
+        db.session.add(thread)
+        db.session.commit()
+        email = Email(
+            datetime.utcnow(),
+            data["From"],
+            data["Subject"],
+            body,
             data["Message-Id"],
             False,
             thread.id,
@@ -244,41 +325,3 @@ def get_threads():
         for thread in thread_list
     ]
     return email_list
-
-@emails.route("/test", methods=["POST"])
-def testing():
-    file_dict = request.form
-    mailobject = email.message_from_string(file_dict['file'])
-
-    text = ""
-    html = ""
-    for x in mailobject.walk():
-        if x.get_content_type() == 'text/plain':
-            # text = quopri.decodestring(x.get_payload()).decode('utf-8')
-            text = x.get_payload()
-        if x.get_content_type() == 'text/html':
-            # html = quopri.decodestring(x.get_payload()).decode('utf-8') idk theres like characters that dont get decoded
-            html = x.get_payload()
-
-    print(text)
-    print(html)
-        
-    thread = Thread()
-    db.session.add(thread)
-    db.session.commit()
-    new_email = Email(
-        datetime.utcnow(),
-        mailobject["From"],
-        mailobject["Subject"],
-        text,
-        html,
-        mailobject["Message-ID"],
-        False,
-        thread.id,
-    )
-    db.session.add(new_email)
-    db.session.commit()
-    return {"message": "good"}, 200
-
-
-

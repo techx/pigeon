@@ -72,7 +72,7 @@ export default function InboxPage() {
     return thread.id === active;
   })[0];
   const [threadSize, setThreadSize] = useState(
-    activeThread ? activeThread.emailList.length : 0,
+    activeThread ? activeThread.emailList.length : 0
   );
   const [sourceActive, setSourceActive] = useState(false);
 
@@ -92,7 +92,7 @@ export default function InboxPage() {
       },
       content: content,
     },
-    [response],
+    [response]
   );
   const getThreads = () => {
     fetch("/api/emails/get_threads")
@@ -129,12 +129,28 @@ export default function InboxPage() {
     const d = new Date(date);
     return d.toLocaleString("en-US", { timeZone: "America/New_York" });
   };
+  const parseBody = (body: string) => {
+    const lines = body.replace(new RegExp("\r?\n", "g"), "<br />");
+    const linesArray = lines.split("<br />");
+    console.log(linesArray);
+    return (
+      <Text>
+        {linesArray.map((line, idx) => (
+          <div
+            key={idx}
+            dangerouslySetInnerHTML={{ __html: line }}
+            style={{ marginBottom: "1rem" }}
+          />
+        ))}
+      </Text>
+    );
+  };
 
   const getResponse = () => {
     const formData = new FormData();
     formData.append(
       "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
+      activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
     fetch("/api/emails/get_response", {
       method: "POST",
@@ -180,7 +196,7 @@ export default function InboxPage() {
     const formData = new FormData();
     formData.append(
       "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
+      activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
     formData.append("body", content);
     fetch("/api/emails/send_email", {
@@ -282,7 +298,7 @@ export default function InboxPage() {
     )
       return cmpDate(
         a.emailList[a.emailList.length - 1].date,
-        b.emailList[b.emailList.length - 1].date,
+        b.emailList[b.emailList.length - 1].date
       );
     else return -1;
   };
@@ -306,7 +322,7 @@ export default function InboxPage() {
             setThreadSize(
               threads.filter((newThread) => {
                 return thread.id === newThread.id;
-              })[0].emailList.length,
+              })[0].emailList.length
             );
           }
         }}
@@ -348,7 +364,7 @@ export default function InboxPage() {
               <Accordion.Item
                 style={{
                   "border-left": `6px solid ${computeColor(
-                    Math.round((document.confidence / 0.8) * 100) / 100,
+                    Math.round((document.confidence / 0.8) * 100) / 100
                   )}`,
                 }}
                 key={documentIndex}
@@ -421,9 +437,9 @@ export default function InboxPage() {
                   ...activeThread.emailList
                     .filter(
                       (email) =>
-                        email.sender === '"HackMIT Team" <help@my.hackmit.org>',
+                        email.sender === '"HackMIT Team" <help@my.hackmit.org>'
                     )
-                    .map((email) => activeThread.emailList.indexOf(email)),
+                    .map((email) => activeThread.emailList.indexOf(email))
                 )}
               >
                 {activeThread.emailList.map((email) => (
@@ -444,7 +460,8 @@ export default function InboxPage() {
                       <Title size="xl">{email.sender}</Title>
                       <Text>{parseFullDate(email.date)}</Text>
                     </Flex>
-                    <Text dangerouslySetInnerHTML={{ __html: email.html }} />
+                    {/* <Text dangerouslySetInnerHTML={{ __html: email.html }} /> */}
+                    {parseBody(email.body)}
                   </Timeline.Item>
                 ))}
               </Timeline>
