@@ -60,7 +60,7 @@ def login():
     launches google authentication.
     """
     google = oauth.create_client("google")
-    redirect_uri = url_for("api.auth.authorize", _external=True)
+    redirect_uri = url_for("api.auth.authorize", _external=True, _scheme="https")
     if app.config["ENV"] == "development":
         # docker url is backend:2000, but google auth requires a public url
         redirect_uri = "http://localhost:2000/api/auth/authorize"
