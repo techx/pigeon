@@ -18,14 +18,8 @@ SQLALCHEMY_DATABASE_URI = os.environ.get(
 
 FLASK_RUN_PORT = 2000
 DEBUG = True
-MAIL_SERVER = "smtp.mailgun.org"
-MAIL_PORT = 587
-MAIL_USE_TLS = True
-MAIL_USE_SSL = False
-MAIL_DEBUG = False
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-MAIL_MAX_EMAILS = 40
 
 MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
 
@@ -37,6 +31,10 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 AUTH_USERNAME = os.environ.get("AUTH_USERNAME")
 AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
+
+AWS_REGION = os.environ.get("AWS_REGION")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
