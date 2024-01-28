@@ -13,6 +13,9 @@ from server.config import (
     MAIL_PASSWORD,
     MAIL_USERNAME,
     MAIL_SENDER_TAG,
+    AWS_REGION,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
     OpenAIMessage,
 )
 from server.models.email import Email
@@ -21,6 +24,7 @@ from server.models.response import Response
 from server.nlp.responses import generate_response
 from datetime import datetime
 import quopri
+import boto3
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
@@ -163,8 +167,6 @@ def receive_email():
     ):
         return {"message": "Missing fields"}, 400
 
-    print(data)
-
     # by default, body contains the full email bodies of all previous emails in the thread
     # here, we filter out previous emails so that only the body of the current email is used
     # this filtering is purposely not done on AWS because of potentially needing context for the TODO below
@@ -180,7 +182,10 @@ def receive_email():
 
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
-        replied_to_email = Email.query.filter_by(message_id=data["In-Reply-To"]).first()
+        real_message_id = data["In-Reply-To"][
+            3:
+        ]  # for some reason AWS adds three spaces to the message id
+        replied_to_email = Email.query.filter_by(message_id=real_message_id).first()
         if MAIL_USERNAME not in data["From"] and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
@@ -231,8 +236,9 @@ def receive_email():
     return data
 
 
-@emails.route("/send_email", methods=["POST"])
-def send_email():
+# not used as of 1/28/2024
+@emails.route("/send_email_mailgun", methods=["POST"])
+def send_email_mailgun():
     data = request.form
     reply_to_email = Email.query.get(data["id"])
     clean_regex = re.compile("<.*?>")
@@ -267,6 +273,61 @@ def send_email():
         True,
         thread.id,
     )
+    db.session.add(reply_email)
+    db.session.commit()
+    thread.last_email = reply_email.id
+    db.session.commit()
+    return {"message": "Email sent successfully"}
+
+
+def get_full_message_id(message_id):
+    return f"<{message_id}@us-east-2.amazonses.com>"
+
+
+@emails.route("/send_email", methods=["POST"])
+def send_email():
+    data = request.form
+    reply_to_email = Email.query.get(data["id"])
+    thread = Thread.query.get(reply_to_email.thread_id)
+    clean_regex = re.compile("<.*?>")
+    clean_text = re.sub(clean_regex, " ", data["body"])
+    context = {"body": data["body"]}
+    template = env.get_template("template.html")
+    body = template.render(**context)
+
+    client = boto3.client(
+        "ses",
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    )
+
+    msg = email.mime.multipart.MIMEMultipart()
+    msg["Subject"] = reply_to_email.subject
+    msg["FROM"] = MAIL_SENDER_TAG
+    msg["In-Reply-To"] = reply_to_email.message_id
+    msg["References"] = reply_to_email.message_id
+    msg["To"] = thread.first_sender
+    msg["Cc"] = MAIL_USERNAME
+    msg.attach(email.mime.text.MIMEText(body, "HTML"))
+
+    response = client.send_raw_email(
+        Source=MAIL_SENDER_TAG,
+        Destinations=[thread.first_sender],
+        RawMessage={"Data": msg.as_string()},
+    )
+
+    thread.resolved = True
+    reply_email = Email(
+        datetime.utcnow(),
+        MAIL_SENDER_TAG,
+        reply_to_email.subject,
+        clean_text,
+        get_full_message_id(response["MessageId"]),
+        True,
+        thread.id,
+    )
+
     db.session.add(reply_email)
     db.session.commit()
     thread.last_email = reply_email.id

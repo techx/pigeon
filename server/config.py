@@ -32,6 +32,10 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 AUTH_USERNAME = os.environ.get("AUTH_USERNAME")
 AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
 
+AWS_REGION = os.environ.get("AWS_REGION")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
     {"name": "Andrew Z Liu", "email": "azliu@mit.edu"},
