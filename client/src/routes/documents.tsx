@@ -24,6 +24,8 @@ interface Document {
   source: string;
 }
 
+import { BASE_URL } from "../main";
+
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Array<Document>>([]);
   const [question, setQuestion] = useState("");
@@ -39,7 +41,7 @@ export default function DocumentsPage() {
   });
 
   const getDocuments = () => {
-    fetch(`/api/admin/get_documents`)
+    fetch(`${BASE_URL}/api/admin/get_documents`)
       .then((res) => res.json())
       .then((data) => {
         setDocuments(data);
@@ -50,7 +52,7 @@ export default function DocumentsPage() {
   }, []);
 
   const updateEmbeddings = () => {
-    fetch(`/api/admin/update_embeddings`);
+    fetch(`${BASE_URL}/api/admin/update_embeddings`);
   };
 
   const clearContent = () => {
@@ -74,7 +76,7 @@ export default function DocumentsPage() {
     // const formData = new FormData();
     // formData.append("file", file);
     // console.log(formData);
-    fetch(`/api/admin/upload_json`, {
+    fetch(`${BASE_URL}/api/admin/upload_json`, {
       method: "POST",
       body: file,
     })
@@ -110,7 +112,7 @@ export default function DocumentsPage() {
     const formData = new FormData();
     formData.append("file", file);
     // console.log(formData);
-    fetch(`/api/admin/import_csv`, {
+    fetch(`${BASE_URL}/api/admin/import_csv`, {
       method: "POST",
       body: formData,
     })
@@ -149,7 +151,7 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
-    fetch("/api/admin/upload_document", {
+    fetch(`${BASE_URL}/api/admin/upload_document`, {
       method: "POST",
       body: formData,
     })
@@ -189,7 +191,7 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
-    fetch(`/api/admin/edit_document`, {
+    fetch(`${BASE_URL}/api/admin/edit_document`, {
       method: "POST",
       body: formData,
     })
@@ -216,7 +218,7 @@ export default function DocumentsPage() {
     notifications.clean();
     const formData = new FormData();
     formData.append("id", id.toString());
-    fetch(`/api/admin/delete_document`, {
+    fetch(`${BASE_URL}/api/admin/delete_document`, {
       method: "POST",
       body: formData,
     })
@@ -242,7 +244,7 @@ export default function DocumentsPage() {
   };
   const clearDocuments = () => {
     notifications.clean();
-    fetch(`/api/admin/clear_documents`, {
+    fetch(`${BASE_URL}/api/admin/clear_documents`, {
       method: "POST",
     })
       .then((res) => {
