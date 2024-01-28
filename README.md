@@ -9,11 +9,11 @@
   <p></p>
 </div>
 
-Pigeon is HackMIT's AI email assistant. Pigeon helps automates the help email workflow.
+Pigeon is HackMIT's RAG email assistant. Pigeon helps automates the help email workflow.
 
 ## Overview
 
-Pigeon uses [Flask](https://flask.palletsprojects.com/en/2.2.x/) for its backend framework and [React](https://reactjs.org) for its frontend framework. It is built on an in-memory [Redis](https://redis.io/) database that stores embedding data for documents and emails, along with [Postgres](https://www.postgresql.org/) for longer-term database management. The custom emailing service is built using [Mailgun](https://www.mailgun.com/).
+Pigeon uses [Flask](https://flask.palletsprojects.com/en/2.2.x/) for its backend framework and [React](https://reactjs.org) for its frontend framework. It is built on an in-memory [Redis](https://redis.io/) database that stores embedding data for documents and emails, along with [Postgres](https://www.postgresql.org/) for longer-term database management. The emailing service is automated with [AWS](https://aws.amazon.com/), see below for details.
 
 ### Directory Overview
 
@@ -80,7 +80,19 @@ BACKEND_URL=""
 BACKEND_URL_DOCKER=""
 MAIL_USERNAME=""
 MAIL_PASSWORD=""
+
+AUTH_CLIENT_ID=""
+AUTH_CLIENT_SECRET=""
+AUTH_USERNAME=""
+AUTH_PASSWORD=""
+
+SESSION_SECRET=""
+
 OPENAI_API_KEY=""
+
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
+AWS_REGION = ""
 ```
 
 ### Docker
@@ -120,18 +132,10 @@ docker compose down
 
 to close all open Pigeon containers.
 
-### Mailgun
-
-All emails are forwarded to Pigeon through [mailgun](https://www.mailgun.com/).
-
-In order to setup mail forwarding locally, you must expose the backend to the internet with `ngrok`. If you don't have `ngrok` installed, you can view instructions for diffenerent operating systems [here](https://ngrok.com/download). Then run
-
-```sh
-ngrok http 2000
-```
-
-to generate an `ngrok` link that exposes port 2000 to the internet. Then under the `Receiving` tab in the Mailgun dashboard, edit the route that matches the current email address and append your `ngrok` with the endpoint `/api/emails/receive_mail` to the list of forwarding URLs. The URL wil look like `https://[hash].ngrok-free.app/api/emails/receive_email`.
-
 ## Development
 
-[Insert development notes.]
+### AWS
+
+All emails are forwarded to Pigeon through [AWS](https://aws.amazon.com/). More specifically, emails are received with a [receipt rule](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-concepts.html) and forwarded to an [S3 bucket](https://aws.amazon.com/s3/), which are then processed and forwarded to the api with a [lambda](https://aws.amazon.com/lambda/). The receiving and sending rules are both handled by [SES](https://aws.amazon.com/ses/). 
+
+For instructions on setting up locally, see [go/pigeon-aws](https://docs.google.com/document/d/1ASPwrC0LeI1jgSu9yML05zhb3SXFs6xe-xUKox3JWNw/edit).
