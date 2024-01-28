@@ -15,6 +15,7 @@ ALLOWED_DOMAINS = [FRONTEND_URL]
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "DATABASE_URL", "postgresql://postgres:password@postgresdb/pigeondb"
 )
+REDIS_URL = os.environ.get("REDIS_URL", "redis")
 
 FLASK_RUN_PORT = 2000
 DEBUG = True

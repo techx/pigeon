@@ -97,10 +97,10 @@ def import_csv():
 
         for _, row in df.iterrows():
             document = Document(
-                "" if pd.isna(row["question"]) else row['question'],
-                row['content'],
-                row['source'],
-                "" if pd.isna(row["label"]) else row['label']
+                "" if pd.isna(row["question"]) else row["question"],
+                row["content"],
+                row["source"],
+                "" if pd.isna(row["label"]) else row["label"],
             )
             db.session.add(document)
         db.session.commit()

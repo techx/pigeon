@@ -93,6 +93,7 @@ def confidence_metric(confidences: list[float]) -> float:
     float
         confidence metric
     """
+    print("confidences", confidences)
     return np.min(np.array(confidences))
 
 
@@ -121,11 +122,16 @@ def generate_context(
     docs = {}
 
     results = query_all(3, questions)
+    print("results", results)
     message = "Here is some context to help you answer this email: \n"
     for result in results:
         confidence = 0
         docs[result["query"]] = []
         for doc in result["result"]:
+            if doc["score"] <= 0.02:
+                doc["score"] = 0
+            else:
+                doc["score"] = (doc["score"] - 0.02) * 8 + 0.02
             confidence = max(confidence, doc["score"])
             message += doc["question"] + " " + doc["content"] + "\n"
             docs[result["query"]].append(doc)
