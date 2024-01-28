@@ -132,16 +132,18 @@ export default function InboxPage() {
   const parseBody = (body: string) => {
     const lines = body.replace(new RegExp("\r?\n", "g"), "<br />");
     const linesArray = lines.split("<br />");
-    console.log(linesArray);
     return (
       <Text>
-        {linesArray.map((line, idx) => (
-          <div
-            key={idx}
-            dangerouslySetInnerHTML={{ __html: line }}
-            style={{ marginBottom: "1rem" }}
-          />
-        ))}
+        {linesArray.map((line, idx) => {
+          return (
+            <div
+              key={idx}
+              dangerouslySetInnerHTML={{
+                __html: line === "" ? "&nbsp;" : line,
+              }}
+            />
+          );
+        })}
       </Text>
     );
   };
@@ -460,7 +462,6 @@ export default function InboxPage() {
                       <Title size="xl">{email.sender}</Title>
                       <Text>{parseFullDate(email.date)}</Text>
                     </Flex>
-                    {/* <Text dangerouslySetInnerHTML={{ __html: email.html }} /> */}
                     {parseBody(email.body)}
                   </Timeline.Item>
                 ))}
