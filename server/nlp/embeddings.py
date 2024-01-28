@@ -26,7 +26,9 @@ cwd = os.path.dirname(__file__)
 VECTOR_DIMENSION = 768
 
 # load redis client
-client = redis.Redis(host="redis", port=6379, decode_responses=True)
+client = redis.Redis(
+    host="redis://red-cmr3ngi1hbls73fn25p0", port=6379, decode_responses=True
+)
 
 # load corpus
 # with open('corpus.json', 'r') as f:
