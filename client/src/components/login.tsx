@@ -45,7 +45,7 @@ export default function LoginPage() {
   };
 
   function handleGoogleSubmit() {
-    window.location.replace(`/api/auth/login`);
+    window.location.replace(`${BASE_URL}/api/auth/login`);
   }
 
   async function onAdminLoginSubmit({
