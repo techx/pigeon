@@ -132,6 +132,27 @@ docker compose down
 
 to close all open Pigeon containers.
 
+#### Troubleshooting
+
+A common reason for docker failing on start is that the containers start in the wrong order, and shut down early. To restart a container, check the "Containers" tab in docker desktop and restart any dead pigeon containers. 
+
+For managing the database, navigate to the `pigeon-postgresdb` container, and then click on the `Exec` tab. 
+
+```sh
+su postgres
+psql
+```
+
+will open up the postgres instance. 
+
+You can also run this locally; `docker container ls` will list the docker containers that are currently running. Then, 
+
+```sh
+docker exec -it <container_id> /bin/bash
+```
+
+will open up a shell inside of the docker container with id `container_id`. Use the postgres container to access the database. 
+
 ## Development
 
 ### AWS
