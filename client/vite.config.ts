@@ -13,7 +13,7 @@ export default defineConfig(({ command, mode }) => {
       host: true,
       proxy: {
         "/api": {
-          target: env.BACKEND_URL_DOCKER,
+          target: env.BACKEND_URL,
           changeOrigin: true,
         },
       },
