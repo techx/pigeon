@@ -158,6 +158,7 @@ def receive_email_mailgun():
 @emails.route("/receive_email", methods=["POST"])
 def receive_email():
     data = request.form
+    print(data, flush=True)
 
     if (
         "From" not in data

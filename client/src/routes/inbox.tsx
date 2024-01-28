@@ -368,7 +368,8 @@ export default function InboxPage() {
               <Accordion.Item
                 style={{
                   "border-left": `6px solid ${computeColor(
-                    Math.round((document.confidence / 0.8) * 100) / 100
+                    // Math.round((document.confidence / 0.8) * 100) / 100
+                    Math.round(document.confidence * 100) / 100
                   )}`,
                 }}
                 key={documentIndex}
@@ -384,7 +385,8 @@ export default function InboxPage() {
                     : document.label}
                   <Text className={classes.sourceConfidence}>
                     {"Relevance: " +
-                      Math.round((document.confidence / 0.8) * 100) / 100}
+                      // Math.round((document.confidence / 0.8) * 100) / 100
+                      Math.round(document.confidence * 100) / 100}
                   </Text>
                 </Accordion.Control>
                 <Accordion.Panel>
