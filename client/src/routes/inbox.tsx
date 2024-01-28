@@ -214,6 +214,7 @@ export default function InboxPage() {
           color: "red",
           message: "Something went wrong!",
         });
+        setSourceActive(false);
       })
       .then((data) => {
         editor?.commands.clearContent(true);
@@ -224,6 +225,7 @@ export default function InboxPage() {
           color: "green",
           message: data.message,
         });
+        setSourceActive(false);
       });
   };
 
