@@ -37,7 +37,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+import { BASE_URL } from "../main";
+
 export const whoami = async () => {
-  const res = await fetch(`/api/auth/whoami`);
+  const res = await fetch(`${BASE_URL}/api/auth/whoami`);
   return await res.text();
 };

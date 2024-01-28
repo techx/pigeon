@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@mantine/core": "^7.1.5",
+    "@mantine/form": "^7.4.0",
     "@mantine/hooks": "^7.1.5",
     "@mantine/notifications": "^7.1.5",
-    "@mantine/form": "^7.4.0",
     "@mantine/tiptap": "^7.1.5",
     "@tabler/icons-react": "^2.39.0",
     "@tiptap/extension-link": "^2.1.12",
@@ -23,10 +23,11 @@
     "@tiptap/pm": "^2.1.12",
     "@tiptap/react": "^2.1.12",
     "@tiptap/starter-kit": "^2.1.12",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.17.0",
-    "react-icons": "^4.10.1"
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^6.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

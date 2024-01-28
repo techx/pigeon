@@ -9,11 +9,13 @@ const theme = createTheme({
   fontFamily: "Verdana, sans-serif",
 });
 
+export const BASE_URL = "https://pigeon-ddzt.onrender.com";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <MantineProvider classNamesPrefix="p" theme={theme}>
       <Notifications />
       <App />
     </MantineProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

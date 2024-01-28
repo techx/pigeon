@@ -18,13 +18,17 @@ interface LinkData {
   onClick?: () => void;
 }
 
+import { BASE_URL } from "../main";
+
 export default function Shell() {
   const navigate = useNavigate();
   const { authorized } = useAuth();
   const [links, setLinks] = useState<ReactElement[]>([]);
 
   const handleLogout = async () => {
-    const response = await fetch("/api/auth/logout", { method: "POST" });
+    const response = await fetch(`${BASE_URL}/api/auth/logout`, {
+      method: "POST",
+    });
     try {
       window.location.replace(response.url);
     } catch (e) {

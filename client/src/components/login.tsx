@@ -24,13 +24,15 @@ export function GoogleButton(props: any) {
   return <Button leftSection={<FcGoogle />} variant="light" {...props} />;
 }
 
+import { BASE_URL } from "../main";
+
 export default function LoginPage() {
   const [adminLoginModal, setAdminLoginModal] = useState(false);
   const { setAuthorized } = useAuth();
   const navigate = useNavigate();
 
   const adminLogin = async (username: string, password: string) => {
-    return await fetch(`/api/auth/login_admin`, {
+    return await fetch(`${BASE_URL}/api/auth/login_admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
