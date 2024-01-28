@@ -149,7 +149,6 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
-    console.log(formData)
     fetch("/api/admin/upload_document", {
       method: "POST",
       body: formData,
@@ -270,7 +269,7 @@ export default function DocumentsPage() {
   const handleSelect = (id: number) => {
     setActive(id);
     const activeDocument = documents.filter(
-      (document) => document.id === id,
+      (document) => document.id === id
     )[0];
     setQuestion(activeDocument.question);
     setContent(activeDocument.content);
@@ -373,9 +372,11 @@ export default function DocumentsPage() {
               accept="file/json"
             >
               {(props) => {
-                return <Button {...props} color="green">
-                  Upload JSON
-                </Button>
+                return (
+                  <Button {...props} color="green">
+                    Upload JSON
+                  </Button>
+                );
               }}
             </FileButton>
           ) : (
@@ -384,14 +385,13 @@ export default function DocumentsPage() {
             </Button>
           )}
           {active === -1 && (
-            <FileButton
-              onChange={(file) => importCSV(file)}
-              accept="file/csv"
-            >
+            <FileButton onChange={(file) => importCSV(file)} accept="file/csv">
               {(props) => {
-                return <Button {...props} color="cyan">
-                  Import CSV
-                </Button>
+                return (
+                  <Button {...props} color="cyan">
+                    Import CSV
+                  </Button>
+                );
               }}
             </FileButton>
           )}

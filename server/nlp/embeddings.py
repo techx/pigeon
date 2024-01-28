@@ -14,26 +14,29 @@ from redis.commands.search.field import (
 )
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
-from sentence_transformers import SentenceTransformer
+from server.config import OPENAI_API_KEY, REDIS_URL
 
 from textwrap import TextWrapper
 from server.config import RedisDocument, OpenAIMessage
+
+import openai
 
 import os
 
 cwd = os.path.dirname(__file__)
 
-VECTOR_DIMENSION = 768
+VECTOR_DIMENSION = 1536
 
 # load redis client
-client = redis.Redis(host="redis", port=6379, decode_responses=True)
+client = redis.Redis(host=REDIS_URL, port=6379, decode_responses=True)
 
 # load corpus
 # with open('corpus.json', 'r') as f:
 #     corpus = json.load(f)
 
 # load embedding model
-embedder = SentenceTransformer("msmarco-distilbert-base-v4")
+# embedder = SentenceTransformer("msmarco-distilbert-base-v4")
+embedding_model = "text-embedding-3-small"
 
 
 def load_corpus(corpus: list[RedisDocument]):
@@ -62,6 +65,17 @@ def load_corpus(corpus: list[RedisDocument]):
     print("successfully loaded all documents")
 
 
+def compute_openai_embeddings(texts):
+    embeddings = []
+    for i in range(len(texts)):
+        embeddings.append(
+            openai.Embedding.create(input=texts[i], model=embedding_model)
+            .data[0]
+            .embedding
+        )
+    return embeddings
+
+
 def compute_embeddings():
     """compute embeddings from redis documents"""
     print("computing embeddings...")
@@ -77,13 +91,15 @@ def compute_embeddings():
     question_and_content = [
         questions[i][0] + " " + content[i][0] for i in range(len(questions))
     ]
-    embeddings = embedder.encode(question_and_content).astype(np.float32).tolist()
+
+    # embeddings = embedder.encode(question_and_content).astype(np.float32).tolist()
+    embeddings = compute_openai_embeddings(question_and_content)
 
     # save embeddings
-    with open(f"{cwd}/embeddings.json", "w") as f:
-        json.dump(embeddings, f)
+    # with open(f"{cwd}/embeddings.json", "w") as f:
+    #     json.dump(embeddings, f)
 
-    VECTOR_DIMENSION = len(embeddings[0])
+    # VECTOR_DIMENSION = len(embeddings[0])
 
     print("successfully computed embeddings")
     return embeddings
@@ -204,7 +220,7 @@ def queries(query, queries: list[str]) -> list[dict]:
     print("running queries...")
 
     # encode queries
-    encoded_queries = embedder.encode(queries)
+    encoded_queries = compute_openai_embeddings(queries)
 
     # run queries
     results_list = []

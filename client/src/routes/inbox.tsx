@@ -71,7 +71,6 @@ export default function InboxPage() {
   const activeThread = threads.filter((thread) => {
     return thread.id === active;
   })[0];
-  console.log(activeThread);
   const [threadSize, setThreadSize] = useState(
     activeThread ? activeThread.emailList.length : 0
   );
