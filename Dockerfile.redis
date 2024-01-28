@@ -1,4 +1,4 @@
-FROM redis/redis-stack-server:latest
+FROM redis/redis-stack-server:7.2.0-v6
 
 WORKDIR /home/pigeon
 
