@@ -128,10 +128,10 @@ def generate_context(
         confidence = 0
         docs[result["query"]] = []
         for doc in result["result"]:
-            if doc["score"] <= 0.02:
-                doc["score"] = 0
-            else:
-                doc["score"] = (doc["score"] - 0.02) * 8 + 0.02
+            # if doc["score"] <= 0.02:
+            #     doc["score"] = 0
+            # else:
+            #     doc["score"] = (doc["score"] - 0.02) * 8 + 0.02
             confidence = max(confidence, doc["score"])
             message += doc["question"] + " " + doc["content"] + "\n"
             docs[result["query"]].append(doc)
