@@ -78,8 +78,10 @@ def authorize():
     user_info = oauth.google.userinfo(token=token)
     for admin in app.config["AUTH_ADMINS"]:
         if admin["email"] == user_info["email"] and admin["name"] == user_info["name"]:
+            print("admin", flush=True)
             session["user"] = {"role": "Admin"}
             return redirect(app.config["FRONTEND_URL"] + "/inbox")
+    print("not admin", flush=True)
     return redirect(app.config["FRONTEND_URL"] + "/restricted")
 
 
