@@ -168,6 +168,12 @@ def receive_email():
     ):
         return {"message": "Missing fields"}, 400
 
+    # aws sends duplicate emails sometimes. ignore if duplicate
+    email_exists = Email.query.filter_by(message_id=data["Message-Id"]).first()
+    if email_exists:
+        print("duplicate email", flush=True)
+        return data
+
     # by default, body contains the full email bodies of all previous emails in the thread
     # here, we filter out previous emails so that only the body of the current email is used
     # this filtering is purposely not done on AWS because of potentially needing context for the TODO below
