@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const checkAuthStatus = async () => {
     const response = await fetch("/api/auth/whoami");
     const data = await response.json();
-    setAuthorized(data.role === "admin");
+    setAuthorized(data.role === "Admin");
   };
 
   useEffect(() => {
@@ -40,8 +40,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 export const whoami = async () => {
   const res = await fetch(`/api/auth/whoami`);
   return await res.text();
-};
-
-export const authLoader = async () => {
-  return await whoami();
 };

@@ -25,10 +25,9 @@ export default function Shell() {
 
   const handleLogout = async () => {
     const response = await fetch("/api/auth/logout", { method: "POST" });
-    if (response.ok) {
-      setAuthorized(false);
-      navigate("/login");
-    } else {
+    try {
+      window.location.replace(response.url);
+    } catch (e) {
       notifications.show({
         title: "Error!",
         color: "red",
