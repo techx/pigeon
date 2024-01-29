@@ -118,7 +118,7 @@ export default function LoginPage() {
             <Divider
               label="Use admin credentials"
               labelPosition="center"
-              mt={24}
+              mt={20}
               mb={adminLoginModal ? 16 : 0}
               className={classes.pointer}
               onClick={() => setAdminLoginModal(!adminLoginModal)}

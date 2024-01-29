@@ -7,9 +7,19 @@ import {
   IconLogin,
   IconLogout,
 } from "@tabler/icons-react";
-import { AppShell, Box, Anchor, NavLink, Text } from "@mantine/core";
+import {
+  AppShell,
+  Box,
+  Anchor,
+  NavLink,
+  Text,
+  Group,
+  Burger,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useAuth } from "./auth";
+import classes from "./shell.module.css";
 
 interface LinkData {
   label: string;
@@ -22,6 +32,7 @@ import { BASE_URL } from "../main";
 
 export default function Shell() {
   const navigate = useNavigate();
+  const [opened, { toggle }] = useDisclosure();
   const { authorized } = useAuth();
   const [links, setLinks] = useState<ReactElement[]>([]);
 
@@ -83,8 +94,15 @@ export default function Shell() {
   }, [authorized, location.pathname]);
 
   return (
-    <AppShell navbar={{ width: 200, breakpoint: "sm" }}>
-      <AppShell.Navbar>
+    <AppShell
+      navbar={{ width: 200, breakpoint: "sm", collapsed: { mobile: !opened } }}
+    >
+      <AppShell.Header>
+        <Group h={{ base: "60px", sm: 0 }} px="md">
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        </Group>
+      </AppShell.Header>
+      <AppShell.Navbar mt={{ base: "60px", sm: 0 }}>
         <Anchor
           style={{ paddingTop: "20px", paddingLeft: "20px" }}
           key="Home"
@@ -97,6 +115,7 @@ export default function Shell() {
         <Box className="navlinksinner">{links}</Box>
       </AppShell.Navbar>
       <AppShell.Main>
+        <div className={classes.paddingDiv}></div>
         <Outlet />
       </AppShell.Main>
     </AppShell>
