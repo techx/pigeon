@@ -39,9 +39,21 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
-    {"name": "Andrew Z Liu", "email": "azliu@mit.edu"},
+    {"name": "Andrew Liu", "email": "azliu@mit.edu"},
     {"name": "Richard Chen", "email": "richen@mit.edu"},
     {"name": "Annie Wang", "email": "anniewang2023@gmail.com"},
     {"name": "Eddie Qiao", "email": "eqiao@mit.edu"},
     {"name": "Albert Tam", "email": "altam@mit.edu"},
+    {"name": "Kathryn Le", "email": "kle@mit.edu"},
+    {"name": "Audrey Douglas", "email": "adouglas@mit.edu"},
+    {"name": "Darren Yao", "email": "dyao@mit.edu"},
+    {"name": "Jenny Yu", "email": "yujenny@mit.edu"},
+    {"name": "Michael Zeng", "email": "michzeng@mit.edu"},
+    {"name": "Anna Li", "email": "annawli@mit.edu"},
+    {"name": "Claire Wang", "email": "clairely@mit.edu"},
+    {"name": "Eddie Qiao", "email": "eqiao@mit.edu"},
+    {"name": "Elaine Jiang", "email": "ejiang@mit.edu"},
+    {"name": "Janet Guo", "email": "janetguo@mit.edu"},
+    {"name": "Maggie Liu", "email": "magpie@mit.edu"},
+    {"name": "Nathan Wang", "email": "nrwang@mit.edu"},
 ]
