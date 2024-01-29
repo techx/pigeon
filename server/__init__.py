@@ -1,6 +1,7 @@
 from apiflask import APIFlask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session
 
 # https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
 import numpy
@@ -36,10 +37,10 @@ def create_app():
 
     # https://stackoverflow.com/questions/52733540/flask-session-dont-persist-data
     app.config.update(
-        SESSION_COOKIE_SAMESITE="None",
-        SESSION_COOKIE_SECURE=True,
+        SESSION_PERMANENT=False,
         SESSION_TYPE="filesystem",
     )
+    Session(app)
 
     with app.app_context():
         db.init_app(app)
