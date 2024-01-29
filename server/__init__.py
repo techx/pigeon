@@ -50,6 +50,9 @@ def create_app():
 
         @app.errorhandler(404)
         def _default(_error):
-            return render_template("index.html"), 200
+            if app.config["ENV"] == "production":
+                return render_template("index.html"), 200
+            else:
+                return redirect(app.config["FRONTEND_URL"])
 
     return app
