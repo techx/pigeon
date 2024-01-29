@@ -29,7 +29,7 @@ export default function IndexPage() {
             </List.Item>
             <List.Item className={classes.text}>
               In the inbox, you can view all incoming help messages along with a
-              customed AI-generated response based on relevant documents.
+              RAG-generated response based on relevant documents.
             </List.Item>
             <List.Item className={classes.text}>
               Use the inbox to keep track of threads and unresolved emails.
