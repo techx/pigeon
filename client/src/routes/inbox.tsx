@@ -443,7 +443,8 @@ export default function InboxPage() {
                   ...activeThread.emailList
                     .filter(
                       (email) =>
-                        email.sender === '"HackMIT Team" <help@my.hackmit.org>'
+                        email.sender ===
+                        '"Blueprint Team" <blueprint@hackmit.org>'
                     )
                     .map((email) => activeThread.emailList.indexOf(email))
                 )}
@@ -453,7 +454,7 @@ export default function InboxPage() {
                     key={email.id}
                     bullet={
                       email.sender ===
-                        '"HackMIT Team" <help@my.hackmit.org>' && (
+                        '"Blueprint Team" <blueprint@hackmit.org>' && (
                         <ThemeIcon
                           size={20}
                           color="blue"
