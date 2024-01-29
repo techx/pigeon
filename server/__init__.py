@@ -1,7 +1,7 @@
 from apiflask import APIFlask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_session import Session
+from flask import redirect, render_template
 
 # https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
 import numpy
@@ -31,16 +31,11 @@ def create_app():
         docs_ui="elements",
         title="Pigeon API",
         static_url_path="",
+        static_folder="../client/dist",
+        template_folder="../client/dist",
     )
 
     app.config.from_pyfile("config.py")
-
-    # https://stackoverflow.com/questions/52733540/flask-session-dont-persist-data
-    app.config.update(
-        SESSION_PERMANENT=False,
-        SESSION_TYPE="filesystem",
-    )
-    Session(app)
 
     with app.app_context():
         db.init_app(app)
@@ -52,5 +47,12 @@ def create_app():
 
         app.register_blueprint(api)
         db.create_all()
+
+        @app.errorhandler(404)
+        def _default(_error):
+            if app.config["ENV"] == "production":
+                return render_template("index.html"), 200
+            else:
+                return redirect(app.config["FRONTEND_URL"])
 
     return app
