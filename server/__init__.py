@@ -35,7 +35,11 @@ def create_app():
     app.config.from_pyfile("config.py")
 
     # https://stackoverflow.com/questions/52733540/flask-session-dont-persist-data
-    app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+    app.config.update(
+        SESSION_COOKIE_SAMESITE="None",
+        SESSION_COOKIE_SECURE=True,
+        SESSION_TYPE="filesystem",
+    )
 
     with app.app_context():
         db.init_app(app)

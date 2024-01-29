@@ -269,6 +269,11 @@ export default function DocumentsPage() {
   };
 
   const handleSelect = (id: number) => {
+    if (active === id) {
+      setActive(-1);
+      clearContent();
+      return;
+    }
     setActive(id);
     const activeDocument = documents.filter(
       (document) => document.id === id
