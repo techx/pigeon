@@ -15,6 +15,7 @@ Flask-Cors==4.0.0
 Flask-HTTPAuth==4.8.0
 Flask-Mail==0.9.1
 flask-marshmallow==0.15.0
+Flask-Session==0.6.0
 Flask-SQLAlchemy==3.1.1
 frozenlist==1.4.0
 fsspec==2023.9.2
