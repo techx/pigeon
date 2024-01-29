@@ -1,4 +1,5 @@
 .row:hover {
+  cursor: pointer;
   background-color: var(--mantine-color-gray-0);
 }
 
