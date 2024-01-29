@@ -5,10 +5,16 @@ from flask_sqlalchemy import SQLAlchemy
 # https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
 import numpy
 from psycopg2.extensions import register_adapter, AsIs
+
+
 def addapt_numpy_float64(numpy_float64):
     return AsIs(numpy_float64)
+
+
 def addapt_numpy_int64(numpy_int64):
     return AsIs(numpy_int64)
+
+
 register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
@@ -27,6 +33,9 @@ def create_app():
     )
 
     app.config.from_pyfile("config.py")
+
+    # https://stackoverflow.com/questions/52733540/flask-session-dont-persist-data
+    app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 
     with app.app_context():
         db.init_app(app)
