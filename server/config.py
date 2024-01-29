@@ -22,7 +22,7 @@ DEBUG = True
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 
-MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
+MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
 
 AUTH_CLIENT_ID = os.environ.get("AUTH_CLIENT_ID")
 AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
