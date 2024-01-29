@@ -64,8 +64,6 @@ interface Response {
   emailId: number;
 }
 
-import { BASE_URL } from "../main";
-
 export default function InboxPage() {
   const [threads, setThreads] = useState<Array<Thread>>([]);
   const [active, setActive] = useState(-1);
@@ -97,7 +95,7 @@ export default function InboxPage() {
     [response]
   );
   const getThreads = () => {
-    fetch(`${BASE_URL}/api/emails/get_threads`)
+    fetch(`/api/emails/get_threads`)
       .then((res) => res.json())
       .then((data) => {
         setThreads(data);
@@ -156,7 +154,7 @@ export default function InboxPage() {
       "id",
       activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
-    fetch(`${BASE_URL}/api/emails/get_response`, {
+    fetch(`/api/emails/get_response`, {
       method: "POST",
       body: formData,
     })
@@ -203,7 +201,7 @@ export default function InboxPage() {
       activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
     formData.append("body", content);
-    fetch(`${BASE_URL}/api/emails/send_email`, {
+    fetch(`/api/emails/send_email`, {
       method: "POST",
       body: formData,
     })
@@ -241,7 +239,7 @@ export default function InboxPage() {
       loading: true,
       autoClose: false,
     });
-    fetch(`${BASE_URL}/api/emails/regen_response`, {
+    fetch(`/api/emails/regen_response`, {
       method: "POST",
       body: formData,
     })

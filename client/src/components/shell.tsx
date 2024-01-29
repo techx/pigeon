@@ -28,8 +28,6 @@ interface LinkData {
   onClick?: () => void;
 }
 
-import { BASE_URL } from "../main";
-
 export default function Shell() {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
@@ -37,7 +35,7 @@ export default function Shell() {
   const [links, setLinks] = useState<ReactElement[]>([]);
 
   const handleLogout = async () => {
-    const response = await fetch(`${BASE_URL}/api/auth/logout`, {
+    const response = await fetch(`/api/auth/logout`, {
       method: "POST",
     });
     try {
