@@ -324,14 +324,18 @@ def send_email():
     msg["FROM"] = f'"Blueprint Team" <blueprint@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
-    msg["To"] = thread.first_sender
+
+    to_email_addresses = [thread.first_sender, "team@hackmit.org"]
+    msg["To"] = ", ".join(to_email_addresses)
+    # msg["To"] = thread.first_sender
     # msg["Cc"] = MAIL_USERNAME
-    msg["Cc"] = "team@hackmit.org"
+    # msg["Cc"] = "team@hackmit.org"
     msg["Reply-To"] = "team@hackmit.org"
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(
-        Destinations=[thread.first_sender],
+        # Destinations=[thread.first_sender],
+        Destinations=to_email_addresses,
         RawMessage={"Data": msg.as_string()},
     )
 
