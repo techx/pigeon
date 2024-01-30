@@ -311,11 +311,14 @@ def send_email():
 
     msg = email.mime.multipart.MIMEMultipart()
     msg["Subject"] = reply_to_email.subject
-    msg["FROM"] = MAIL_SENDER_TAG
+    # msg["FROM"] = MAIL_SENDER_TAG
+    msg["FROM"] = f'"Blueprint Team" <blueprint@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
     msg["To"] = thread.first_sender
-    msg["Cc"] = MAIL_USERNAME
+    # msg["Cc"] = MAIL_USERNAME
+    msg["Cc"] = "team@hackmit.org"
+    msg["Reply-To"] = "team@hackmit.org"
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(
