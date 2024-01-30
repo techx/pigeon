@@ -103,7 +103,7 @@ export default function InboxPage() {
   };
   useEffect(() => {
     getThreads();
-    const interval = setInterval(getThreads, 10000);
+    const interval = setInterval(getThreads, 300000);
     return () => clearInterval(interval);
   }, []);
   const strip: (text: string) => string = (text) => {
@@ -444,7 +444,7 @@ export default function InboxPage() {
                     .filter(
                       (email) =>
                         email.sender ===
-                        '"Blueprint Team" <blueprint@hackmit.org>'
+                        '"Blueprint Team" <blueprint@my.hackmit.org>'
                     )
                     .map((email) => activeThread.emailList.indexOf(email))
                 )}
@@ -454,7 +454,7 @@ export default function InboxPage() {
                     key={email.id}
                     bullet={
                       email.sender ===
-                        '"Blueprint Team" <blueprint@hackmit.org>' && (
+                        '"Blueprint Team" <blueprint@my.hackmit.org>' && (
                         <ThemeIcon
                           size={20}
                           color="blue"

@@ -11,7 +11,7 @@ from server import db
 from server.config import (
     MAIL_USERNAME,
     MAIL_PASSWORD,
-    MAIL_USERNAME,
+    MAIL_CC,
     MAIL_SENDER_TAG,
     AWS_REGION,
     AWS_ACCESS_KEY_ID,
@@ -315,7 +315,8 @@ def send_email():
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
     msg["To"] = thread.first_sender
-    msg["Cc"] = MAIL_USERNAME
+    msg["Cc"] = MAIL_CC
+    msg["Reply-To"] = MAIL_CC
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(

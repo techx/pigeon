@@ -21,6 +21,7 @@ FLASK_RUN_PORT = 2000
 DEBUG = True
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+MAIL_CC = os.environ.get("MAIL_CC")
 
 MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
 
