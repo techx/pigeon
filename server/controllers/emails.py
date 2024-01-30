@@ -189,11 +189,20 @@ def receive_email():
 
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
-        real_message_id = data["In-Reply-To"][
-            3:
-        ]  # for some reason AWS adds three spaces to the message id
+
+        # for some reason AWS adds three spaces to the message id
+        real_message_id = real_message_id.strip()
+
         replied_to_email = Email.query.filter_by(message_id=real_message_id).first()
-        if MAIL_USERNAME not in data["From"] and replied_to_email:
+        print("replied to email", replied_to_email, flush=True)
+        print("real message id", real_message_id, len(real_message_id), flush=True)
+        print(
+            "data from",
+            data["From"],
+            "blueprint@my.hackmit.org" not in data["From"],
+            flush=True,
+        )
+        if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
                 email = Email(
@@ -327,10 +336,18 @@ def send_email():
         RawMessage={"Data": msg.as_string()},
     )
 
+    new_mesage_id = get_full_message_id(response["MessageId"])
+    print(
+        "sending a new repsonse with message id",
+        new_mesage_id,
+        len(new_mesage_id),
+        flush=True,
+    )
+
     thread.resolved = True
     reply_email = Email(
         datetime.utcnow(),
-        MAIL_SENDER_TAG,
+        f'"Blueprint Team" <blueprint@my.hackmit.org>',
         reply_to_email.subject,
         clean_text,
         get_full_message_id(response["MessageId"]),
