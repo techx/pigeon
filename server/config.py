@@ -56,4 +56,6 @@ AUTH_ADMINS = [
     {"name": "Janet Guo", "email": "janetguo@mit.edu"},
     {"name": "Maggie Liu", "email": "magpie@mit.edu"},
     {"name": "Nathan Wang", "email": "nrwang@mit.edu"},
+    {"name": "Claire Wang", "email": "clara32356@gmail.com"},
+    {"name": "Claire Wang", "email": "sparrowsong325@gmail.com"},
 ]
