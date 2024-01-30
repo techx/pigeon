@@ -191,7 +191,7 @@ def receive_email():
         # reply to existing email, add to existing thread
 
         # for some reason AWS adds three spaces to the message id
-        real_message_id = real_message_id.strip()
+        real_message_id = data["In-Reply-To"].strip()
 
         replied_to_email = Email.query.filter_by(message_id=real_message_id).first()
         print("replied to email", replied_to_email, flush=True)
@@ -331,7 +331,6 @@ def send_email():
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(
-        Source=MAIL_SENDER_TAG,
         Destinations=[thread.first_sender],
         RawMessage={"Data": msg.as_string()},
     )
