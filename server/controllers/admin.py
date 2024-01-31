@@ -30,9 +30,14 @@ def upload_text():
 def delete_text():
     data = request.form
     document = Document.query.get(data["id"])
-    db.session.delete(document)
-    db.session.commit()
-    return {"message": "Document deleted"}
+    if document.response_count > 0:
+        document.to_delete = True
+        db.session.commit()
+        return {"message": "Document marked for deletion"}
+    else:
+        db.session.delete(document)
+        db.session.commit()
+        return {"message": "Document deleted"}
 
 
 @admin.route("/edit_document", methods=["POST"])
@@ -56,7 +61,7 @@ def get_all():
 @admin.route("/update_embeddings", methods=["GET"])
 def update_embeddings():
     documents = Document.query.order_by(Document.id.desc()).all()
-    docs = [document.map() for document in documents]
+    docs = [document.map() for document in documents if not document.to_delete]
     modified_corpus = [
         {
             "question": doc["question"],
@@ -112,8 +117,14 @@ def import_csv():
 @admin.route("/clear_documents", methods=["POST"])
 def clear_documents():
     try:
-        Document.query.delete()
+        documents = Document.query.order_by(Document.id.desc()).all()
+        for document in documents:
+            if document.response_count > 0:
+                document.to_delete = True
+            else:
+                db.session.delete(document)
         db.session.commit()
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
     return {"message": "Documents cleared"}
+

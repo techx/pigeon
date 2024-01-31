@@ -54,6 +54,8 @@ interface Document {
   content: string;
   source: string;
   confidence: number;
+  to_delete: boolean;
+  response_count: number;
 }
 interface Response {
   id: number;
@@ -388,6 +390,11 @@ export default function InboxPage() {
                       // Math.round((document.confidence / 0.8) * 100) / 100
                       Math.round(document.confidence * 100) / 100}
                   </Text>
+                  {document.to_delete && (
+                    <Text className={classes.deletedWarning}>
+                      {"This source has been deleted! Regenerating response recommended."}
+                    </Text>
+                  )}
                 </Accordion.Control>
                 <Accordion.Panel>
                   <div>

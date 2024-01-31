@@ -22,6 +22,8 @@ interface Document {
   question: string;
   content: string;
   source: string;
+  to_delete: boolean;
+  response_count: number;
 }
 
 export default function DocumentsPage() {
@@ -42,7 +44,7 @@ export default function DocumentsPage() {
     fetch("/api/admin/get_documents")
       .then((res) => res.json())
       .then((data) => {
-        setDocuments(data);
+        setDocuments(data.filter((document: Document) => !document.to_delete));
       });
   };
   useEffect(() => {
