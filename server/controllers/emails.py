@@ -21,9 +21,9 @@ from server.config import (
 from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
+from server.models.document import Document
 from server.nlp.responses import generate_response
 from datetime import datetime
-import quopri
 import boto3
 
 cwd = os.path.dirname(__file__)
@@ -83,6 +83,36 @@ def document_data(
         doc_confidences.append(doc_confidences_question)
     return questions, doc_ids, doc_confidences
 
+def increment_response_count(document_ids: list[list[int]]):
+    """increment response count for documents
+
+    Parameters
+    ----------
+    document_ids : :obj:`list` of :obj:`list` of :obj:`int`
+        list of document ids. each element in the list is a list of document ids used to answer a specific question
+    """
+    for doc_ids_question in document_ids:
+        for doc_id in doc_ids_question:
+            document = Document.query.get(doc_id)
+            document.response_count += 1
+            db.session.commit()
+
+def decrement_response_count(document_ids: list[list[int]]):
+    """decrement response count for documents
+
+    Parameters
+    ----------
+    document_ids : :obj:`list` of :obj:`list` of :obj:`int`
+        list of document ids. each element in the list is a list of document ids used to answer a specific question
+    """
+    for doc_ids_question in document_ids:
+        for doc_id in doc_ids_question:
+            document = Document.query.get(doc_id)
+            if document.to_delete and document.response_count == 1:
+                db.session.delete(document)
+            else:
+                document.response_count -= 1
+            db.session.commit()
 
 # not used as of 1/28/2024
 @emails.route("/receive_email_mailgun", methods=["POST"])
@@ -249,6 +279,7 @@ def receive_email():
         thread.last_email = email.id
         thread.resolved = False
         db.session.commit()
+        increment_response_count(document_ids)
     return data
 
 
@@ -359,6 +390,10 @@ def send_email():
     db.session.commit()
     thread.last_email = reply_email.id
     db.session.commit()
+
+    response = Response.query.filter_by(email_id=reply_to_email.id).first()
+    decrement_response_count(response.documents)
+
     return {"message": "Email sent successfully"}
 
 
@@ -384,8 +419,9 @@ def regen_response():
     openai_res, documents, confidence = generate_response(
         email.sender, email.body, openai_messages
     )
+    decrement_response_count(response.documents)
     questions, document_ids, document_confidences = document_data(documents)
-
+    increment_response_count(document_ids)
     response.response = openai_res
     response.questions = questions
     response.documents = document_ids

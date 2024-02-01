@@ -30,9 +30,14 @@ def upload_text():
 def delete_text():
     data = request.form
     document = Document.query.get(data["id"])
-    db.session.delete(document)
-    db.session.commit()
-    return {"message": "Document deleted"}
+    if document.response_count > 0:
+        document.to_delete = True
+        db.session.commit()
+        return {"message": "Document marked for deletion"}
+    else:
+        db.session.delete(document)
+        db.session.commit()
+        return {"message": "Document deleted"}
 
 
 @admin.route("/edit_document", methods=["POST"])
@@ -56,7 +61,7 @@ def get_all():
 @admin.route("/update_embeddings", methods=["GET"])
 def update_embeddings():
     documents = Document.query.order_by(Document.id.desc()).all()
-    docs = [document.map() for document in documents]
+    docs = [document.map() for document in documents if not document.to_delete]
     modified_corpus = [
         {
             "question": doc["question"],
@@ -70,7 +75,7 @@ def update_embeddings():
     return {"message": "Embeddings updated"}
 
 
-@admin.route("/upload_json", methods=["POST"])
+@admin.route("/import_json", methods=["POST"])
 def upload_json():
     try:
         file = request.data
@@ -86,7 +91,17 @@ def upload_json():
         db.session.commit()
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
-    return {"message": "Documents imported"}
+    return {"message": "JSON imported"}
+
+@admin.route("/export_json", methods=["GET"])
+def export_json():
+    documents = Document.query.order_by(Document.id.desc()).all()
+    return json.dumps([{
+        "question": document.question,
+        "content": document.content,
+        "source": document.source,
+        "label": document.label,
+    } for document in documents if not document.to_delete], indent=4)
 
 
 @admin.route("/import_csv", methods=["POST"])
@@ -106,14 +121,33 @@ def import_csv():
         db.session.commit()
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
-    return {"message": "Documents imported"}
+    return {"message": "CSV imported"}
+
+
+@admin.route("/export_csv", methods=["GET"])
+def export_csv():
+    documents = Document.query.order_by(Document.id.desc()).all()
+    df = pd.DataFrame([{
+        "question": document.question,
+        "content": document.content,
+        "source": document.source,
+        "label": document.label,
+    } for document in documents if not document.to_delete])
+    csv = df.to_csv(index=False)
+    return csv
 
 
 @admin.route("/clear_documents", methods=["POST"])
 def clear_documents():
     try:
-        Document.query.delete()
+        documents = Document.query.order_by(Document.id.desc()).all()
+        for document in documents:
+            if document.response_count > 0:
+                document.to_delete = True
+            else:
+                db.session.delete(document)
         db.session.commit()
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
     return {"message": "Documents cleared"}
+

@@ -22,6 +22,8 @@ interface Document {
   question: string;
   content: string;
   source: string;
+  to_delete: boolean;
+  response_count: number;
 }
 
 export default function DocumentsPage() {
@@ -42,7 +44,7 @@ export default function DocumentsPage() {
     fetch(`/api/admin/get_documents`)
       .then((res) => res.json())
       .then((data) => {
-        setDocuments(data);
+        setDocuments(data.filter((document: Document) => !document.to_delete));
       });
   };
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function DocumentsPage() {
     setLabel("");
   };
 
-  const uploadJSON = (file: File | null) => {
+  const importJSON = (file: File | null) => {
     notifications.clean();
     if (!file) {
       notifications.show({
@@ -71,10 +73,7 @@ export default function DocumentsPage() {
       });
       return;
     }
-    // const formData = new FormData();
-    // formData.append("file", file);
-    // console.log(formData);
-    fetch(`/api/admin/upload_json`, {
+    fetch("/api/admin/import_json", {
       method: "POST",
       body: file,
     })
@@ -109,8 +108,7 @@ export default function DocumentsPage() {
     }
     const formData = new FormData();
     formData.append("file", file);
-    // console.log(formData);
-    fetch(`/api/admin/import_csv`, {
+    fetch("/api/admin/import_csv", {
       method: "POST",
       body: formData,
     })
@@ -131,6 +129,77 @@ export default function DocumentsPage() {
         });
       })
       .then(updateEmbeddings);
+  };
+
+  const importFile = (file: File | null) => {
+    notifications.clean();
+    if (!file) {
+      notifications.show({
+        title: "Error!",
+        color: "red",
+        message: "No file selected!",
+      });
+      return;
+    }
+    if (file.name.endsWith(".json")) {
+      importJSON(file);
+    } else if (file.name.endsWith(".csv")) {
+      importCSV(file);
+    } else {
+      notifications.show({
+        title: "Error!",
+        color: "red",
+        message: "Invalid file type!",
+      });
+    }
+  };
+
+  const exportCSV = () => {
+    notifications.clean();
+    fetch("/api/admin/export_csv", {
+      method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) return res.blob();
+        notifications.show({
+          title: "Error!",
+          color: "red",
+          message: "Something went wrong!",
+        });
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "documents.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
+  };
+
+  const exportJSON = () => {
+    notifications.clean();
+    fetch("/api/admin/export_json", {
+      method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) return res.blob();
+        notifications.show({
+          title: "Error!",
+          color: "red",
+          message: "Something went wrong!",
+        });
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "documents.json");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
   };
 
   const uploadDocument = () => {
@@ -372,37 +441,37 @@ export default function DocumentsPage() {
             <Button onClick={() => editDocument(active)}>Edit Document</Button>
           )}
           {active === -1 ? (
-            <FileButton
-              onChange={(file) => uploadJSON(file)}
-              accept="file/json"
-            >
-              {(props) => {
-                return (
-                  <Button {...props} color="green">
-                    Upload JSON
-                  </Button>
-                );
-              }}
-            </FileButton>
+            <Button color="red" onClick={() => clearDocuments()}>
+              Clear Documents
+            </Button>
           ) : (
             <Button color="red" onClick={() => deleteDocument(active)}>
               Delete Document
             </Button>
           )}
           {active === -1 && (
-            <FileButton onChange={(file) => importCSV(file)} accept="file/csv">
+            <FileButton
+              onChange={(file) => importFile(file)}
+              accept=".json, .csv"
+            >
               {(props) => {
                 return (
-                  <Button {...props} color="cyan">
-                    Import CSV
+                  <Button {...props} color="green">
+                    Import
                   </Button>
                 );
               }}
             </FileButton>
           )}
           {active === -1 && (
-            <Button color="orange" onClick={() => clearDocuments()}>
-              Clear Documents
+            <Button color="yellow" onClick={() => exportCSV()}>
+              Export CSV
+            </Button>
+          )}
+
+          {active === -1 && (
+            <Button color="orange" onClick={() => exportJSON()}>
+              Export JSON
             </Button>
           )}
         </Group>
