@@ -59,25 +59,8 @@ def get_all():
 
 
 @admin.route("/update_embeddings", methods=["GET"])
-def update_embeddings(init=False):
+def update_embeddings():
     documents = Document.query.order_by(Document.id.desc()).all()
-    if init and len(documents) == 0:
-        # initialize with some default documents to create the index
-        document = Document(
-            "what is hackmit?",
-            "HackMIT is a weekend-long event where thousands of students from around the world come together to work on cool new software and/or hardware projects.",
-            "https://hackmit.org",
-            "what is hackmit?",
-        )
-        db.session.add(document)
-        document = Document(
-            "what is blueprint?",
-            "Blueprint is a weekend-long learnathon and hackathon for high school students hosted at MIT",
-            "https://blueprint.hackmit.org",
-            "what is blueprint?",
-        )
-        db.session.add(document)
-        db.session.commit()
 
     docs = [document.map() for document in documents if not document.to_delete]
     modified_corpus = [
@@ -182,7 +165,3 @@ def clear_documents():
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}, 400
     return {"message": "Documents cleared"}
-
-
-# on server start, re-embed all documents
-update_embeddings(init=True)

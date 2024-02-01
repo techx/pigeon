@@ -7,7 +7,7 @@ class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)  # DATE IN UTC
     sender = db.Column(db.Text(), nullable=False)
-    subject = db.Column(db.String(100), nullable=False)
+    subject = db.Column(db.Text(), nullable=False)
     body = db.Column(db.Text(), nullable=True)
     message_id = db.Column(db.Text(), nullable=False)
     reply = db.Column(db.Boolean, default=False)
