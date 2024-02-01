@@ -392,7 +392,9 @@ export default function InboxPage() {
                   </Text>
                   {document.to_delete && (
                     <Text className={classes.deletedWarning}>
-                      {"This source has been deleted! Regenerating response recommended."}
+                      {
+                        "This source has been deleted! Regenerating response recommended."
+                      }
                     </Text>
                   )}
                 </Accordion.Control>
