@@ -168,7 +168,7 @@ export default function DocumentsPage() {
         });
       })
       .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
+        const url = window.URL.createObjectURL(new Blob([blob as any]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", "documents.csv");
@@ -192,7 +192,7 @@ export default function DocumentsPage() {
         });
       })
       .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
+        const url = window.URL.createObjectURL(new Blob([blob as any]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", "documents.json");
