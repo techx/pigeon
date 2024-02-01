@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 COPY server/ server/
 
 EXPOSE 2000
-CMD python run.py
+CMD python wsgi.py

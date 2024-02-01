@@ -43,6 +43,8 @@
 .thread {
   right: 10vw;
   padding: 0;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 .rightPanel {
@@ -88,7 +90,6 @@
 .editor {
   margin-top: 20px;
   padding-left: 20px;
-  height: 20vh;
 }
 
 .content {

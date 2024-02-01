@@ -46,6 +46,11 @@ def create_app():
         from server.controllers import api
 
         app.register_blueprint(api)
+
+        from server.cli import seed
+
+        app.register_blueprint(seed)
+
         db.create_all()
 
         @app.errorhandler(404)

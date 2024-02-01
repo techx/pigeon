@@ -83,6 +83,7 @@ def document_data(
         doc_confidences.append(doc_confidences_question)
     return questions, doc_ids, doc_confidences
 
+
 def increment_response_count(document_ids: list[list[int]]):
     """increment response count for documents
 
@@ -96,6 +97,7 @@ def increment_response_count(document_ids: list[list[int]]):
             document = Document.query.get(doc_id)
             document.response_count += 1
             db.session.commit()
+
 
 def decrement_response_count(document_ids: list[list[int]]):
     """decrement response count for documents
@@ -113,6 +115,7 @@ def decrement_response_count(document_ids: list[list[int]]):
             else:
                 document.response_count -= 1
             db.session.commit()
+
 
 # not used as of 1/28/2024
 @emails.route("/receive_email_mailgun", methods=["POST"])
@@ -427,6 +430,26 @@ def regen_response():
     response.documents = document_ids
     response.documents_confidence = document_confidences
     response.confidence = confidence
+    db.session.commit()
+
+    return {"message": "Successfully updated"}, 200
+
+
+@emails.route("/resolve", methods=["POST"])
+def resolve():
+    data = request.form
+    thread = Thread.query.get(data["id"])
+    thread.resolved = True
+    db.session.commit()
+
+    return {"message": "Successfully updated"}, 200
+
+
+@emails.route("/unresolve", methods=["POST"])
+def unresolve():
+    data = request.form
+    thread = Thread.query.get(data["id"])
+    thread.resolved = False
     db.session.commit()
 
     return {"message": "Successfully updated"}, 200
