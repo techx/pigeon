@@ -20,7 +20,7 @@ seed = Blueprint("seed", __name__)
 
 @seed.cli.command()
 def email():
-    body = "Hello! This is a test email."
+    body = "Hello! What is blueprint?"
     body = "Dear Blueprint Team,\n\n" + body + "\n\nBest regards,\nTest User\n\n"
 
     thread = Thread()
@@ -29,7 +29,7 @@ def email():
     email = Email(
         datetime.utcnow(),
         "azliu@mit.edu",
-        "Test email",
+        "Help",
         body,
         "message-id",
         False,
