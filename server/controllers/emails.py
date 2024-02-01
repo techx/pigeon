@@ -11,7 +11,7 @@ from server import db
 from server.config import (
     MAIL_USERNAME,
     MAIL_PASSWORD,
-    MAIL_USERNAME,
+    MAIL_CC,
     MAIL_SENDER_TAG,
     AWS_REGION,
     AWS_ACCESS_KEY_ID,
@@ -324,13 +324,10 @@ def send_email():
     msg["FROM"] = f'"Blueprint Team" <blueprint@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
-
-    to_email_addresses = [thread.first_sender, "team@hackmit.org"]
+    to_email_addresses = [thread.first_sender, MAIL_CC]
     msg["To"] = ", ".join(to_email_addresses)
-    # msg["To"] = thread.first_sender
-    # msg["Cc"] = MAIL_USERNAME
-    # msg["Cc"] = "team@hackmit.org"
-    msg["Reply-To"] = "team@hackmit.org"
+    # msg["Cc"] = MAIL_CC
+    msg["Reply-To"] = MAIL_CC
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(

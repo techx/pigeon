@@ -103,7 +103,7 @@ export default function InboxPage() {
   };
   useEffect(() => {
     getThreads();
-    const interval = setInterval(getThreads, 10000);
+    const interval = setInterval(getThreads, 300000);
     return () => clearInterval(interval);
   }, []);
   const strip: (text: string) => string = (text) => {
