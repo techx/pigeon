@@ -21,7 +21,7 @@ seed = Blueprint("seed", __name__)
 @seed.cli.command()
 def email():
     body = "Hello! What is blueprint?"
-    body = "Dear Blueprint Team,\n\n" + body + "\n\nBest regards,\nTest User\n\n"
+    body = "Dear Blueprint Team,\n\n" + body + "\n\nBest regards,\nAndrew\n\n"
 
     thread = Thread()
     db.session.add(thread)

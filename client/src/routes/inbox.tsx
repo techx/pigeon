@@ -28,6 +28,8 @@ import {
   IconRepeat,
   IconFolderOpen,
   IconFolderOff,
+  IconCheck,
+  IconX,
 } from "@tabler/icons-react";
 
 interface Thread {
@@ -261,6 +263,97 @@ export default function InboxPage() {
           title: "Success!",
           color: "green",
           message: "Response has been regenerated!",
+        });
+      });
+  };
+
+  const resolveThread = () => {
+    notifications.show({
+      id: "loading",
+      title: "Loading",
+      color: "yellow",
+      message: "Resolving thread...",
+      loading: true,
+      autoClose: false,
+    });
+    const formData = new FormData();
+    formData.append("id", active.toString());
+    fetch("/api/emails/resolve", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        notifications.hide("loading");
+        notifications.show({
+          title: "Error!",
+          color: "red",
+          message: "Something went wrong!",
+        });
+      })
+      .then(() => {
+        setThreads((oldThreads) => {
+          return oldThreads.map((thread) => {
+            if (thread.id === active) {
+              thread.resolved = true;
+            }
+            return thread;
+          });
+        });
+        setResponse(undefined);
+        setContent("");
+        notifications.hide("loading");
+        notifications.show({
+          title: "Success!",
+          color: "green",
+          message: "Marked thread resolved",
+          autoClose: 1000,
+          withCloseButton: false,
+        });
+      });
+  };
+
+  const unresolveThread = () => {
+    notifications.show({
+      id: "loading",
+      title: "Loading",
+      color: "yellow",
+      message: "Unresolving thread...",
+      loading: true,
+      autoClose: false,
+    });
+    const formData = new FormData();
+    formData.append("id", active.toString());
+    fetch("/api/emails/unresolve", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        notifications.hide("loading");
+        notifications.show({
+          title: "Error!",
+          color: "red",
+          message: "Something went wrong!",
+        });
+      })
+      .then(() => {
+        setThreads((oldThreads) => {
+          return oldThreads.map((thread) => {
+            if (thread.id === active) {
+              thread.resolved = false;
+            }
+            return thread;
+          });
+        });
+        getResponse();
+        notifications.hide("loading");
+        notifications.show({
+          title: "Success!",
+          color: "green",
+          message: "Marked thread unresolved",
+          autoClose: 1000,
+          withCloseButton: false,
         });
       });
   };
@@ -557,6 +650,26 @@ export default function InboxPage() {
                     onClick={() => setSourceActive(!sourceActive)}
                   >
                     {sourceActive ? "Close Sources" : "Open Sources"}
+                  </Button>
+                )}
+
+                {!activeThread.resolved && (
+                  <Button
+                    leftSection={<IconCheck />}
+                    color="yellow"
+                    onClick={() => resolveThread()}
+                  >
+                    Resolve
+                  </Button>
+                )}
+
+                {activeThread.resolved && (
+                  <Button
+                    leftSection={<IconX />}
+                    color="red"
+                    onClick={() => unresolveThread()}
+                  >
+                    Unresolve
                   </Button>
                 )}
               </Group>
