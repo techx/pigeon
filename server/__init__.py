@@ -22,6 +22,31 @@ register_adapter(numpy.int64, addapt_numpy_int64)
 cors = CORS()
 db = SQLAlchemy()
 
+from server.models.document import Document
+
+
+# def init():
+#     documents = Document.query.order_by(Document.id.desc()).all()
+
+#     if len(documents) > 0:
+#         return
+#     # initialize with some default documents to create the index
+#     document = Document(
+#         "what is hackmit?",
+#         "HackMIT is a weekend-long event where thousands of students from around the world come together to work on cool new software and/or hardware projects.",
+#         "https://hackmit.org",
+#         "what is hackmit?",
+#     )
+#     db.session.add(document)
+#     document = Document(
+#         "what is blueprint?",
+#         "Blueprint is a weekend-long learnathon and hackathon for high school students hosted at MIT",
+#         "https://blueprint.hackmit.org",
+#         "what is blueprint?",
+#     )
+#     db.session.add(document)
+#     db.session.commit()
+
 
 def create_app():
     app = APIFlask(
@@ -42,6 +67,7 @@ def create_app():
         cors.init_app(
             app, origins=app.config.get("ALLOWED_DOMAINS"), supports_credentials=True
         )
+        db.create_all()
 
         from server.controllers import api
 
@@ -51,7 +77,14 @@ def create_app():
 
         app.register_blueprint(seed)
 
-        db.create_all()
+        # from server.controllers.admin import update_embeddings
+
+        # on server start, embed some hard-coded documents and update index
+        # this doesn't work for some reason
+        # from server.controllers.admin import update_embeddings
+
+        # init()
+        # update_embeddings()
 
         @app.errorhandler(404)
         def _default(_error):
