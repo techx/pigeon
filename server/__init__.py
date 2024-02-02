@@ -67,7 +67,6 @@ def create_app():
         cors.init_app(
             app, origins=app.config.get("ALLOWED_DOMAINS"), supports_credentials=True
         )
-        db.create_all()
 
         from server.controllers import api
 
@@ -85,6 +84,8 @@ def create_app():
 
         # init()
         # update_embeddings()
+
+        db.create_all()
 
         @app.errorhandler(404)
         def _default(_error):
