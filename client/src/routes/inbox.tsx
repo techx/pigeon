@@ -211,10 +211,11 @@ export default function InboxPage() {
     })
       .then((res) => {
         if (res.ok) return res.json();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
         setSourceActive(false);
@@ -222,10 +223,11 @@ export default function InboxPage() {
       .then((data) => {
         editor?.commands.clearContent(true);
         getThreads();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Success!",
           color: "green",
+          loading: false,
           message: data.message,
         });
         setSourceActive(false);
@@ -249,19 +251,21 @@ export default function InboxPage() {
     })
       .then((res) => {
         if (res.ok) return res.json();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
       })
       .then(() => {
         getResponse();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Success!",
           color: "green",
+          loading: false,
           message: "Response has been regenerated!",
         });
       });
@@ -284,11 +288,12 @@ export default function InboxPage() {
     })
       .then((res) => {
         if (res.ok) return res.json();
-        notifications.hide("loading");
         notifications.show({
+          id: "loading",
           title: "Error!",
           color: "red",
           message: "Something went wrong!",
+          loading: false,
         });
       })
       .then(() => {
@@ -302,13 +307,15 @@ export default function InboxPage() {
         });
         setResponse(undefined);
         setContent("");
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Success!",
           color: "green",
-          message: "Marked thread resolved",
-          autoClose: 1000,
+          message: "Resolved thread",
+          icon: <IconCheck />,
+          autoClose: 2000,
           withCloseButton: false,
+          loading: false,
         });
       });
   };
@@ -330,10 +337,11 @@ export default function InboxPage() {
     })
       .then((res) => {
         if (res.ok) return res.json();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
       })
@@ -347,13 +355,15 @@ export default function InboxPage() {
           });
         });
         getResponse();
-        notifications.hide("loading");
-        notifications.show({
+        notifications.update({
+          id: "loading",
           title: "Success!",
           color: "green",
-          message: "Marked thread unresolved",
-          autoClose: 1000,
+          message: "Unresolved thread",
+          icon: <IconCheck />,
+          autoClose: 2000,
           withCloseButton: false,
+          loading: false,
         });
       });
   };
