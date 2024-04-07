@@ -35,7 +35,9 @@ export default function Shell() {
   const [links, setLinks] = useState<ReactElement[]>([]);
 
   const handleLogout = async () => {
-    const response = await fetch("/api/auth/logout", { method: "POST" });
+    const response = await fetch(`/api/auth/logout`, {
+      method: "POST",
+    });
     try {
       window.location.replace(response.url);
     } catch (e) {

@@ -41,7 +41,7 @@ export default function DocumentsPage() {
   });
 
   const getDocuments = () => {
-    fetch("/api/admin/get_documents")
+    fetch(`/api/admin/get_documents`)
       .then((res) => res.json())
       .then((data) => {
         setDocuments(data.filter((document: Document) => !document.to_delete));
@@ -52,7 +52,7 @@ export default function DocumentsPage() {
   }, []);
 
   const updateEmbeddings = () => {
-    fetch("/api/admin/update_embeddings");
+    fetch(`/api/admin/update_embeddings`);
   };
 
   const clearContent = () => {
@@ -218,7 +218,7 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
-    fetch("/api/admin/upload_document", {
+    fetch(`/api/admin/upload_document`, {
       method: "POST",
       body: formData,
     })
@@ -258,7 +258,7 @@ export default function DocumentsPage() {
     formData.append("content", content);
     formData.append("source", source);
     formData.append("label", label);
-    fetch("/api/admin/edit_document", {
+    fetch(`/api/admin/edit_document`, {
       method: "POST",
       body: formData,
     })
@@ -285,7 +285,7 @@ export default function DocumentsPage() {
     notifications.clean();
     const formData = new FormData();
     formData.append("id", id.toString());
-    fetch("/api/admin/delete_document", {
+    fetch(`/api/admin/delete_document`, {
       method: "POST",
       body: formData,
     })
@@ -311,7 +311,7 @@ export default function DocumentsPage() {
   };
   const clearDocuments = () => {
     notifications.clean();
-    fetch("/api/admin/clear_documents", {
+    fetch(`/api/admin/clear_documents`, {
       method: "POST",
     })
       .then((res) => {

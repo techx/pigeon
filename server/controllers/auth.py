@@ -49,6 +49,7 @@ def whoami():
     """GET /whoami
     Returns user if they are logged in, otherwise returns nothing.
     """
+    print(session, flush=True)
     if dict(session).get("user", 0):
         return session["user"]
     return {}
@@ -79,6 +80,7 @@ def authorize():
         if admin["email"] == user_info["email"]:
             session["user"] = {"role": "Admin"}
             return redirect(app.config["FRONTEND_URL"] + "/inbox")
+    print("not admin", flush=True)
     return redirect(app.config["FRONTEND_URL"] + "/restricted")
 
 
@@ -95,6 +97,7 @@ def login_admin():
         password == app.config["AUTH_PASSWORD"]
     ):
         session["user"] = {"role": "Admin"}
+        print(session, flush=True)
         return {}
     message = "incorrect username or password"
     abort(400, message)

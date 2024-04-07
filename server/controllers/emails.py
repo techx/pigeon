@@ -222,11 +222,20 @@ def receive_email():
 
     if "In-Reply-To" in data:
         # reply to existing email, add to existing thread
-        real_message_id = data["In-Reply-To"][
-            3:
-        ]  # for some reason AWS adds three spaces to the message id
+
+        # for some reason AWS adds three spaces to the message id
+        real_message_id = data["In-Reply-To"].strip()
+
         replied_to_email = Email.query.filter_by(message_id=real_message_id).first()
-        if MAIL_USERNAME not in data["From"] and replied_to_email:
+        print("replied to email", replied_to_email, flush=True)
+        print("real message id", real_message_id, len(real_message_id), flush=True)
+        print(
+            "data from",
+            data["From"],
+            "blueprint@my.hackmit.org" not in data["From"],
+            flush=True,
+        )
+        if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
                 email = Email(
@@ -345,24 +354,34 @@ def send_email():
 
     msg = email.mime.multipart.MIMEMultipart()
     msg["Subject"] = reply_to_email.subject
-    msg["FROM"] = MAIL_SENDER_TAG
+    # msg["FROM"] = MAIL_SENDER_TAG
+    msg["FROM"] = f'"Blueprint Team" <blueprint@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
-    msg["To"] = thread.first_sender
-    msg["Cc"] = MAIL_CC
+    to_email_addresses = [thread.first_sender, MAIL_CC]
+    msg["To"] = ", ".join(to_email_addresses)
+    # msg["Cc"] = MAIL_CC
     msg["Reply-To"] = MAIL_CC
     msg.attach(email.mime.text.MIMEText(body, "HTML"))
 
     response = client.send_raw_email(
-        Source=MAIL_SENDER_TAG,
-        Destinations=[thread.first_sender],
+        # Destinations=[thread.first_sender],
+        Destinations=to_email_addresses,
         RawMessage={"Data": msg.as_string()},
+    )
+
+    new_mesage_id = get_full_message_id(response["MessageId"])
+    print(
+        "sending a new repsonse with message id",
+        new_mesage_id,
+        len(new_mesage_id),
+        flush=True,
     )
 
     thread.resolved = True
     reply_email = Email(
         datetime.utcnow(),
-        MAIL_SENDER_TAG,
+        f'"Blueprint Team" <blueprint@my.hackmit.org>',
         reply_to_email.subject,
         clean_text,
         get_full_message_id(response["MessageId"]),

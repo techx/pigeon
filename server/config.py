@@ -11,7 +11,7 @@ ENV = os.environ.get("ENV", "development")
 
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:2003")
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2000")
-ALLOWED_DOMAINS = [FRONTEND_URL]
+ALLOWED_DOMAINS = [FRONTEND_URL, "https://pigeon-t2cj.onrender.com/"]
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "DATABASE_URL", "postgresql://postgres:password@postgresdb/pigeondb"
 )
@@ -57,4 +57,6 @@ AUTH_ADMINS = [
     {"name": "Janet Guo", "email": "janetguo@mit.edu"},
     {"name": "Maggie Liu", "email": "magpie@mit.edu"},
     {"name": "Nathan Wang", "email": "nrwang@mit.edu"},
+    {"name": "Claire Wang", "email": "clara32356@gmail.com"},
+    {"name": "Claire Wang", "email": "sparrowsong325@gmail.com"},
 ]

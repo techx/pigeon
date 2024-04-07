@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [authorized, setAuthorized] = useState<boolean>(false);
 
   const checkAuthStatus = async () => {
-    const response = await fetch("/api/auth/whoami");
+    const response = await fetch(`/api/auth/whoami`);
     const data = await response.json();
     setAuthorized(data.role === "Admin");
   };

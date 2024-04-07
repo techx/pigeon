@@ -99,7 +99,7 @@ export default function InboxPage() {
     [response]
   );
   const getThreads = () => {
-    fetch("/api/emails/get_threads")
+    fetch(`/api/emails/get_threads`)
       .then((res) => res.json())
       .then((data) => {
         setThreads(data);
@@ -158,7 +158,7 @@ export default function InboxPage() {
       "id",
       activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
-    fetch("/api/emails/get_response", {
+    fetch(`/api/emails/get_response`, {
       method: "POST",
       body: formData,
     })
@@ -205,7 +205,7 @@ export default function InboxPage() {
       activeThread.emailList[activeThread.emailList.length - 1].id.toString()
     );
     formData.append("body", content);
-    fetch("/api/emails/send_email", {
+    fetch(`/api/emails/send_email`, {
       method: "POST",
       body: formData,
     })
@@ -215,6 +215,7 @@ export default function InboxPage() {
           id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
         setSourceActive(false);
@@ -226,6 +227,7 @@ export default function InboxPage() {
           id: "loading",
           title: "Success!",
           color: "green",
+          loading: false,
           message: data.message,
         });
         setSourceActive(false);
@@ -243,25 +245,27 @@ export default function InboxPage() {
       loading: true,
       autoClose: false,
     });
-    fetch("/api/emails/regen_response", {
+    fetch(`/api/emails/regen_response`, {
       method: "POST",
       body: formData,
     })
       .then((res) => {
         if (res.ok) return res.json();
-        notifications.show({
+        notifications.update({
           id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
       })
       .then(() => {
         getResponse();
-        notifications.show({
+        notifications.update({
           id: "loading",
           title: "Success!",
           color: "green",
+          loading: false,
           message: "Response has been regenerated!",
         });
       });
@@ -289,6 +293,7 @@ export default function InboxPage() {
           title: "Error!",
           color: "red",
           message: "Something went wrong!",
+          loading: false,
         });
       })
       .then(() => {
@@ -307,8 +312,10 @@ export default function InboxPage() {
           title: "Success!",
           color: "green",
           message: "Resolved thread",
+          icon: <IconCheck />,
           autoClose: 2000,
           withCloseButton: false,
+          loading: false,
         });
       });
   };
@@ -334,6 +341,7 @@ export default function InboxPage() {
           id: "loading",
           title: "Error!",
           color: "red",
+          loading: false,
           message: "Something went wrong!",
         });
       })
@@ -352,8 +360,10 @@ export default function InboxPage() {
           title: "Success!",
           color: "green",
           message: "Unresolved thread",
+          icon: <IconCheck />,
           autoClose: 2000,
           withCloseButton: false,
+          loading: false,
         });
       });
   };
