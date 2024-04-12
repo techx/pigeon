@@ -8,7 +8,7 @@ from server.models.thread import Thread
 from server.models.response import Response
 from server.models.document import Document
 from server.nlp.responses import generate_response
-from datetime import datetime
+import datetime
 from server.controllers.emails import (
     thread_emails_to_openai_messages,
     document_data,
@@ -28,7 +28,7 @@ def email():
     db.session.add(thread)
     db.session.commit()
     email = Email(
-        datetime.now(datetime.UTC),
+        datetime.datetime.now(datetime.timezone.utc),
         "azliu@mit.edu",
         subject,
         body,

@@ -76,7 +76,7 @@ Copy `.env.sample` to `.env` and fill in the necessary values. You should be abl
 
 ## Docker
 
-Using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) are strongly recommended when doing development work on Ballot. Containers are a way of provisioning identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up Postgres, etc...
+Using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) are strongly recommended when doing development work on pigeon. Containers are a way of provisioning identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up Postgres, etc...
 
 To use Dev Containers you must first install [Visual Studio Code](https://code.visualstudio.com/) and [Docker](https://www.docker.com/get-started/). Then you must install the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for Visual Studio Code.
 

@@ -4,3 +4,5 @@
 venv
 flask_session
 .pyc
+__pycache__
+venv
