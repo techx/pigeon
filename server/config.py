@@ -9,15 +9,15 @@ RedisDocument = dict[str, str]
 
 ENV = os.environ.get("ENV", "development")
 
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:2003")
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2000")
-ALLOWED_DOMAINS = [FRONTEND_URL, "https://pigeon-t2cj.onrender.com/"]
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2010")
+ALLOWED_DOMAINS = [FRONTEND_URL]
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "DATABASE_URL", "postgresql://postgres:password@postgresdb/pigeondb"
 )
 REDIS_URL = os.environ.get("REDIS_URL", "redis")
 
-FLASK_RUN_PORT = 2000
+FLASK_RUN_PORT = 2010
 DEBUG = True
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")

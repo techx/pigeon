@@ -20,6 +20,7 @@ seed = Blueprint("seed", __name__)
 
 @seed.cli.command()
 def email():
+    subject = "Test Email Subject"
     body = "Hello! What is blueprint?"
     body = "Dear Blueprint Team,\n\n" + body + "\n\nBest regards,\nAndrew\n\n"
 
@@ -27,9 +28,9 @@ def email():
     db.session.add(thread)
     db.session.commit()
     email = Email(
-        datetime.utcnow(),
+        datetime.now(datetime.UTC),
         "azliu@mit.edu",
-        "Helpfdjs klafjdklasjfklsadjklfjklsadfjl kasdfsdklafjklasd fjlkasfdlkas jfkdsal jfkdslafjklasdjfklajsdlkfjaslkdfj",
+        subject,
         body,
         "message-id",
         False,
