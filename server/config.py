@@ -10,10 +10,10 @@ RedisDocument = dict[str, str]
 ENV = os.environ.get("ENV", "development")
 
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:2010")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:2010")
 ALLOWED_DOMAINS = [FRONTEND_URL]
 SQLALCHEMY_DATABASE_URI = os.environ.get(
-    "DATABASE_URL", "postgresql://postgres:password@postgresdb/pigeondb"
+    "DATABASE_URL", "postgresql://postgres:password@database/pigeondb"
 )
 REDIS_URL = os.environ.get("REDIS_URL", "redis")
 

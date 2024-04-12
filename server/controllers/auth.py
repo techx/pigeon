@@ -49,7 +49,6 @@ def whoami():
     """GET /whoami
     Returns user if they are logged in, otherwise returns nothing.
     """
-    print(session, flush=True)
     if dict(session).get("user", 0):
         return session["user"]
     return {}
@@ -61,10 +60,8 @@ def login():
     launches google authentication.
     """
     google = oauth.create_client("google")
-    redirect_uri = url_for("api.auth.authorize", _external=True, _scheme="https")
-    if app.config["ENV"] == "development":
-        # docker url is backend:2000, but google auth requires a public url
-        redirect_uri = "http://localhost:2000/api/auth/authorize"
+    scheme = "https" if app.config["ENV"] == "production" else "http"
+    redirect_uri = url_for("api.auth.authorize", _external=True, _scheme=scheme)
     return google.authorize_redirect(redirect_uri)
 
 
@@ -80,7 +77,6 @@ def authorize():
         if admin["email"] == user_info["email"]:
             session["user"] = {"role": "Admin"}
             return redirect(app.config["FRONTEND_URL"] + "/inbox")
-    print("not admin", flush=True)
     return redirect(app.config["FRONTEND_URL"] + "/restricted")
 
 
@@ -97,7 +93,6 @@ def login_admin():
         password == app.config["AUTH_PASSWORD"]
     ):
         session["user"] = {"role": "Admin"}
-        print(session, flush=True)
         return {}
     message = "incorrect username or password"
     abort(400, message)
