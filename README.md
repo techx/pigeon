@@ -19,14 +19,14 @@ Pigeon uses [Flask](https://flask.palletsprojects.com/en/2.2.x/) for its backend
 
 ```
 pigeon/
-├── Dockerfile.backend
-├── Dockerfile.frontend
-├── Dockerfile.redis
-├── docker-compose.yml
+├── .devcontainer                 # Dev container configuration
 ├── README.md
-├── requirements.txt
-├── .env
-├── wsgi.py
+├── requirements.txt              # Python dependencies list for backend
+├── .env                          # Stores secrets that are not in VCS                  
+├── wsgi.py                       # Flask entry point
+├── scripts
+│   ├── deploy.sh                 # Deploy to production server
+│   └── devcontainer_setup.sh     # Run once when the dev container initializes  
 └── client
 │   ├── public
 │   │   └── pigeon.png
@@ -72,32 +72,13 @@ pigeon/
 
 ### Env
 
-Fill in the `.env` file (should be able to find it on Slack).
+Copy `.env.sample` to `.env` and fill in the necessary values. You should be able to find them on slack.
 
-```env
-FRONTEND_URL=""
-BACKEND_URL=""
-BACKEND_URL_DOCKER=""
-MAIL_USERNAME=""
-MAIL_PASSWORD=""
+## Docker
 
-AUTH_CLIENT_ID=""
-AUTH_CLIENT_SECRET=""
-AUTH_USERNAME=""
-AUTH_PASSWORD=""
+Using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) are strongly recommended when doing development work on Ballot. Containers are a way of provisioning identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up Postgres, etc...
 
-SESSION_SECRET=""
-
-OPENAI_API_KEY=""
-
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_REGION = ""
-```
-
-### Docker
-
-Docker is a way to provision identical environments from computer to computer and alleviates a lot of headache when it comes to installing dependencies, setting up postgres/redis, etc.
+To use Dev Containers you must first install [Visual Studio Code](https://code.visualstudio.com/) and [Docker](https://www.docker.com/get-started/). Then you must install the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for Visual Studio Code.
 
 To use Docker, install it [here](https://docs.docker.com/get-docker/). To check if your installation is working, try running
 
@@ -107,53 +88,23 @@ docker run hello-world
 
 If you get a message on your screen that starts with "Hello from Docker!", your installation is working.
 
-To begin development, cd into your `/postgres` directory and run:
+After that, follow [this tutorial](https://www.youtube.com/watch?v=Uvf2FVS1F8k) to get your environment set up. Make sure you open this repository as a dev container in VSCode.
 
-```sh
-docker compose up
-```
-
-This command will install every React, Flask, Postgres, and Redis dependency you need to run Pigeon into containers that interact with each other separately from the rest of your machine. To know when Pigeon is ready to run, you should look for four messages:
-
-```sh
-pigeon-postgresdb-1  | ... database system is ready to accept connections
-pigeon-redis-1       | ... Ready to accept connections tcp
-pigeon-backend-1     | ... * Running on all addresses (0.0.0.0)
-pigeon-frontend-1    | ... ready in 1486 ms
-```
-
-If it is your first time starting up Pigeon, it may take a while for all four of these messages to show up (on the order of tens of minutes). Once everything is running, navigate to `http://localhost:5173` to see Pigeon's homepage.
-
-Once you are done, you can Ctrl+C or run
-
-```sh
-docker compose down
-```
-
-to close all open Pigeon containers.
-
-#### Troubleshooting
-
-A common reason for docker failing on start is that the containers start in the wrong order, and shut down early. To restart a container, check the "Containers" tab in docker desktop and restart any dead pigeon containers. 
-
-For managing the database, navigate to the `pigeon-postgresdb` container, and then click on the `Exec` tab. 
-
-```sh
-su postgres
-psql
-```
-
-will open up the postgres instance. 
-
-You can also run this locally; `docker container ls` will list the docker containers that are currently running. Then, 
-
-```sh
-docker exec -it <container_id> /bin/bash
-```
-
-will open up a shell inside of the docker container with id `container_id`. Use the postgres container to access the database. 
+> Note: It can take a few minutes to provision the container if it is your first time starting it up.
 
 ## Development
+
+To start the server, run
+
+```sh
+python3 run.py
+```
+
+To start the client, in a different terminal, run 
+```sh
+cd client
+npm run dev
+```
 
 ### AWS
 
