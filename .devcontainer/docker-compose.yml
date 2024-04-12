@@ -11,8 +11,18 @@ services:
 
     command: sleep infinity
 
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:database
+    # Runs app on the same network as database and redis, allowing forwardPorts to work in devcontainer.json
+    networks:
+      - backend
+
+  redis:
+    image: redis-stack-server:7.2.0-v6
+    ports:
+      - "6379:6379"
+    volumes:
+      - db-data:/data
+    networks:
+      - backend
 
   database:
     image: postgres:16
@@ -24,6 +34,11 @@ services:
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: pigeondb
+    networks:
+      - backend
 
 volumes:
   db-data:
+
+networks:
+  backend:
