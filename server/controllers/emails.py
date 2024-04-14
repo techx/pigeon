@@ -23,7 +23,7 @@ from server.models.thread import Thread
 from server.models.response import Response
 from server.models.document import Document
 from server.nlp.responses import generate_response
-from datetime import datetime
+from datetime import datetime, timezone
 import boto3
 
 cwd = os.path.dirname(__file__)
@@ -95,7 +95,8 @@ def increment_response_count(document_ids: list[list[int]]):
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:
             document = Document.query.get(doc_id)
-            document.response_count += 1
+            if document:
+                document.response_count += 1
             db.session.commit()
 
 
@@ -110,10 +111,11 @@ def decrement_response_count(document_ids: list[list[int]]):
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:
             document = Document.query.get(doc_id)
-            if document.to_delete and document.response_count == 1:
-                db.session.delete(document)
-            else:
-                document.response_count -= 1
+            if document:
+                if document.to_delete and document.response_count == 1:
+                    db.session.delete(document)
+                else:
+                    document.response_count -= 1
             db.session.commit()
 
 
@@ -141,7 +143,7 @@ def receive_email_mailgun():
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
                 email = Email(
-                    datetime.utcnow(),
+                    datetime.now(timezone.utc),
                     data["From"],
                     data["Subject"],
                     data["stripped-text"],
@@ -156,7 +158,7 @@ def receive_email_mailgun():
         db.session.add(thread)
         db.session.commit()
         email = Email(
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
             data["From"],
             data["Subject"],
             data["stripped-text"],
@@ -254,7 +256,7 @@ def receive_email():
         db.session.add(thread)
         db.session.commit()
         email = Email(
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
             data["From"],
             data["Subject"],
             body,
@@ -314,7 +316,7 @@ def send_email_mailgun():
     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
     thread.resolved = True
     reply_email = Email(
-        datetime.utcnow(),
+        datetime.now(timezone.utc),
         MAIL_SENDER_TAG,
         reply_to_email.subject,
         clean_text,

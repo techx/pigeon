@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from typing import cast
 
 load_dotenv(os.path.dirname(__file__) / Path("../.env"))
 
@@ -9,34 +10,54 @@ RedisDocument = dict[str, str]
 
 ENV = os.environ.get("ENV", "development")
 
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:2010")
+
+def _get_config_option(
+    name: str, default_value: str | None = None, required: bool = False
+) -> str | None:
+    if ENV == "production":
+        value = os.environ.get(name, None)
+        if value is None:
+            raise Exception(
+                f"Environment variable {name} not set. In production, "
+                "every environment variable must be set."
+            )
+    else:
+        value = os.environ.get(name, default_value)
+
+    if required and value is None:
+        raise Exception(f"Environment variable {name} is required but not set.")
+
+    return value
+
+
+FRONTEND_URL = _get_config_option("FRONTEND_URL", "http://localhost:5173")
+BACKEND_URL = _get_config_option("BACKEND_URL", "http://127.0.0.1:2010")
 ALLOWED_DOMAINS = [FRONTEND_URL]
-SQLALCHEMY_DATABASE_URI = os.environ.get(
+SQLALCHEMY_DATABASE_URI = _get_config_option(
     "DATABASE_URL", "postgresql://postgres:password@database/pigeondb"
 )
-REDIS_URL = os.environ.get("REDIS_URL", "redis")
+REDIS_URL = _get_config_option("REDIS_URL", "redis")
 
 FLASK_RUN_PORT = 2010
 DEBUG = True
-MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
-MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-MAIL_CC = os.environ.get("MAIL_CC")
+MAIL_USERNAME = cast(str, _get_config_option("MAIL_USERNAME", required=True))
+MAIL_PASSWORD = cast(str, _get_config_option("MAIL_PASSWORD", required=True))
+MAIL_CC = _get_config_option("MAIL_CC", required=True)
 
 MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
 
-AUTH_CLIENT_ID = os.environ.get("AUTH_CLIENT_ID")
-AUTH_CLIENT_SECRET = os.environ.get("AUTH_CLIENT_SECRET")
-SESSION_SECRET = os.environ.get("SESSION_SECRET")
+AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID", required=True)
+AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET", required=True)
+SESSION_SECRET = _get_config_option("SESSION_SECRET", required=True)
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_API_KEY = _get_config_option("OPENAI_API_KEY", required=True)
 
-AUTH_USERNAME = os.environ.get("AUTH_USERNAME")
-AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
+AUTH_USERNAME = _get_config_option("AUTH_USERNAME", required=True)
+AUTH_PASSWORD = _get_config_option("AUTH_PASSWORD", required=True)
 
-AWS_REGION = os.environ.get("AWS_REGION")
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = _get_config_option("AWS_REGION", required=True)
+AWS_ACCESS_KEY_ID = _get_config_option("AWS_ACCESS_KEY_ID", required=True)
+AWS_SECRET_ACCESS_KEY = _get_config_option("AWS_SECRET_ACCESS_KEY", required=True)
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
