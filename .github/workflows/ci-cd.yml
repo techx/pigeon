@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-tests:
+  tests:
     name: Run tests
 
     runs-on: ubuntu-20.04
