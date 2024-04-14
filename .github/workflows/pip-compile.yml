@@ -1,0 +1,46 @@
+name: Pip Compile
+
+on:
+  push:
+    branches:
+      - main
+    paths: ["requirements.in", "requirements.txt"]
+  pull_request:
+    branches:
+      - main
+    paths: ["requirements.in", "requirements.txt"]
+
+jobs:
+  pip-compile:
+    # Checks to make sure pip-compile has been run if requirements.in changes.
+    name: check pip-compile
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          cache: "pip"
+
+      - name: Install pip-tools
+        run: python -m pip install pip-tools
+        shell: bash
+
+      - run: cp requirements.txt requirements2.txt
+
+      - name: Run pip-compile
+        run: pip-compile
+        shell: bash
+
+      - name: Check for changes
+        run: |
+          if ! cmp --silent requirements2.txt requirements.txt; then
+            echo "Files aren't the same! Did you forget to run pip-compile?"
+            exit 1
+          else
+            echo "Files are the same."
+          fi
+        shell: bash
