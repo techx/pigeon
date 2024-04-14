@@ -1,12 +1,15 @@
-from flask import current_app as app, request, session, redirect, url_for
+"""The auth controller handles authentication-related routes."""
+
 from apiflask import APIBlueprint, abort
 from authlib.integrations.flask_client import OAuth
+from flask import current_app as app
+from flask import redirect, request, session, url_for
 
 auth = APIBlueprint("auth", __name__, url_prefix="/auth", tag="Auth")
 
 app.secret_key = app.config["SESSION_SECRET"]
 
-oauth = OAuth(app)
+oauth: OAuth = OAuth(app)
 google = oauth.register(
     name="google",
     client_id=app.config["AUTH_CLIENT_ID"],
@@ -23,15 +26,14 @@ google = oauth.register(
 
 
 def auth_required_decorator(roles):
-    """
-    middleware for protected routes
-    """
+    """Middleware for protected routes."""
 
     def auth_required(func):
         def wrapper(*args, **kwargs):
-            if not dict(session).get("user", 0):
-                return abort(401)
-            elif dict(session).get("user").get("role") not in roles:
+            if (
+                not dict(session).get("user", 0)
+                or dict(session).get("user").get("role") not in roles  # type: ignore
+            ):
                 return abort(401)
             return func(*args, **kwargs)
 
@@ -46,6 +48,7 @@ def auth_required_decorator(roles):
 @auth.route("/whoami")
 def whoami():
     """GET /whoami
+
     Returns user if they are logged in, otherwise returns nothing.
     """
     if dict(session).get("user", 0):
@@ -56,22 +59,25 @@ def whoami():
 @auth.route("/login")
 def login():
     """GET /login
+
     launches google authentication.
     """
     google = oauth.create_client("google")
     scheme = "https" if app.config["ENV"] == "production" else "http"
     redirect_uri = url_for("api.auth.authorize", _external=True, _scheme=scheme)
-    return google.authorize_redirect(redirect_uri)
+    return google.authorize_redirect(redirect_uri)  # type: ignore
 
 
 @auth.route("/authorize")
 def authorize():
     """GET /authorize
-    callback function after google authentication. verifies user token, then returns user data if it is in the database.
+
+    callback function after google authentication. verifies user token, then returns
+    user data if it is in the database.
     """
     google = oauth.create_client("google")
-    token = google.authorize_access_token()
-    user_info = oauth.google.userinfo(token=token)
+    token = google.authorize_access_token()  # type: ignore
+    user_info = oauth.google.userinfo(token=token)  # type: ignore
     for admin in app.config["AUTH_ADMINS"]:
         if admin["email"] == user_info["email"]:
             session["user"] = {"role": "Admin"}
@@ -83,6 +89,7 @@ def authorize():
 @auth.doc(tags=["Auth"])
 def login_admin():
     """POST /login_admin
+
     log in with admin credentials
     """
     data = request.get_json()
@@ -100,6 +107,7 @@ def login_admin():
 @auth.post("/logout")
 def logout():
     """POST /logout
+
     clears current user session
     """
     session.clear()

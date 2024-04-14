@@ -1,7 +1,8 @@
+import os
 import time
 
 import numpy as np
-
+import openai
 import redis
 from redis.commands.search.field import (
     NumericField,
@@ -10,13 +11,8 @@ from redis.commands.search.field import (
 )
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
-from server.config import REDIS_URL
 
-from server.config import RedisDocument
-
-import openai
-
-import os
+from server.config import REDIS_URL, RedisDocument
 
 cwd = os.path.dirname(__file__)
 
@@ -35,14 +31,14 @@ embedding_model = "text-embedding-3-small"
 
 
 def load_corpus(corpus: list[RedisDocument]):
-    """loads given corpus into redis
+    """Loads given corpus into redis
 
     PARAMETERS
     ----------
     corpus : :obj:`list` of :obj:`RedisDocument`
         list of documents, each represented by dictionary
 
-    RAISES
+    Raises:
     ------
     Exception
         if failed to load corpus into redis
@@ -72,7 +68,7 @@ def compute_openai_embeddings(texts):
 
 
 def compute_embeddings():
-    """compute embeddings from redis documents"""
+    """Compute embeddings from redis documents"""
     print("computing embeddings...")
 
     # get keys, questions, content
@@ -101,14 +97,14 @@ def compute_embeddings():
 
 
 def load_embeddings(embeddings: list[list[float]]):
-    """load embeddings into redis
+    """Load embeddings into redis
 
     PARAMETERS
     ----------
     embeddings : :obj:`list` of :obj:`list` of :obj:`float`
         list of embeddings
 
-    RAISES
+    Raises:
     ------
     Exception
         if failed to load embeddings into redis
@@ -129,7 +125,7 @@ def load_embeddings(embeddings: list[list[float]]):
 
 
 def create_index(corpus_len: int):
-    """create search index in redis
+    """Create search index in redis
     assumes that documents and embeddings have already been loaded into redis
 
     PARAMETERS
@@ -137,7 +133,7 @@ def create_index(corpus_len: int):
     corpus_len : :obj:`int`
         number of documents in corpus
 
-    RAISES
+    Raises:
     ------
     Exception
         if failed to create index
@@ -182,7 +178,7 @@ def create_index(corpus_len: int):
 
 
 def create_query(k: int):
-    """create k-NN redis query
+    """Create k-NN redis query
 
     PARAMETERS
     ----------
@@ -198,7 +194,7 @@ def create_query(k: int):
 
 
 def queries(query, queries: list[str]) -> list[dict]:
-    """run queries against redis
+    """Run queries against redis
 
     PARAMETERS
     ----------
@@ -207,7 +203,7 @@ def queries(query, queries: list[str]) -> list[dict]:
     queries : :obj:`list` of :obj:`str`
         list of question queries
 
-    RETURNS
+    Returns:
     -------
     :obj:`list` of :obj:`dict`
         list of dictionaries containing query and result
@@ -247,7 +243,7 @@ def queries(query, queries: list[str]) -> list[dict]:
 
 
 def query_all(k: int, questions: list[str]):
-    """return k most similar documents for each query
+    """Return k most similar documents for each query
 
     PARAMETERS
     ----------
@@ -256,7 +252,7 @@ def query_all(k: int, questions: list[str]):
     questions : :obj:`list` of :obj:`str`
         list of question queries
 
-    RETURNS
+    Returns:
     -------
     :obj:`list` of :obj:`dict`
         list of dictionaries containing query and result
@@ -266,14 +262,14 @@ def query_all(k: int, questions: list[str]):
 
 
 def embed_corpus(corpus: list[RedisDocument]):
-    """load corpus, compute embeddings, load embeddings into redis
+    """Load corpus, compute embeddings, load embeddings into redis
 
     PARAMETERS
     ----------
     corpus : :obj:`list` of :obj:`dict`
         list of documents, each represented by dictionary
 
-    RAISES
+    Raises:
     ------
     Exception
         if failed to load corpus

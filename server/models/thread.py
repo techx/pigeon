@@ -1,7 +1,8 @@
-from server import db
 from sqlalchemy import Integer
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
+
+from server import db
 from server.models.email import Email
 
 

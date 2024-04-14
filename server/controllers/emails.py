@@ -201,7 +201,7 @@ def decrement_response_count(document_ids: list[list[int]]):
 
 @emails.route("/receive_email", methods=["POST"])
 def receive_email():
-    """Receive email from AWS SES and process it.
+    """GET /receive_email
 
     More information about the way that AWS SES sends emails can be found at
     go/pigeon-emails
@@ -357,7 +357,7 @@ def get_full_message_id(message_id):
 
 @emails.route("/send_email", methods=["POST"])
 def send_email():
-    """Send an email through AWS SES."""
+    """POST /send_email"""
     data = request.form
     reply_to_email = Email.query.get(data["id"])
     if not reply_to_email:
@@ -429,7 +429,7 @@ def send_email():
 
 @emails.route("/get_response", methods=["POST"])
 def get_response():
-    """Get the AI-gen response for an email."""
+    """POST /get_response"""
     data = request.form
     response = Response.query.filter_by(email_id=data["id"]).first()
     if not response:
@@ -439,7 +439,10 @@ def get_response():
 
 @emails.route("/regen_response", methods=["POST"])
 def regen_response():
-    """Regenerate the AI-gen response response for an email."""
+    """POST /regen_response
+
+    Regenerate the AI-gen response response for an email.
+    """
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -470,7 +473,10 @@ def regen_response():
 
 @emails.route("/resolve", methods=["POST"])
 def resolve():
-    """Mark an email thread as resolved."""
+    """POST /resolve
+
+    Mark an email thread as resolved.
+    """
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -483,7 +489,10 @@ def resolve():
 
 @emails.route("/unresolve", methods=["POST"])
 def unresolve():
-    """Mark an email thread as unresolved."""
+    """POST /unresolve
+
+    Mark an email thread as unresolved.
+    """
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -496,7 +505,10 @@ def unresolve():
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
-    """Get a list of all threads."""
+    """GET /get_threads
+
+    Get a list of all threads.
+    """
     thread_list = Thread.query.order_by(Thread.resolved, Thread.last_email.desc()).all()
     email_list = [
         {

@@ -1,18 +1,28 @@
+"""Initialize the Flask app."""
+
+import numpy
 from apiflask import APIFlask
+from flask import redirect, render_template
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask import redirect, render_template
-
-# https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
-import numpy
-from psycopg2.extensions import register_adapter, AsIs
+from psycopg2.extensions import AsIs, register_adapter
 
 
 def addapt_numpy_float64(numpy_float64):
+    """Adapt numpy.float64 to SQL syntax.
+
+    See here:
+    https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
+    """
     return AsIs(numpy_float64)
 
 
 def addapt_numpy_int64(numpy_int64):
+    """Adapt numpy.int64 to SQL syntax.
+
+    See here:
+    https://stackoverflow.com/questions/50626058/psycopg2-cant-adapt-type-numpy-int64
+    """
     return AsIs(numpy_int64)
 
 
@@ -31,14 +41,16 @@ db = SQLAlchemy()
 #     # initialize with some default documents to create the index
 #     document = Document(
 #         "what is hackmit?",
-#         "HackMIT is a weekend-long event where thousands of students from around the world come together to work on cool new software and/or hardware projects.",
+#         "HackMIT is a weekend-long event where thousands of students from around the
+#  world come together to work on cool new software and/or hardware projects.",
 #         "https://hackmit.org",
 #         "what is hackmit?",
 #     )
 #     db.session.add(document)
 #     document = Document(
 #         "what is blueprint?",
-#         "Blueprint is a weekend-long learnathon and hackathon for high school students hosted at MIT",
+#         "Blueprint is a weekend-long learnathon and hackathon for high school
+# students hosted at MIT",
 #         "https://blueprint.hackmit.org",
 #         "what is blueprint?",
 #     )
@@ -47,6 +59,7 @@ db = SQLAlchemy()
 
 
 def create_app():
+    """Create the Flask app."""
     app = APIFlask(
         __name__,
         docs_path="/api/docs",
@@ -62,8 +75,14 @@ def create_app():
 
     with app.app_context():
         db.init_app(app)
+
+        allowed_domains = app.config.get("ALLOWED_DOMAINS")
+        assert type(allowed_domains) is list[str]
+
         cors.init_app(
-            app, origins=app.config.get("ALLOWED_DOMAINS"), supports_credentials=True
+            app,
+            origins=allowed_domains,
+            supports_credentials=True,
         )
 
         from server.controllers import api

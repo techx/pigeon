@@ -1,18 +1,22 @@
-from server import db
-from flask import request
+"""The admin controller handles admin-related routes."""
+
+import json
+from ast import literal_eval
+
+import pandas as pd
 from apiflask import APIBlueprint
+from flask import request
+
+from server import db
 from server.models.document import Document
 from server.nlp.embeddings import embed_corpus
-from ast import literal_eval
-import json
-import pandas as pd
-
 
 admin = APIBlueprint("admin", __name__, url_prefix="/admin", tag="Admin")
 
 
 @admin.route("/upload_document", methods=["POST"])
 def upload_text():
+    """POST /admin/upload_document"""
     data = request.form
     document = Document(
         data["question"], data["content"], data["source"], data["label"]
@@ -24,8 +28,11 @@ def upload_text():
 
 @admin.route("/delete_document", methods=["POST"])
 def delete_text():
+    """POST /admin/delete_document"""
     data = request.form
     document = Document.query.get(data["id"])
+    if document is None:
+        return {"error": "Document not found"}, 404
     if document.response_count > 0:
         document.to_delete = True
         db.session.commit()
@@ -38,8 +45,11 @@ def delete_text():
 
 @admin.route("/edit_document", methods=["POST"])
 def update_text():
+    """POST /admin/edit_document"""
     data = request.form
     document = Document.query.get(data["id"])
+    if document is None:
+        return {"error": "Document not found"}, 404
     document.question = data["question"]
     document.content = data["content"]
     document.source = data["source"]
@@ -50,12 +60,14 @@ def update_text():
 
 @admin.route("/get_documents", methods=["GET"])
 def get_all():
+    """GET /admin/get_documents"""
     documents = Document.query.order_by(Document.id.desc()).all()
     return [document.map() for document in documents]
 
 
 @admin.route("/update_embeddings", methods=["GET"])
 def update_embeddings():
+    """GET /admin/update_embeddings"""
     documents = Document.query.order_by(Document.id.desc()).all()
 
     docs = [document.map() for document in documents if not document.to_delete]
@@ -74,15 +86,16 @@ def update_embeddings():
 
 @admin.route("/import_json", methods=["POST"])
 def upload_json():
+    """POST /admin/import_json"""
     try:
         file = request.data
         json_data = literal_eval(file.decode("utf8"))
         for doc in json_data:
             document = Document(
-                doc["question"] if "question" in doc else "",
+                doc.get("question", ""),
                 doc["content"],
                 doc["source"],
-                doc["label"] if "label" in doc else "",
+                doc.get("label", ""),
             )
             db.session.add(document)
         db.session.commit()
@@ -93,6 +106,7 @@ def upload_json():
 
 @admin.route("/export_json", methods=["GET"])
 def export_json():
+    """GET /admin/export_json"""
     documents = Document.query.order_by(Document.id.desc()).all()
     return json.dumps(
         [
@@ -111,6 +125,7 @@ def export_json():
 
 @admin.route("/import_csv", methods=["POST"])
 def import_csv():
+    """POST /admin/import_csv"""
     try:
         file = request.files["file"]
         df = pd.read_csv(file.stream)
@@ -131,6 +146,7 @@ def import_csv():
 
 @admin.route("/export_csv", methods=["GET"])
 def export_csv():
+    """GET /admin/export_csv"""
     documents = Document.query.order_by(Document.id.desc()).all()
     df = pd.DataFrame(
         [
@@ -150,6 +166,7 @@ def export_csv():
 
 @admin.route("/clear_documents", methods=["POST"])
 def clear_documents():
+    """POST /admin/clear_documents"""
     try:
         documents = Document.query.order_by(Document.id.desc()).all()
         for document in documents:

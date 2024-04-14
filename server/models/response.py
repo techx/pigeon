@@ -1,5 +1,6 @@
-from server import db
 from sqlalchemy.dialects.postgresql import ARRAY
+
+from server import db
 from server.models.document import Document
 
 
