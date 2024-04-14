@@ -6,3 +6,4 @@ flask_session
 .pyc
 __pycache__
 venv
+.ruff_cache/
