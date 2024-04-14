@@ -2,7 +2,6 @@
 
 import os
 from pathlib import Path
-from typing import cast
 
 from dotenv import load_dotenv
 
@@ -14,9 +13,7 @@ RedisDocument = dict[str, str]
 ENV = os.environ.get("ENV", "development")
 
 
-def _get_config_option(
-    name: str, default_value: str | None = None, required: bool = False
-) -> str | None:
+def _get_config_option(name: str, default_value: str | None = None) -> str:
     if ENV == "production":
         value = os.environ.get(name, None)
         if value is None:
@@ -27,11 +24,8 @@ def _get_config_option(
     else:
         value = os.environ.get(name, default_value)
 
-    if required and value is None:
-        raise Exception(f"Environment variable {name} is required but not set.")
-
-    if required:
-        value = cast(str, value)
+    if value is None:
+        raise Exception(f"Environment variable {name} not set.")
 
     return value
 
@@ -46,24 +40,24 @@ REDIS_URL = _get_config_option("REDIS_URL", "redis")
 
 FLASK_RUN_PORT = 2010
 DEBUG = True
-MAIL_USERNAME = _get_config_option("MAIL_USERNAME", required=True)
-MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD", required=True)
-MAIL_CC = _get_config_option("MAIL_CC", required=True)
+MAIL_USERNAME = _get_config_option("MAIL_USERNAME")
+MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD")
+MAIL_CC = _get_config_option("MAIL_CC")
 
 MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
 
-AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID", required=True)
-AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET", required=True)
-SESSION_SECRET = _get_config_option("SESSION_SECRET", required=True)
+AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID")
+AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET")
+SESSION_SECRET = _get_config_option("SESSION_SECRET")
 
-OPENAI_API_KEY = _get_config_option("OPENAI_API_KEY", required=True)
+OPENAI_API_KEY = _get_config_option("OPENAI_API_KEY")
 
-AUTH_USERNAME = _get_config_option("AUTH_USERNAME", required=True)
-AUTH_PASSWORD = _get_config_option("AUTH_PASSWORD", required=True)
+AUTH_USERNAME = _get_config_option("AUTH_USERNAME")
+AUTH_PASSWORD = _get_config_option("AUTH_PASSWORD")
 
-AWS_REGION = _get_config_option("AWS_REGION", required=True)
-AWS_ACCESS_KEY_ID = _get_config_option("AWS_ACCESS_KEY_ID", required=True)
-AWS_SECRET_ACCESS_KEY = _get_config_option("AWS_SECRET_ACCESS_KEY", required=True)
+AWS_REGION = _get_config_option("AWS_REGION")
+AWS_ACCESS_KEY_ID = _get_config_option("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = _get_config_option("AWS_SECRET_ACCESS_KEY")
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},

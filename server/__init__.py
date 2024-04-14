@@ -1,5 +1,7 @@
 """Initialize the Flask app."""
 
+from typing import cast
+
 import numpy
 from apiflask import APIFlask
 from flask import redirect, render_template
@@ -77,11 +79,10 @@ def create_app():
         db.init_app(app)
 
         allowed_domains = app.config.get("ALLOWED_DOMAINS")
-        assert type(allowed_domains) is list[str]
 
         cors.init_app(
             app,
-            origins=allowed_domains,
+            origins=cast(list[str], allowed_domains),
             supports_credentials=True,
         )
 
