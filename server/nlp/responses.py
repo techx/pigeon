@@ -1,8 +1,15 @@
-import openai
-import numpy as np
-from server.nlp.embeddings import query_all
+"""Provides responses module.
+
+This module is used to generate responses to incoming emails using OpenAI.
+"""
+
 import ast
-from server.config import RedisDocument, OpenAIMessage, OPENAI_API_KEY
+
+import numpy as np
+import openai
+
+from server.config import OPENAI_API_KEY, OpenAIMessage, RedisDocument
+from server.nlp.embeddings import query_all
 
 openai.api_key = OPENAI_API_KEY
 
@@ -10,7 +17,7 @@ MODEL = "gpt-3.5-turbo"
 
 
 def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
-    """generate a response from openai
+    """Generate a response from OpenAI.
 
     Parameters
     ----------
@@ -19,19 +26,27 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
     sender: :obj:`str`
         hacker email address
 
-    Returns
+    Returns:
     -------
     str
         email response
     """
-
     messages = [
         {
             "role": "system",
-            "content": f"You are an organizer for Blueprint, a hackathon for high schoolers led by the organizers of HackMIT. You are responsible for responding to an email from a participant. \
-             Please write an email response to the participant. Begin the email with the header 'Dear [First Name]' where '[First Name]' is the participant's first name and end the email with the footer 'Best regards, The Blueprint Team'. Do not include the subject line in your response. \
-             The participant's email address is {sender}.\
-             You receive documents to help you answer the email. Please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. However, please write the emails in a friendly tone.",
+            "content": f"You are an organizer for Blueprint, a hackathon for high \
+            schoolers led by the organizers of HackMIT. You are responsible for \
+            responding to an email from a participant. \
+            Please write an email response to the participant. Begin the email with \
+            the header 'Dear [First Name]' where '[First Name]' is the participant's \
+            first name and end the email with the footer 'Best regards, The Blueprint \
+            Team'. Do not include the subject line in your response. \
+            The participant's email address is {sender}.\
+            You receive documents to help you answer the email. \
+            Please do not include information that is not explicitly stated in the \
+            documents. It is very important to keep responses brief and only answer \
+            the questions asked. However, please write the emails in a friendly \
+            tone.",
         }
     ]
     messages += thread
@@ -39,7 +54,10 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
     messages += [
         {
             "role": "system",
-            "content": "Once again, please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. Please write the emails in a friendly tone.",
+            "content": "Once again, please do not include information that is not \
+            explicitly stated in the documents. It is very important to keep responses \
+            brief and only answer the questions asked. Please write the emails in a \
+            friendly tone.",
         }
     ]
 
@@ -49,14 +67,14 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
 
 
 def openai_parse(email: str) -> list[str]:
-    """parse an email using openai
+    """Parse an email into questions using OpenAI.
 
     Parameters
     ----------
     email : :obj:`str`
         hacker email
 
-    Returns
+    Returns:
     -------
     :obj:`list` of :obj:`str`
         parsed list of questions
@@ -66,7 +84,9 @@ def openai_parse(email: str) -> list[str]:
         messages=[
             {
                 "role": "system",
-                "content": "You are an organizer for HackMIT. Please parse incoming emails from participants into separate questions. Return a list of questions in the format of a python list.",
+                "content": "You are an organizer for HackMIT. Please parse incoming \
+                    emails from participants into separate questions. Return a list of \
+                    questions in the format of a python list.",
             },
             {"role": "user", "content": email},
         ],
@@ -82,14 +102,14 @@ def openai_parse(email: str) -> list[str]:
 
 
 def confidence_metric(confidences: list[float]) -> float:
-    """compute confidence metric for a list of confidences
+    """Compute confidence metric for a list of confidences.
 
     Parameters
     ----------
     confidences : :obj:`list` of :obj:`float`
         list of confidences
 
-    Returns
+    Returns:
     -------
     float
         confidence metric
@@ -101,19 +121,20 @@ def confidence_metric(confidences: list[float]) -> float:
 def generate_context(
     email: str,
 ) -> tuple[list[OpenAIMessage], dict[str, list[RedisDocument]], float]:
-    """generate email context
+    """Generate email context.
 
     Parameters
     ----------
     email : :obj:`str`
         hacker email
 
-    Returns
+    Returns:
     -------
     :obj:`list` of :obj:`OpenAIMessage`
         list of contexts for all questions in email
     :obj:`dict` of :obj:`[str, list[RedisDocument]]`
-        dictionary mapping each question to list of context documents used to answer question
+        dictionary mapping each question to list of context documents used to
+        answer question
     :obj:`float`
         confidence metric for all documents
     """
@@ -144,9 +165,9 @@ def generate_context(
 
 
 def generate_response(
-    sender: str, email: str, thread: list[OpenAIMessage] = []
+    sender: str, email: str, thread: list[OpenAIMessage] | None = None
 ) -> tuple[str, dict[str, list[RedisDocument]], float]:
-    """generate response to email
+    """Generate response to email.
 
     Parameters
     ----------
@@ -157,15 +178,18 @@ def generate_response(
     thread : :obj:`list` of :obj:`OpenAIMessage`, optional
         previous email thread
 
-    Returns
+    Returns:
     -------
     str
         email response
     :obj:`dict` of :obj:`[str, list[RedisDocument]]`
-        dictionary mapping each question to list of context documents used to answer question
+        dictionary mapping each question to list of context documents used to
+        answer question
     float
         confidence of response
     """
+    if thread is None:
+        thread = []
 
     # generate new context
     contexts, docs, confidence = generate_context(email)
@@ -176,35 +200,37 @@ def generate_response(
     return openai_response(thread, sender), docs, confidence
 
 
-def test():
-    thread = []
-    new_email = "Where is the hackathon held? When is the application deadline? When is HackMIT happening?"
-    response, docs, confidence = generate_response(new_email)
+# def test():
+#     thread = []
+#     new_email = "Where is the hackathon held? When is the application deadline? \
+#                 When is HackMIT happening?"
+#     response, docs, confidence = generate_response(new_email)
 
-    for question in docs.keys():
-        print("question", question)
-        for doc in docs[question]:
-            print("confidence:", doc["score"])
-            print(f"Q: {doc['question']}")
-            print(f"A: {doc['content']}")
-        print()
-    print(response)
-    print("confidence:", confidence)
+#     for question in docs.keys():
+#         print("question", question)
+#         for doc in docs[question]:
+#             print("confidence:", doc["score"])
+#             print(f"Q: {doc['question']}")
+#             print(f"A: {doc['content']}")
+#         print()
+#     print(response)
+#     print("confidence:", confidence)
 
-    thread.append({"role": "user", "content": new_email})
-    thread.append({"role": "assistant", "content": response})
+#     thread.append({"role": "user", "content": new_email})
+#     thread.append({"role": "assistant", "content": response})
 
-    new_email = "Thank you for your response! Is there anything else I should know before heading to the event? Thanks!"
-    response, docs, confidence = generate_response(new_email, thread)
+#     new_email = "Thank you for your response! Is there anything else I should know \
+#                 before heading to the event? Thanks!"
+#     response, docs, confidence = generate_response(new_email, thread)
 
-    print("thread", thread)
+#     print("thread", thread)
 
-    for question in docs.keys():
-        print("question", question)
-        for doc in docs[question]:
-            print("confidence:", doc["score"])
-            print(f"Q: {doc['question']}")
-            print(f"A: {doc['content']}")
-        print()
-    print(response)
-    print("confidence:", confidence)
+#     for question in docs.keys():
+#         print("question", question)
+#         for doc in docs[question]:
+#             print("confidence:", doc["score"])
+#             print(f"Q: {doc['question']}")
+#             print(f"A: {doc['content']}")
+#         print()
+#     print(response)
+#     print("confidence:", confidence)
