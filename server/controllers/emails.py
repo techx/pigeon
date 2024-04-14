@@ -1,18 +1,16 @@
 import os
-import smtplib
 import re
 import email
 import email.mime.multipart
 import email.mime.text
+from typing import Any
 from flask import request
 from jinja2 import Environment, FileSystemLoader
 from apiflask import APIBlueprint
 from server import db
 from server.config import (
     MAIL_USERNAME,
-    MAIL_PASSWORD,
     MAIL_CC,
-    MAIL_SENDER_TAG,
     AWS_REGION,
     AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY,
@@ -31,12 +29,13 @@ env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
 emails = APIBlueprint("emails", __name__, url_prefix="/emails", tag="Emails")
 
 
-def thread_emails_to_openai_messages(thread_emails: list[int]) -> list[OpenAIMessage]:
+def thread_emails_to_openai_messages(thread_emails: list[Any]) -> list[OpenAIMessage]:
     """converts list of email to openai messages
 
     Parameters
     ----------
-    thread_email_ids : :obj:`list` of :obj:`int`
+    thread_email_ids : :obj:`list` of :obj:`Any`
+        TODO(azliu): change "any" to the correct type.
         list of email ids
 
     Returns
@@ -120,74 +119,75 @@ def decrement_response_count(document_ids: list[list[int]]):
 
 
 # not used as of 1/28/2024
-@emails.route("/receive_email_mailgun", methods=["POST"])
-def receive_email_mailgun():
-    data = request.form
+# save for future reference, in case we ever need to switch back to mailgun or a similar provider
+# @emails.route("/receive_email_mailgun", methods=["POST"])
+# def receive_email_mailgun():
+#     data = request.form
 
-    if (
-        "From" not in data
-        or "Subject" not in data
-        or "stripped-text" not in data
-        or "stripped-html" not in data
-        or "Message-Id" not in data
-    ):
-        return {"message": "Missing fields"}, 400
+#     if (
+#         "From" not in data
+#         or "Subject" not in data
+#         or "stripped-text" not in data
+#         or "stripped-html" not in data
+#         or "Message-Id" not in data
+#     ):
+#         return {"message": "Missing fields"}, 400
 
-    email = None
-    thread = None
+#     email = None
+#     thread = None
 
-    if "In-Reply-To" in data:
-        # reply to existing email, add to existing thread
-        replied_to_email = Email.query.filter_by(message_id=data["In-Reply-To"]).first()
-        if data["sender"] != MAIL_USERNAME and replied_to_email:
-            thread = Thread.query.get(replied_to_email.thread_id)
-            if thread:
-                email = Email(
-                    datetime.now(timezone.utc),
-                    data["From"],
-                    data["Subject"],
-                    data["stripped-text"],
-                    data["stripped-html"],
-                    data["Message-Id"],
-                    False,
-                    thread.id,
-                )
-    else:
-        # new email, create new thread
-        thread = Thread()
-        db.session.add(thread)
-        db.session.commit()
-        email = Email(
-            datetime.now(timezone.utc),
-            data["From"],
-            data["Subject"],
-            data["stripped-text"],
-            data["stripped-html"],
-            data["Message-Id"],
-            False,
-            thread.id,
-        )
-    if email is not None and thread is not None:
-        openai_messages = thread_emails_to_openai_messages(thread.emails)
-        openai_res, documents, confidence = generate_response(
-            email.sender, email.body, openai_messages
-        )
-        questions, document_ids, document_confidences = document_data(documents)
-        db.session.add(email)
-        db.session.commit()
-        r = Response(
-            openai_res,
-            questions,
-            document_ids,
-            document_confidences,
-            confidence,
-            email.id,
-        )
-        db.session.add(r)
-        thread.last_email = email.id
-        thread.resolved = False
-        db.session.commit()
-    return data
+#     if "In-Reply-To" in data:
+#         # reply to existing email, add to existing thread
+#         replied_to_email = Email.query.filter_by(message_id=data["In-Reply-To"]).first()
+#         if data["sender"] != MAIL_USERNAME and replied_to_email:
+#             thread = Thread.query.get(replied_to_email.thread_id)
+#             if thread:
+#                 email = Email(
+#                     datetime.now(timezone.utc),
+#                     data["From"],
+#                     data["Subject"],
+#                     data["stripped-text"],
+#                     data["stripped-html"],
+#                     data["Message-Id"],
+#                     False,
+#                     thread.id,
+#                 )
+#     else:
+#         # new email, create new thread
+#         thread = Thread()
+#         db.session.add(thread)
+#         db.session.commit()
+#         email = Email(
+#             datetime.now(timezone.utc),
+#             data["From"],
+#             data["Subject"],
+#             data["stripped-text"],
+#             data["stripped-html"],
+#             data["Message-Id"],
+#             False,
+#             thread.id,
+#         )
+#     if email is not None and thread is not None:
+#         openai_messages = thread_emails_to_openai_messages(thread.emails)
+#         openai_res, documents, confidence = generate_response(
+#             email.sender, email.body, openai_messages
+#         )
+#         questions, document_ids, document_confidences = document_data(documents)
+#         db.session.add(email)
+#         db.session.commit()
+#         r = Response(
+#             openai_res,
+#             questions,
+#             document_ids,
+#             document_confidences,
+#             confidence,
+#             email.id,
+#         )
+#         db.session.add(r)
+#         thread.last_email = email.id
+#         thread.resolved = False
+#         db.session.commit()
+#     return data
 
 
 @emails.route("/receive_email", methods=["POST"])
@@ -289,47 +289,48 @@ def receive_email():
 
 
 # not used as of 1/28/2024
-@emails.route("/send_email_mailgun", methods=["POST"])
-def send_email_mailgun():
-    data = request.form
-    reply_to_email = Email.query.get(data["id"])
-    clean_regex = re.compile("<.*?>")
-    clean_text = re.sub(clean_regex, " ", data["body"])
-    context = {"body": data["body"]}
-    template = env.get_template("template.html")
-    body = template.render(**context)
-    thread = Thread.query.get(reply_to_email.thread_id)
-    server = smtplib.SMTP("smtp.mailgun.org", 587)
-    server.starttls()
-    server.ehlo()
-    server.login(MAIL_USERNAME, MAIL_PASSWORD)
-    msg = email.mime.multipart.MIMEMultipart()
-    msg["Subject"] = reply_to_email.subject
-    msg["FROM"] = MAIL_SENDER_TAG
-    msg["In-Reply-To"] = reply_to_email.message_id
-    msg["References"] = reply_to_email.message_id
-    msg["To"] = thread.first_sender
-    msg["Cc"] = MAIL_USERNAME
-    message_id = email.utils.make_msgid(domain="my.hackmit.org")
-    msg["message-id"] = message_id
-    msg.attach(email.mime.text.MIMEText(body, "HTML"))
-    server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
-    thread.resolved = True
-    reply_email = Email(
-        datetime.now(timezone.utc),
-        MAIL_SENDER_TAG,
-        reply_to_email.subject,
-        clean_text,
-        data["body"],
-        message_id,
-        True,
-        thread.id,
-    )
-    db.session.add(reply_email)
-    db.session.commit()
-    thread.last_email = reply_email.id
-    db.session.commit()
-    return {"message": "Email sent successfully"}
+# save for future reference, in case we ever need to switch back to mailgun or a similar provider
+# @emails.route("/send_email_mailgun", methods=["POST"])
+# def send_email_mailgun():
+#     data = request.form
+#     reply_to_email = Email.query.get(data["id"])
+#     clean_regex = re.compile("<.*?>")
+#     clean_text = re.sub(clean_regex, " ", data["body"])
+#     context = {"body": data["body"]}
+#     template = env.get_template("template.html")
+#     body = template.render(**context)
+#     thread = Thread.query.get(reply_to_email.thread_id)
+#     server = smtplib.SMTP("smtp.mailgun.org", 587)
+#     server.starttls()
+#     server.ehlo()
+#     server.login(MAIL_USERNAME, MAIL_PASSWORD)
+#     msg = email.mime.multipart.MIMEMultipart()
+#     msg["Subject"] = reply_to_email.subject
+#     msg["FROM"] = MAIL_SENDER_TAG
+#     msg["In-Reply-To"] = reply_to_email.message_id
+#     msg["References"] = reply_to_email.message_id
+#     msg["To"] = thread.first_sender
+#     msg["Cc"] = MAIL_USERNAME
+#     message_id = email.utils.make_msgid(domain="my.hackmit.org")
+#     msg["message-id"] = message_id
+#     msg.attach(email.mime.text.MIMEText(body, "HTML"))
+#     server.sendmail(MAIL_USERNAME, [thread.first_sender], msg.as_bytes())
+#     thread.resolved = True
+#     reply_email = Email(
+#         datetime.now(timezone.utc),
+#         MAIL_SENDER_TAG,
+#         reply_to_email.subject,
+#         clean_text,
+#         data["body"],
+#         message_id,
+#         True,
+#         thread.id,
+#     )
+#     db.session.add(reply_email)
+#     db.session.commit()
+#     thread.last_email = reply_email.id
+#     db.session.commit()
+#     return {"message": "Email sent successfully"}
 
 
 def get_full_message_id(message_id):
@@ -340,7 +341,11 @@ def get_full_message_id(message_id):
 def send_email():
     data = request.form
     reply_to_email = Email.query.get(data["id"])
+    if not reply_to_email:
+        return {"message": "Email not found"}, 400
     thread = Thread.query.get(reply_to_email.thread_id)
+    if not thread:
+        return {"message": "Thread not found"}, 400
     clean_regex = re.compile("<.*?>")
     clean_text = re.sub(clean_regex, " ", data["body"])
     context = {"body": data["body"]}
@@ -382,7 +387,7 @@ def send_email():
 
     thread.resolved = True
     reply_email = Email(
-        datetime.utcnow(),
+        datetime.now(timezone.utc),
         '"Blueprint Team" <blueprint@my.hackmit.org>',
         reply_to_email.subject,
         clean_text,
@@ -397,7 +402,8 @@ def send_email():
     db.session.commit()
 
     response = Response.query.filter_by(email_id=reply_to_email.id).first()
-    decrement_response_count(response.documents)
+    if response:
+        decrement_response_count(response.documents)
 
     return {"message": "Email sent successfully"}
 
@@ -415,7 +421,11 @@ def get_response():
 def regen_response():
     data = request.form
     thread = Thread.query.get(data["id"])
+    if not thread:
+        return {"message": "Thread not found"}, 400
     email = Email.query.get(thread.last_email)
+    if not email:
+        return {"message": "Email not found"}, 400
     response = Response.query.filter_by(email_id=email.id).first()
     if not thread or not email or not response:
         return {"message": "Something went wrong!"}, 400
@@ -441,6 +451,8 @@ def regen_response():
 def resolve():
     data = request.form
     thread = Thread.query.get(data["id"])
+    if not thread:
+        return {"message": "Thread not found"}, 400
     thread.resolved = True
     db.session.commit()
 
@@ -451,6 +463,8 @@ def resolve():
 def unresolve():
     data = request.form
     thread = Thread.query.get(data["id"])
+    if not thread:
+        return {"message": "Thread not found"}, 400
     thread.resolved = False
     db.session.commit()
 
