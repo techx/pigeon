@@ -1,7 +1,10 @@
+"""Configuration for backend server."""
+
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 from typing import cast
+
+from dotenv import load_dotenv
 
 load_dotenv(os.path.dirname(__file__) / Path("../.env"))
 
@@ -27,6 +30,9 @@ def _get_config_option(
     if required and value is None:
         raise Exception(f"Environment variable {name} is required but not set.")
 
+    if required:
+        value = cast(str, value)
+
     return value
 
 
@@ -40,8 +46,8 @@ REDIS_URL = _get_config_option("REDIS_URL", "redis")
 
 FLASK_RUN_PORT = 2010
 DEBUG = True
-MAIL_USERNAME = cast(str, _get_config_option("MAIL_USERNAME", required=True))
-MAIL_PASSWORD = cast(str, _get_config_option("MAIL_PASSWORD", required=True))
+MAIL_USERNAME = _get_config_option("MAIL_USERNAME", required=True)
+MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD", required=True)
 MAIL_CC = _get_config_option("MAIL_CC", required=True)
 
 MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
