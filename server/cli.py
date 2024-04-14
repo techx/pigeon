@@ -1,7 +1,4 @@
 from flask import Blueprint
-import email
-import email.mime.multipart
-import email.mime.text
 from server import db
 from server.models.email import Email
 from server.models.thread import Thread
