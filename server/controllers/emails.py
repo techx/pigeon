@@ -1,44 +1,47 @@
-import os
-import re
+"""The email controller handles sending and receiving of emails."""
+
 import email
 import email.mime.multipart
 import email.mime.text
-from typing import Any
+import os
+import re
+from datetime import datetime, timezone
+
+import boto3
+from apiflask import APIBlueprint
 from flask import request
 from jinja2 import Environment, FileSystemLoader
-from apiflask import APIBlueprint
+
 from server import db
 from server.config import (
-    MAIL_USERNAME,
-    MAIL_CC,
-    AWS_REGION,
     AWS_ACCESS_KEY_ID,
+    AWS_REGION,
     AWS_SECRET_ACCESS_KEY,
+    MAIL_CC,
+    MAIL_USERNAME,
     OpenAIMessage,
+    RedisDocument,
 )
-from server.models.email import Email
-from server.models.thread import Thread
-from server.models.response import Response
 from server.models.document import Document
+from server.models.email import Email
+from server.models.response import Response
+from server.models.thread import Thread
 from server.nlp.responses import generate_response
-from datetime import datetime, timezone
-import boto3
 
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
 emails = APIBlueprint("emails", __name__, url_prefix="/emails", tag="Emails")
 
 
-def thread_emails_to_openai_messages(thread_emails: list[Any]) -> list[OpenAIMessage]:
-    """converts list of email to openai messages
+def thread_emails_to_openai_messages(thread_emails: list[Email]) -> list[OpenAIMessage]:
+    """Converts list of email to openai messages.
 
-    Parameters
+    Parameters:
     ----------
-    thread_email_ids : :obj:`list` of :obj:`Any`
-        TODO(azliu): change "any" to the correct type.
+    thread_email_ids : :obj:`list` of :obj:`Email`
         list of email ids
 
-    Returns
+    Returns:
     -------
     :obj:`list` of :obj:`OpenAIMessage`
         list of openai messages
@@ -51,25 +54,27 @@ def thread_emails_to_openai_messages(thread_emails: list[Any]) -> list[OpenAIMes
 
 
 def document_data(
-    documents: list[dict],
+    documents: dict[str, list[RedisDocument]],
 ) -> tuple[list[str], list[list[int]], list[list[float]]]:
-    """process raw openai document output
+    """Process raw openai document output.
 
     Parameters
     ----------
     documents : :obj:`list` of :obj:`dict`
         raw openai document output
 
-    Returns
+    Returns:
     -------
     :obj:`list` of :obj:`str`
         list of questions parsed from the original email body
     :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to answer a specific question
+        list of document ids. each element in the list is a list of document ids used to
+        answer a specific question
     :obj:`list` of :obj:`list` of :obj:`float`
-        list of document confidence. each element in the list is the corresponding list of confidence scores for each document used to answer a specific question
+        list of document confidence. each element in the list is the corresponding list
+        of confidence scores for each document used to answer a specific question
     """
-    questions = documents.keys()
+    questions = list(documents.keys())
     doc_ids = []
     doc_confidences = []
     for question in questions:
@@ -84,12 +89,13 @@ def document_data(
 
 
 def increment_response_count(document_ids: list[list[int]]):
-    """increment response count for documents
+    """Increment response count for documents.
 
     Parameters
     ----------
     document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to answer a specific question
+        list of document ids. each element in the list is a list of document ids used to
+        answer a specific question
     """
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:
@@ -100,12 +106,13 @@ def increment_response_count(document_ids: list[list[int]]):
 
 
 def decrement_response_count(document_ids: list[list[int]]):
-    """decrement response count for documents
+    """Decrement response count for documents.
 
     Parameters
     ----------
     document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to answer a specific question
+        list of document ids. each element in the list is a list of document ids used to
+        answer a specific question
     """
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:
@@ -119,7 +126,8 @@ def decrement_response_count(document_ids: list[list[int]]):
 
 
 # not used as of 1/28/2024
-# save for future reference, in case we ever need to switch back to mailgun or a similar provider
+# save for future reference, in case we ever need to switch back to mailgun or a similar
+# provider
 # @emails.route("/receive_email_mailgun", methods=["POST"])
 # def receive_email_mailgun():
 #     data = request.form
@@ -138,7 +146,8 @@ def decrement_response_count(document_ids: list[list[int]]):
 
 #     if "In-Reply-To" in data:
 #         # reply to existing email, add to existing thread
-#         replied_to_email = Email.query.filter_by(message_id=data["In-Reply-To"]).first()
+#         replied_to_email =
+# Email.query.filter_by(message_id=data["In-Reply-To"]).first()
 #         if data["sender"] != MAIL_USERNAME and replied_to_email:
 #             thread = Thread.query.get(replied_to_email.thread_id)
 #             if thread:
@@ -192,6 +201,11 @@ def decrement_response_count(document_ids: list[list[int]]):
 
 @emails.route("/receive_email", methods=["POST"])
 def receive_email():
+    """Receive email from AWS SES and process it.
+
+    More information about the way that AWS SES sends emails can be found at
+    go/pigeon-emails
+    """
     data = request.form
     print(data, flush=True)
 
@@ -209,9 +223,10 @@ def receive_email():
         print("duplicate email", flush=True)
         return data
 
-    # by default, body contains the full email bodies of all previous emails in the thread
-    # here, we filter out previous emails so that only the body of the current email is used
-    # this filtering is purposely not done on AWS because of potentially needing context for the TODO below
+    # by default, body contains the full email bodies of all previous emails in the
+    # thread here, we filter out previous emails so that only the body of the current
+    # email is used. this filtering is purposely not done on AWS because of potentially
+    # needing context for the TODO below
     body = data["stripped-text"]
     body = str(body)
     start_of_reply = body.find("________________________________")
@@ -241,7 +256,7 @@ def receive_email():
             thread = Thread.query.get(replied_to_email.thread_id)
             if thread:
                 email = Email(
-                    datetime.utcnow(),
+                    datetime.now(timezone.utc),
                     data["From"],
                     data["Subject"],
                     body,
@@ -249,7 +264,8 @@ def receive_email():
                     False,
                     thread.id,
                 )
-        # TODO(#5): this ignores case where user responds to an email that isn't in the database. should we handle this?
+        # TODO(#5): this ignores case where user responds to an email that isn't in the
+        # database. should we handle this?
     else:
         # new email, create new thread
         thread = Thread()
@@ -289,7 +305,8 @@ def receive_email():
 
 
 # not used as of 1/28/2024
-# save for future reference, in case we ever need to switch back to mailgun or a similar provider
+# save for future reference, in case we ever need to switch back to mailgun or a
+# similar provider
 # @emails.route("/send_email_mailgun", methods=["POST"])
 # def send_email_mailgun():
 #     data = request.form
@@ -334,11 +351,13 @@ def receive_email():
 
 
 def get_full_message_id(message_id):
+    """Get full SES-formatted message id."""
     return f"<{message_id}@us-east-2.amazonses.com>"
 
 
 @emails.route("/send_email", methods=["POST"])
 def send_email():
+    """Send an email through AWS SES."""
     data = request.form
     reply_to_email = Email.query.get(data["id"])
     if not reply_to_email:
@@ -410,6 +429,7 @@ def send_email():
 
 @emails.route("/get_response", methods=["POST"])
 def get_response():
+    """Get the AI-gen response for an email."""
     data = request.form
     response = Response.query.filter_by(email_id=data["id"]).first()
     if not response:
@@ -419,6 +439,7 @@ def get_response():
 
 @emails.route("/regen_response", methods=["POST"])
 def regen_response():
+    """Regenerate the AI-gen response response for an email."""
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -449,6 +470,7 @@ def regen_response():
 
 @emails.route("/resolve", methods=["POST"])
 def resolve():
+    """Mark an email thread as resolved."""
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -461,6 +483,7 @@ def resolve():
 
 @emails.route("/unresolve", methods=["POST"])
 def unresolve():
+    """Mark an email thread as unresolved."""
     data = request.form
     thread = Thread.query.get(data["id"])
     if not thread:
@@ -473,6 +496,7 @@ def unresolve():
 
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
+    """Get a list of all threads."""
     thread_list = Thread.query.order_by(Thread.resolved, Thread.last_email.desc()).all()
     email_list = [
         {
