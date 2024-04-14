@@ -39,7 +39,7 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
     messages += [
         {
             "role": "system",
-            "content": f"Once again, please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. Please write the emails in a friendly tone.",
+            "content": "Once again, please do not include information that is not explicitly stated in the documents. It is very important to keep responses brief and only answer the questions asked. Please write the emails in a friendly tone.",
         }
     ]
 
@@ -76,7 +76,8 @@ def openai_parse(email: str) -> list[str]:
         assert isinstance(questions, list)
         assert len(questions) > 0
         return questions
-    except:
+    except Exception as e:
+        print(e)
         return [email]
 
 

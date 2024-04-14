@@ -48,8 +48,8 @@ const router = createBrowserRouter(
       />
 
       <Route path="*" element={<RestrictedPage />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default function App() {

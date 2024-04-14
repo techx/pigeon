@@ -1,23 +1,18 @@
-import json
 import time
 
 import numpy as np
-import pandas as pd
 
 import redis
-import requests
 from redis.commands.search.field import (
     NumericField,
-    TagField,
     TextField,
     VectorField,
 )
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
-from server.config import OPENAI_API_KEY, REDIS_URL
+from server.config import REDIS_URL
 
-from textwrap import TextWrapper
-from server.config import RedisDocument, OpenAIMessage
+from server.config import RedisDocument
 
 import openai
 

@@ -6,7 +6,6 @@ from server import db
 from server.models.email import Email
 from server.models.thread import Thread
 from server.models.response import Response
-from server.models.document import Document
 from server.nlp.responses import generate_response
 import datetime
 from server.controllers.emails import (

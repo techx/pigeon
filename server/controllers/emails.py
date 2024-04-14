@@ -45,9 +45,9 @@ def thread_emails_to_openai_messages(thread_emails: list[int]) -> list[OpenAIMes
         list of openai messages
     """
     openai_messages = []
-    for email in thread_emails:
-        role = "user" if email.sender != MAIL_USERNAME else "assistant"
-        openai_messages.append({"role": role, "content": email.body})
+    for t_email in thread_emails:
+        role = "user" if t_email.sender != MAIL_USERNAME else "assistant"
+        openai_messages.append({"role": role, "content": t_email.body})
     return openai_messages
 
 
@@ -355,7 +355,7 @@ def send_email():
     msg = email.mime.multipart.MIMEMultipart()
     msg["Subject"] = reply_to_email.subject
     # msg["FROM"] = MAIL_SENDER_TAG
-    msg["FROM"] = f'"Blueprint Team" <blueprint@my.hackmit.org>'
+    msg["FROM"] = '"Blueprint Team" <blueprint@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
     to_email_addresses = [thread.first_sender, MAIL_CC]
@@ -381,7 +381,7 @@ def send_email():
     thread.resolved = True
     reply_email = Email(
         datetime.utcnow(),
-        f'"Blueprint Team" <blueprint@my.hackmit.org>',
+        '"Blueprint Team" <blueprint@my.hackmit.org>',
         reply_to_email.subject,
         clean_text,
         get_full_message_id(response["MessageId"]),

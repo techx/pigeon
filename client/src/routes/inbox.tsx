@@ -76,7 +76,7 @@ export default function InboxPage() {
     return thread.id === active;
   })[0];
   const [threadSize, setThreadSize] = useState(
-    activeThread ? activeThread.emailList.length : 0
+    activeThread ? activeThread.emailList.length : 0,
   );
   const [sourceActive, setSourceActive] = useState(false);
 
@@ -96,7 +96,7 @@ export default function InboxPage() {
       },
       content: content,
     },
-    [response]
+    [response],
   );
   const getThreads = () => {
     fetch(`/api/emails/get_threads`)
@@ -156,7 +156,7 @@ export default function InboxPage() {
     const formData = new FormData();
     formData.append(
       "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString()
+      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
     );
     fetch(`/api/emails/get_response`, {
       method: "POST",
@@ -202,7 +202,7 @@ export default function InboxPage() {
     const formData = new FormData();
     formData.append(
       "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString()
+      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
     );
     formData.append("body", content);
     fetch(`/api/emails/send_email`, {
@@ -407,7 +407,7 @@ export default function InboxPage() {
     )
       return cmpDate(
         a.emailList[a.emailList.length - 1].date,
-        b.emailList[b.emailList.length - 1].date
+        b.emailList[b.emailList.length - 1].date,
       );
     else return -1;
   };
@@ -431,7 +431,7 @@ export default function InboxPage() {
             setThreadSize(
               threads.filter((newThread) => {
                 return thread.id === newThread.id;
-              })[0].emailList.length
+              })[0].emailList.length,
             );
           }
         }}
@@ -474,7 +474,7 @@ export default function InboxPage() {
                 style={{
                   "border-left": `6px solid ${computeColor(
                     // Math.round((document.confidence / 0.8) * 100) / 100
-                    Math.round(document.confidence * 100) / 100
+                    Math.round(document.confidence * 100) / 100,
                   )}`,
                 }}
                 key={documentIndex}
@@ -556,9 +556,9 @@ export default function InboxPage() {
                     .filter(
                       (email) =>
                         email.sender ===
-                        '"Blueprint Team" <blueprint@my.hackmit.org>'
+                        '"Blueprint Team" <blueprint@my.hackmit.org>',
                     )
-                    .map((email) => activeThread.emailList.indexOf(email))
+                    .map((email) => activeThread.emailList.indexOf(email)),
                 )}
               >
                 {activeThread.emailList.map((email) => (

@@ -22,11 +22,11 @@ pigeon/
 ├── .devcontainer                 # Dev container configuration
 ├── README.md
 ├── requirements.txt              # Python dependencies list for backend
-├── .env                          # Stores secrets that are not in VCS                  
+├── .env                          # Stores secrets that are not in VCS
 ├── wsgi.py                       # Flask entry point
 ├── scripts
 │   ├── deploy.sh                 # Deploy to production server
-│   └── devcontainer_setup.sh     # Run once when the dev container initializes  
+│   └── devcontainer_setup.sh     # Run once when the dev container initializes
 └── client
 │   ├── public
 │   │   └── pigeon.png
@@ -100,7 +100,7 @@ To start the server, run
 python3 run.py
 ```
 
-To start the client, in a different terminal, run 
+To start the client, in a different terminal, run
 ```sh
 cd client
 npm run dev
@@ -108,7 +108,7 @@ npm run dev
 
 ### Installing Python Dependencies
 
-Put all direct dependencies (i.e., packages we directly import) in `requirements.in`. pigar can be used to automate part of this process. Then, run 
+Put all direct dependencies (i.e., packages we directly import) in `requirements.in`. pigar can be used to automate part of this process. Then, run
 ```
 pip-compile
 ```
@@ -116,6 +116,6 @@ to generate requirements.txt, which contains pinned versions of subdependencies 
 
 ### AWS
 
-All emails are forwarded to Pigeon through [AWS](https://aws.amazon.com/). More specifically, emails are received with a [receipt rule](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-concepts.html) and forwarded to an [S3 bucket](https://aws.amazon.com/s3/), which are then processed and forwarded to the api with a [lambda](https://aws.amazon.com/lambda/). The receiving and sending rules are both handled by [SES](https://aws.amazon.com/ses/). 
+All emails are forwarded to Pigeon through [AWS](https://aws.amazon.com/). More specifically, emails are received with a [receipt rule](https://docs.aws.amazon.com/ses/latest/dg/receiving-email-concepts.html) and forwarded to an [S3 bucket](https://aws.amazon.com/s3/), which are then processed and forwarded to the api with a [lambda](https://aws.amazon.com/lambda/). The receiving and sending rules are both handled by [SES](https://aws.amazon.com/ses/).
 
 For instructions on setting up locally, see [go/pigeon-aws](https://docs.google.com/document/d/1ASPwrC0LeI1jgSu9yML05zhb3SXFs6xe-xUKox3JWNw/edit).

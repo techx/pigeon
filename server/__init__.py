@@ -22,8 +22,6 @@ register_adapter(numpy.int64, addapt_numpy_int64)
 cors = CORS()
 db = SQLAlchemy()
 
-from server.models.document import Document
-
 
 # def init():
 #     documents = Document.query.order_by(Document.id.desc()).all()

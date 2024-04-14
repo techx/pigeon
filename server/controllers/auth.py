@@ -1,4 +1,3 @@
-from server import db
 from flask import current_app as app, request, session, redirect, url_for
 from apiflask import APIBlueprint, abort
 from authlib.integrations.flask_client import OAuth

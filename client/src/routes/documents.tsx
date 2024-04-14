@@ -343,7 +343,7 @@ export default function DocumentsPage() {
     }
     setActive(id);
     const activeDocument = documents.filter(
-      (document) => document.id === id
+      (document) => document.id === id,
     )[0];
     setQuestion(activeDocument.question);
     setContent(activeDocument.content);
