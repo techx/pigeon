@@ -7,3 +7,4 @@ flask_session
 __pycache__
 venv
 .ruff_cache/
+.pytest_cache/
