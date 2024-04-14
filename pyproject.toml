@@ -1,0 +1,46 @@
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["server_tests/"]
+filterwarnings = []
+
+
+[tool.pyright]
+exclude = ["**/node_modules", "**/__pycache__"]
+reportMissingImports = true
+reportMissingTypeStubs = false
+pythonVersion = "3.12"
+pythonPlatform = "Linux"
+executionEnvironments = [{ root = "." }]
+
+
+[tool.ruff]
+target-version = "py38"
+
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+
+
+[tool.ruff.lint.per-file-ignores]
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
