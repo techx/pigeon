@@ -1,0 +1,8 @@
+# Dev dependencies are only installed in devcontainers.
+# They are not installed in production.
+
+# needed for pre-commit hooks
+pre-commit
+
+# needed for pip-compile, needed to generate requirements.txt
+pip-tools
