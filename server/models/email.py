@@ -24,7 +24,7 @@ class Email(db.Model):
     body(str): The body of the email.
     message_id(str): The message ID of the email.
     response(Response): AI response to the email.
-    reply(bool): Whether the email is a reply to another email.
+    is_reply(bool): Whether the email is a reply to another email.
     thread_id(int): The ID of the thread the email belongs to.
     thread(Thread): The thread the email belongs to.
     """
@@ -42,7 +42,7 @@ class Email(db.Model):
         back_populates="email", init=False
     )
 
-    reply: Mapped[bool] = mapped_column(nullable=False, default=False)
+    is_reply: Mapped[bool] = mapped_column(nullable=False)
 
     thread_id: Mapped[int] = mapped_column(ForeignKey("Threads.id"), nullable=False)
     thread: Mapped[Thread] = relationship(back_populates="emails")
@@ -55,7 +55,7 @@ class Email(db.Model):
             "sender": self.sender,
             "subject": self.subject,
             "body": self.body,
-            "messageId": self.message_id,
-            "reply": self.reply,
-            "threadId": self.thread_id,
+            "message_id": self.message_id,
+            "is_reply": self.is_reply,
+            "thread_id": self.thread_id,
         }
