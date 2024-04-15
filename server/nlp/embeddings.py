@@ -17,14 +17,16 @@ from redis.commands.search.field import (
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
-from server.config import REDIS_URL, RedisDocument
+from server.config import REDIS_DB_INDEX, REDIS_URL, RedisDocument
 
 cwd = os.path.dirname(__file__)
 
 VECTOR_DIMENSION = 1536
 
 # load redis client
-client = redis.Redis(host=REDIS_URL, port=6379, decode_responses=True)
+client = redis.Redis(
+    host=REDIS_URL, port=6379, decode_responses=True, db=int(REDIS_DB_INDEX)
+)
 
 # load corpus
 # with open('corpus.json', 'r') as f:

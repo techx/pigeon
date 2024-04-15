@@ -3,6 +3,7 @@ from typing import cast
 
 import psycopg2
 import pytest
+import redis
 from apiflask import APIFlask
 from flask.testing import FlaskClient, FlaskCliRunner
 from psycopg2 import sql
@@ -41,8 +42,23 @@ def db_url(db_name="pigeondb_test"):
 
 
 @pytest.fixture(scope="session")
-def app(db_url: str):
+def redis_db_index():
+    """Yields test db index for Redis.
+
+    Flushes test db if it already exists.
+    """
+    test_db_index = 1
+    client = redis.Redis(host="localhost", port=6379, db=test_db_index)
+    client.flushdb()
+    client.close()
+
+    yield test_db_index
+
+
+@pytest.fixture(scope="session")
+def app(db_url: str, redis_db_index: int):
     os.environ["DATABASE_URL"] = db_url
+    os.environ["REDIS_DB_INDEX"] = str(redis_db_index)
 
     app = create_app()
     app.config.update(

@@ -37,6 +37,7 @@ SQLALCHEMY_DATABASE_URI = _get_config_option(
     "DATABASE_URL", "postgresql://postgres:password@database/pigeondb"
 )
 REDIS_URL = _get_config_option("REDIS_URL", "redis")
+REDIS_DB_INDEX = _get_config_option("REDIS_DB_INDEX", "0")
 
 FLASK_RUN_PORT = 2010
 DEBUG = True
