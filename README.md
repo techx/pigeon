@@ -106,6 +106,30 @@ cd client
 npm run dev
 ```
 
+The postgres and redis services are running on the same network as the dev container, but they can only communicate with each other via the designated service names, which are `database` and `redis` respectively. If you want to view these services from inside the dev container, you can use the following commands:
+
+```sh
+# postgres
+PGPASSWORD='password' psql -h database -U postgres
+
+# redis
+redis-cli -h redis
+```
+
+Alternatively, you can access these services from your local machine, i.e., outside of the dev container, by connecting directly to the docker containers. To do this, run
+
+```sh
+docker container ls
+```
+
+and retrieve the container id of your desired instance (e.g., `pigeon_devcontainer-database-1`). Then, run
+
+```sh
+docker exec -it <container_id> /bin/bash
+```
+
+to enter the container, from which you should be able to run `psql` or `redis-cli` directly.
+
 ### Installing Python Dependencies
 
 Put all direct dependencies (i.e., packages we directly import) in `requirements.in`. pigar can be used to automate part of this process. Then, run
