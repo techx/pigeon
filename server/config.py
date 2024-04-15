@@ -40,24 +40,26 @@ REDIS_URL = _get_config_option("REDIS_URL", "redis")
 
 FLASK_RUN_PORT = 2010
 DEBUG = True
-MAIL_USERNAME = _get_config_option("MAIL_USERNAME")
-MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD")
-MAIL_CC = _get_config_option("MAIL_CC")
+MAIL_USERNAME = _get_config_option("MAIL_USERNAME", "test_mail_username")
+MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD", "test_mail_password")
+MAIL_CC = _get_config_option("MAIL_CC", "test_mail_cc")
 
 MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
 
-AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID")
-AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET")
-SESSION_SECRET = _get_config_option("SESSION_SECRET")
+AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID", "test_auth_client_id")
+AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET", "test_auth_client_secret")
+SESSION_SECRET = _get_config_option("SESSION_SECRET", "test_session_secret")
 
-OPENAI_API_KEY = _get_config_option("OPENAI_API_KEY")
+OPENAI_API_KEY = _get_config_option("OPENAI_API_KEY", "test_openai_api_key")
 
-AUTH_USERNAME = _get_config_option("AUTH_USERNAME")
-AUTH_PASSWORD = _get_config_option("AUTH_PASSWORD")
+AUTH_USERNAME = _get_config_option("AUTH_USERNAME", "test_auth_username")
+AUTH_PASSWORD = _get_config_option("AUTH_PASSWORD", "test_auth_password")
 
-AWS_REGION = _get_config_option("AWS_REGION")
-AWS_ACCESS_KEY_ID = _get_config_option("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = _get_config_option("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = _get_config_option("AWS_REGION", "test_aws_region")
+AWS_ACCESS_KEY_ID = _get_config_option("AWS_ACCESS_KEY_ID", "test_aws_access_key_id")
+AWS_SECRET_ACCESS_KEY = _get_config_option(
+    "AWS_SECRET_ACCESS_KEY", "test_aws_secret_access_key"
+)
 
 AUTH_ADMINS = [
     {"name": "HackMIT", "email": "admin@hackmit.org"},
