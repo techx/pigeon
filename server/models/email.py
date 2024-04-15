@@ -18,21 +18,22 @@ class Email(db.Model):
 
     Table for storing emails.
 
-    id(str): The ID of the email.
-    date(DateTime): The date of the email in UTC.
-    sender(str): The sender of the email.
-    subject(str): The subject of the email.
-    body(str): The body of the email.
-    message_id(str): The message ID of the email.
-    response(Response): AI response to the email.
-    is_reply(bool): Whether the email is a reply to another email.
-    thread_id(int): The ID of the thread the email belongs to.
-    thread(Thread): The thread the email belongs to.
+    Attributes:
+        id (int): The ID of the email.
+        date (datetime.datetime): The date of the email in UTC.
+        sender (str): The sender of the email.
+        subject (str): The subject of the email.
+        body (str): The body of the email.
+        message_id (str): The message ID of the email.
+        response (Optional[Response]): AI response to the email.
+        is_reply (bool): Whether the email is a reply to another email.
+        thread_id (int): The ID of the thread the email belongs to.
+        thread (Thread): The thread the email belongs to.
     """
 
     __tablename__ = "email"
 
-    id: Mapped[str] = mapped_column(primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
     date: Mapped[datetime.datetime] = mapped_column(nullable=False)
     sender: Mapped[str] = mapped_column(nullable=False)
     subject: Mapped[str] = mapped_column(nullable=False)
@@ -40,13 +41,15 @@ class Email(db.Model):
     message_id: Mapped[str] = mapped_column(nullable=False)
 
     response: Mapped[Optional["Response"]] = relationship(
-        back_populates="email", init=False
+        "Response", back_populates="email", init=False
     )
 
     is_reply: Mapped[bool] = mapped_column(nullable=False)
 
-    thread_id: Mapped[str] = mapped_column(ForeignKey("thread.id"), nullable=False)
-    thread: Mapped["Thread"] = relationship(back_populates="emails", init=False)
+    thread_id: Mapped[int] = mapped_column(ForeignKey("thread.id"), nullable=False)
+    thread: Mapped["Thread"] = relationship(
+        "Thread", back_populates="emails", init=False
+    )
 
     def map(self):
         """Map the email to a dictionary."""

@@ -17,18 +17,19 @@ class Document(db.Model):
 
     Table for storing documents.
 
-    id(str): The ID of the document.
-    question(str): The question of the document.
-    content(str): The content of the document.
-    source(str): The source of the document.
-    label(str): The label of the document.
-    to_delete(bool): Whether the document is to be deleted.
-    response_count(int): The number of responses the document has.
+    Attributes:
+        id(int): The ID of the document.
+        question(str): The question of the document.
+        content(str): The content of the document.
+        source(str): The source of the document.
+        label(str): The label of the document.
+        to_delete(bool): Whether the document is to be deleted.
+        response_count(int): The number of responses the document has.
     """
 
     __tablename__ = "document"
 
-    id: Mapped[str] = mapped_column(primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
     question: Mapped[str] = mapped_column(nullable=False)
     label: Mapped[str] = mapped_column(nullable=False)
     content: Mapped[str] = mapped_column(nullable=False)

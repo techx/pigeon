@@ -2,18 +2,17 @@
 
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import ForeignKey, Text, UniqueConstraint
+from sqlalchemy import ForeignKey, Integer, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Numeric
 
 from server import db
+from server.models.document_response import document_response_table
 
 if TYPE_CHECKING:
     from server.models.document import Document
     from server.models.email import Email
-
-from server.models.document_response import document_response_table
 
 
 class Response(db.Model):
@@ -22,54 +21,45 @@ class Response(db.Model):
     Table for storing AI responses.
 
     Attributes:
-    id(str): The ID of the response.
-    response(str): The response content.
-    questions(List[str]): The list of questions.
-    documents(List[List[int]]): The list of documents.
-    documents_confidence(List[List[float]]): The list of documents' confidence.
-    confidence(float): The confidence of the response.
-    email_id(int): The ID of the original email.
-    email(Email): The original email.
+        id (int): The ID of the response.
+        response (str): The response content.
+        questions (List[str]): The list of questions.
+        docs_per_question (List[int]): The list of documents per question.
+        documents (List[Document]): The list of documents.
+        document_confidences (List[float]): The list of documents' confidence.
+        confidence (float): The confidence of the response.
+        email_id (str): The ID of the original email.
+        email (Email): The original email.
     """
 
     __tablename__ = "response"
     __table_args__ = (UniqueConstraint("email_id", name="unique_email_id"),)
 
-    id: Mapped[str] = mapped_column(primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
     response: Mapped[str] = mapped_column(nullable=False)
     questions: Mapped[List[str]] = mapped_column(ARRAY(Text), nullable=False)
-
-    documents: Mapped[List[List["Document"]]] = relationship(
-        secondary=document_response_table, back_populates="responses"
+    docs_per_question: Mapped[List[int]] = mapped_column(ARRAY(Integer), nullable=False)
+    documents: Mapped[List["Document"]] = relationship(
+        "Document", secondary=document_response_table, back_populates="responses"
     )
-
-    document_confidences: Mapped[List[List[float]]] = mapped_column(
+    document_confidences: Mapped[List[float]] = mapped_column(
         ARRAY(Numeric), nullable=False
     )
-
     confidence: Mapped[float] = mapped_column(nullable=False)
-
-    email_id: Mapped[str] = mapped_column(ForeignKey("email.id", ondelete="CASCADE"))
+    email_id: Mapped[int] = mapped_column(
+        ForeignKey("email.id", ondelete="CASCADE"), nullable=False
+    )
     email: Mapped["Email"] = relationship(
-        back_populates="response", init=False, single_parent=True
+        "Email", back_populates="response", init=False, single_parent=True
     )
 
     def map(self):
         """Map the response to a dictionary."""
-        documents = []
-        for index in range(len(self.questions)):
-            question_documents = []
-            for i, doc in enumerate(self.documents[index]):
-                doc = doc.map()
-                del doc["id"]
-                doc["confidence"] = self.document_confidences[index][i]
-                question_documents.append(doc)
-            documents.append(question_documents)
         return {
             "id": self.id,
             "content": self.response,
             "questions": self.questions,
-            "documents": documents,
+            "document_confidences": self.document_confidences,
             "confidence": self.confidence,
             "emailId": self.email_id,
         }

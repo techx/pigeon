@@ -17,23 +17,25 @@ class Thread(db.Model):
 
     Table for storing threads.
 
-    id(str): The ID of the thread.
-    resolved(bool): Whether the thread is resolved.
-    last_email(str): The ID of the last email in the thread.
-    emails(list): The emails in the thread.
+    Attributes:
+        id (int): The ID of the thread.
+        resolved (bool): Whether the thread is resolved.
+        last_email (int): The ID of the last email in the thread.
+        emails (list): The emails in the thread.
     """
 
     __tablename__ = "thread"
 
-    id: Mapped[str] = mapped_column(primary_key=True, init=False)
-    last_email: Mapped[Optional[str]] = mapped_column(nullable=True, init=False)
-    resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False, autoincrement=True)
+    last_email: Mapped[Optional[int]] = mapped_column(nullable=True, init=False)
+    resolved: Mapped[bool] = mapped_column(nullable=False, default=False, init=False)
 
     emails: Mapped[List["Email"]] = relationship(
-        "email",
+        "Email",
         back_populates="thread",
         default_factory=list,
         cascade="all, delete-orphan",
+        init=False,
     )
 
     @hybrid_property

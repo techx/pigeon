@@ -53,7 +53,7 @@ def thread_emails_to_openai_messages(thread_emails: List[Email]) -> List[OpenAIM
 
 def document_data(
     documents: dict[str, List[RedisDocument]],
-) -> tuple[List[str], List[List["Document"]], List[List[float]]]:
+) -> tuple[List[str], List["Document"], List[float], List[int]]:
     """Process raw openai document output.
 
     Args:
@@ -62,65 +62,61 @@ def document_data(
 
     Returns:
         list of questions parsed from the original email body
-        list of documents. each element in the list is a list of documents
-        used to answer a specific question
-        list of document confidence. each element in the list is the corresponding list
-        of confidence scores for each document used to answer a specific question
+        list of documents. each element in the list is a document
+        list of document confidence. each element in the list is the confidence
+        score for each document
+        list of the number of documents per question
     """
     questions = list(documents.keys())
     db_documents = []
     doc_confidences = []
+    docs_per_question = []
     for question in questions:
-        db_documents_question = []
-        doc_confidences_question = []
         for doc in documents[question]:
             document = db.session.execute(
                 select(Document).where(Document.id == doc["sql_id"])
             ).scalar()
-            db_documents_question.append(document)
-            doc_confidences_question.append(doc["score"])
-        db_documents.append(db_documents_question)
-        doc_confidences.append(doc_confidences_question)
-    return questions, db_documents, doc_confidences
+            db_documents.append(document)
+            doc_confidences.append(doc["score"])
+        docs_per_question.append(len(documents[question]))
+    return questions, db_documents, doc_confidences, docs_per_question
 
 
-def increment_response_count(documents: List[List["Document"]]):
+def increment_response_count(documents: List["Document"]):
     """Increment response count for documents.
 
     Args:
         documents:
-            list of documents. each element in the list is a list of documents
+            list of documents. each element in the list is a document
             used to answer a specific question
     """
-    for doc_question in documents:
-        for doc in doc_question:
-            document = db.session.execute(
-                select(Document).where(Document.id == doc.id)
-            ).scalar()
-            if document:
-                document.response_count += 1
-            db.session.commit()
+    for doc in documents:
+        document = db.session.execute(
+            select(Document).where(Document.id == doc.id)
+        ).scalar()
+        if document:
+            document.response_count += 1
+        db.session.commit()
 
 
-def decrement_response_count(documents: List[List["Document"]]):
+def decrement_response_count(documents: List["Document"]):
     """Decrement response count for documents.
 
     Args:
         documents:
-            list of documents. each element in the list is a list of documents
+            list of documents. each element in the list is a document
             used to answer a specific question
     """
-    for doc_question in documents:
-        for doc in doc_question:
-            document = db.session.execute(
-                select(Document).where(Document.id == doc.id)
-            ).scalar()
-            if document:
-                if document.to_delete and document.response_count == 1:
-                    db.session.delete(document)
-                else:
-                    document.response_count -= 1
-            db.session.commit()
+    for doc in documents:
+        document = db.session.execute(
+            select(Document).where(Document.id == doc.id)
+        ).scalar()
+        if document:
+            if document.to_delete and document.response_count == 1:
+                db.session.delete(document)
+            else:
+                document.response_count -= 1
+        db.session.commit()
 
 
 # not used as of 1/28/2024

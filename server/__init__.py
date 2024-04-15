@@ -1,6 +1,6 @@
 """Initialize the Flask app."""
 
-from typing import List, Type, cast
+from typing import Type, cast
 
 import numpy
 from apiflask import APIFlask
@@ -82,7 +82,7 @@ def create_app():
 
         cors.init_app(
             app,
-            origins=cast(List[str], allowed_domains),
+            origins=cast(list[str], allowed_domains),
             supports_credentials=True,
         )
 
