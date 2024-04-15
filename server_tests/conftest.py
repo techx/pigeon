@@ -24,7 +24,7 @@ def db_url(db_name="pigeondb_test"):
         dbname="postgres",
         user="postgres",
         password="password",
-        host="localhost",
+        host="database",
         port="5432",
     )
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -38,7 +38,7 @@ def db_url(db_name="pigeondb_test"):
 
     conn.close()
 
-    yield "postgresql://postgres:password@localhost/pigeondb_test"
+    yield "postgresql://postgres:password@database/pigeondb_test"
 
 
 @pytest.fixture(scope="session")
@@ -48,7 +48,7 @@ def redis_db_index():
     Flushes test db if it already exists.
     """
     test_db_index = 1
-    client = redis.Redis(host="localhost", port=6379, db=test_db_index)
+    client = redis.Redis(host="redis", port=6379, db=test_db_index)
     client.flushdb()
     client.close()
 
