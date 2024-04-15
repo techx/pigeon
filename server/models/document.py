@@ -37,7 +37,7 @@ class Document(db.Model):
     response_count: Mapped[int] = mapped_column(default=0, init=False)
 
     responses: Mapped[List["Response"]] = relationship(
-        secondary=document_response_table, back_populates="documents"
+        secondary=document_response_table, back_populates="documents", init=False
     )
 
     def map(self):

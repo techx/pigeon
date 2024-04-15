@@ -6,6 +6,7 @@ from ast import literal_eval
 import pandas as pd
 from apiflask import APIBlueprint
 from flask import request
+from sqlalchemy import select
 
 from server import db
 from server.models.document import Document
@@ -30,7 +31,9 @@ def upload_text():
 def delete_text():
     """POST /admin/delete_document"""
     data = request.form
-    document = Document.query.get(data["id"])
+    document = db.session.execute(
+        select(Document).where(Document.id == data["id"])
+    ).scalar()
     if document is None:
         return {"error": "Document not found"}, 404
     if document.response_count > 0:
@@ -47,7 +50,9 @@ def delete_text():
 def update_text():
     """POST /admin/edit_document"""
     data = request.form
-    document = Document.query.get(data["id"])
+    document = db.session.execute(
+        select(Document).where(Document.id == data["id"])
+    ).scalar()
     if document is None:
         return {"error": "Document not found"}, 404
     document.question = data["question"]
@@ -61,14 +66,22 @@ def update_text():
 @admin.route("/get_documents", methods=["GET"])
 def get_all():
     """GET /admin/get_documents"""
-    documents = Document.query.order_by(Document.id.desc()).all()
+    documents = (
+        db.session.execute(select(Document).order_by(Document.id.desc()))
+        .scalars()
+        .all()
+    )
     return [document.map() for document in documents]
 
 
 @admin.route("/update_embeddings", methods=["GET"])
 def update_embeddings():
     """GET /admin/update_embeddings"""
-    documents = Document.query.order_by(Document.id.desc()).all()
+    documents = (
+        db.session.execute(select(Document).order_by(Document.id.desc()))
+        .scalars()
+        .all()
+    )
 
     docs = [document.map() for document in documents if not document.to_delete]
     modified_corpus = [
@@ -107,7 +120,11 @@ def upload_json():
 @admin.route("/export_json", methods=["GET"])
 def export_json():
     """GET /admin/export_json"""
-    documents = Document.query.order_by(Document.id.desc()).all()
+    documents = (
+        db.session.execute(select(Document).order_by(Document.id.desc()))
+        .scalars()
+        .all()
+    )
     return json.dumps(
         [
             {
@@ -132,10 +149,10 @@ def import_csv():
 
         for _, row in df.iterrows():
             document = Document(
-                "" if pd.isna(row["question"]) else row["question"],
-                row["content"],
-                row["source"],
-                "" if pd.isna(row["label"]) else row["label"],
+                "" if pd.isna(row["question"]) else row["question"],  # type: ignore
+                row["content"],  # type: ignore
+                row["source"],  # type: ignore
+                "" if pd.isna(row["label"]) else row["label"],  # type: ignore
             )
             db.session.add(document)
         db.session.commit()
@@ -147,7 +164,11 @@ def import_csv():
 @admin.route("/export_csv", methods=["GET"])
 def export_csv():
     """GET /admin/export_csv"""
-    documents = Document.query.order_by(Document.id.desc()).all()
+    documents = (
+        db.session.execute(select(Document).order_by(Document.id.desc()))
+        .scalars()
+        .all()
+    )
     df = pd.DataFrame(
         [
             {
@@ -168,7 +189,11 @@ def export_csv():
 def clear_documents():
     """POST /admin/clear_documents"""
     try:
-        documents = Document.query.order_by(Document.id.desc()).all()
+        documents = (
+            db.session.execute(select(Document).order_by(Document.id.desc()))
+            .scalars()
+            .all()
+        )
         for document in documents:
             if document.response_count > 0:
                 document.to_delete = True

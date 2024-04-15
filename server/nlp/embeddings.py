@@ -69,7 +69,7 @@ def compute_openai_embeddings(texts):
     embeddings = []
     for i in range(len(texts)):
         embeddings.append(
-            openai.Embedding.create(input=texts[i], model=embedding_model)
+            openai.embeddings.create(input=texts[i], model=embedding_model)
             .data[0]
             .embedding
         )
@@ -81,7 +81,7 @@ def compute_embeddings():
     print("computing embeddings...")
 
     # get keys, questions, content
-    keys = sorted(client.keys("documents:*"))
+    keys = sorted(client.keys("documents:*"))  # type: ignore
     questions = client.json().mget(keys, "$.question")
     content = client.json().mget(keys, "$.content")
 
@@ -89,7 +89,8 @@ def compute_embeddings():
 
     # compute embeddings
     question_and_content = [
-        questions[i][0] + " " + content[i][0] for i in range(len(questions))
+        questions[i][0] + " " + content[i][0]
+        for i in range(len(questions))  # type: ignore
     ]
 
     # embeddings = embedder.encode(question_and_content).astype(np.float32).tolist()
@@ -222,7 +223,7 @@ def queries(query, queries: list[str]) -> list[dict]:
                 query,
                 {"query_vector": np.array(encoded_query, dtype=np.float32).tobytes()},
             )
-            .docs
+            .docs  # type: ignore
         )
         query_result = []
         for doc in result_docs:
