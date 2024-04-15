@@ -1,6 +1,7 @@
 """Flask CLI commands."""
 
 import datetime
+import json
 
 from flask import Blueprint
 
@@ -10,12 +11,50 @@ from server.controllers.emails import (
     increment_response_count,
     thread_emails_to_openai_messages,
 )
+from server.models.document import Document
 from server.models.email import Email
 from server.models.response import Response
 from server.models.thread import Thread
+from server.nlp.embeddings import embed_corpus
 from server.nlp.responses import generate_response
 
 seed = Blueprint("seed", __name__)
+
+
+def _generate_test_documents():
+    """Generate test documents."""
+    with open("server/nlp/corpus_mit.json") as f:
+        corpus = json.load(f)
+
+    documents = []
+    for doc in corpus:
+        document = Document(
+            question=doc["question"],
+            label=doc["question"],
+            source=doc["source"],
+            content=doc["content"],
+        )
+        db.session.add(document)
+        db.session.commit()
+        documents.append(document)
+
+    test_documents = [
+        {
+            "question": doc.question,
+            "source": doc.source,
+            "content": doc.content,
+            "sql_id": doc.id,
+        }
+        for doc in documents
+    ]
+    return test_documents
+
+
+@seed.cli.command()
+def corpus():
+    """Add test documents to the corpus."""
+    test_documents = _generate_test_documents()
+    embed_corpus(test_documents)
 
 
 @seed.cli.command()
