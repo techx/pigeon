@@ -12,6 +12,7 @@ import boto3
 from apiflask import APIBlueprint
 from flask import request
 from jinja2 import Environment, FileSystemLoader
+from sqlalchemy import select
 
 from server import db
 from server.config import (
@@ -52,66 +53,68 @@ def thread_emails_to_openai_messages(thread_emails: List[Email]) -> List[OpenAIM
 
 def document_data(
     documents: dict[str, List[RedisDocument]],
-) -> tuple[List[str], List[List[int]], List[List[float]]]:
+) -> tuple[List[str], List[List["Document"]], List[List[float]]]:
     """Process raw openai document output.
 
     Args:
-    ----------
-    documents : :obj:`list` of :obj:`dict`
+    documents:
         raw openai document output
 
     Returns:
-    -------
-    :obj:`list` of :obj:`str`
         list of questions parsed from the original email body
-    :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to
-        answer a specific question
-    :obj:`list` of :obj:`list` of :obj:`float`
+        list of documents. each element in the list is a list of documents
+        used to answer a specific question
         list of document confidence. each element in the list is the corresponding list
         of confidence scores for each document used to answer a specific question
     """
     questions = list(documents.keys())
-    doc_ids = []
+    db_documents = []
     doc_confidences = []
     for question in questions:
-        doc_ids_question = []
+        db_documents_question = []
         doc_confidences_question = []
         for doc in documents[question]:
-            doc_ids_question.append(doc["sql_id"])
+            document = db.session.execute(
+                select(Document).where(Document.id == doc["sql_id"])
+            ).scalar()
+            db_documents_question.append(document)
             doc_confidences_question.append(doc["score"])
-        doc_ids.append(doc_ids_question)
+        db_documents.append(db_documents_question)
         doc_confidences.append(doc_confidences_question)
-    return questions, doc_ids, doc_confidences
+    return questions, db_documents, doc_confidences
 
 
-def increment_response_count(document_ids: List[List[int]]):
+def increment_response_count(documents: List[List["Document"]]):
     """Increment response count for documents.
 
     Args:
-        document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-            list of document ids. each element in the list is a list of document ids
+        documents:
+            list of documents. each element in the list is a list of documents
             used to answer a specific question
     """
-    for doc_ids_question in document_ids:
-        for doc_id in doc_ids_question:
-            document = Document.query.get(doc_id)
+    for doc_question in documents:
+        for doc in doc_question:
+            document = db.session.execute(
+                select(Document).where(Document.id == doc.id)
+            ).scalar()
             if document:
                 document.response_count += 1
             db.session.commit()
 
 
-def decrement_response_count(document_ids: List[List[int]]):
+def decrement_response_count(documents: List[List["Document"]]):
     """Decrement response count for documents.
 
     Args:
-        document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-            list of document ids. each element in the list is a list of document ids
+        documents:
+            list of documents. each element in the list is a list of documents
             used to answer a specific question
     """
-    for doc_ids_question in document_ids:
-        for doc_id in doc_ids_question:
-            document = Document.query.get(doc_id)
+    for doc_question in documents:
+        for doc in doc_question:
+            document = db.session.execute(
+                select(Document).where(Document.id == doc.id)
+            ).scalar()
             if document:
                 if document.to_delete and document.response_count == 1:
                     db.session.delete(document)
@@ -213,7 +216,9 @@ def receive_email():
         return {"message": "Missing fields"}, 400
 
     # aws sends duplicate emails sometimes. ignore if duplicate
-    email_exists = Email.query.filter_by(message_id=data["Message-Id"]).first()
+    email_exists = db.session.execute(
+        select(Email).where(Email.message_id == data["Message-Id"])
+    ).scalar()
     if email_exists:
         print("duplicate email", flush=True)
         return data
@@ -238,7 +243,9 @@ def receive_email():
         # for some reason AWS adds three spaces to the message id
         real_message_id = data["In-Reply-To"].strip()
 
-        replied_to_email = Email.query.filter_by(message_id=real_message_id).first()
+        replied_to_email = db.session.execute(
+            select(Email).where(Email.message_id == real_message_id)
+        ).scalar()
         print("replied to email", replied_to_email, flush=True)
         print("real message id", real_message_id, len(real_message_id), flush=True)
         print(
@@ -248,7 +255,9 @@ def receive_email():
             flush=True,
         )
         if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
-            thread = Thread.query.get(replied_to_email.thread_id)
+            thread = db.session.execute(
+                select(Thread).where(Thread.id == replied_to_email.thread_id)
+            ).scalar()
             if thread:
                 email = Email(
                     datetime.now(timezone.utc),
@@ -280,13 +289,14 @@ def receive_email():
         openai_res, documents, confidence = generate_response(
             email.sender, email.body, openai_messages
         )
-        questions, document_ids, document_confidences = document_data(documents)
+        questions, documents, document_confidences = document_data(documents)
+
         db.session.add(email)
         db.session.commit()
         r = Response(
             openai_res,
             questions,
-            document_ids,
+            documents,
             document_confidences,
             confidence,
             email.id,
@@ -295,7 +305,7 @@ def receive_email():
         thread.last_email = email.id
         thread.resolved = False
         db.session.commit()
-        increment_response_count(document_ids)
+        increment_response_count(documents)
     return data
 
 
@@ -354,10 +364,14 @@ def get_full_message_id(message_id):
 def send_email():
     """POST /send_email"""
     data = request.form
-    reply_to_email = Email.query.get(data["id"])
+    reply_to_email = db.session.execute(
+        select(Email).where(Email.id == data["id"])
+    ).scalar()
     if not reply_to_email:
         return {"message": "Email not found"}, 400
-    thread = Thread.query.get(reply_to_email.thread_id)
+    thread = db.session.execute(
+        select(Thread).where(Thread.id == reply_to_email.thread_id)
+    ).scalar()
     if not thread:
         return {"message": "Thread not found"}, 400
     clean_regex = re.compile("<.*?>")
@@ -415,7 +429,9 @@ def send_email():
     thread.last_email = reply_email.id
     db.session.commit()
 
-    response = Response.query.filter_by(email_id=reply_to_email.id).first()
+    response = db.session.execute(
+        select(Response).where(Response.email_id == reply_to_email.id)
+    ).scalar()
     if response:
         decrement_response_count(response.documents)
 
@@ -426,7 +442,9 @@ def send_email():
 def get_response():
     """POST /get_response"""
     data = request.form
-    response = Response.query.filter_by(email_id=data["id"]).first()
+    response = db.session.execute(
+        select(Response).where(Response.email_id == data["id"])
+    ).scalar()
     if not response:
         return {"message": "Response not found"}, 400
     return response.map()
@@ -439,13 +457,17 @@ def regen_response():
     Regenerate the AI-gen response response for an email.
     """
     data = request.form
-    thread = Thread.query.get(data["id"])
+    thread = db.session.execute(select(Thread).where(Thread.id == data["id"])).scalar()
     if not thread:
         return {"message": "Thread not found"}, 400
-    email = Email.query.get(thread.last_email)
+    email = db.session.execute(
+        select(Email).where(Email.id == thread.last_email)
+    ).scalar()
     if not email:
         return {"message": "Email not found"}, 400
-    response = Response.query.filter_by(email_id=email.id).first()
+    response = db.session.execute(
+        select(Response).where(Response.email_id == email.id)
+    ).scalar()
     if not thread or not email or not response:
         return {"message": "Something went wrong!"}, 400
 
@@ -454,12 +476,12 @@ def regen_response():
         email.sender, email.body, openai_messages
     )
     decrement_response_count(response.documents)
-    questions, document_ids, document_confidences = document_data(documents)
-    increment_response_count(document_ids)
+    questions, documents, document_confidences = document_data(documents)
+    increment_response_count(documents)
     response.response = openai_res
     response.questions = questions
-    response.documents = document_ids
-    response.documents_confidence = document_confidences
+    response.documents = documents
+    response.document_confidences = document_confidences
     response.confidence = confidence
     db.session.commit()
 
@@ -473,7 +495,7 @@ def resolve():
     Mark an email thread as resolved.
     """
     data = request.form
-    thread = Thread.query.get(data["id"])
+    thread = db.session.execute(select(Thread).where(Thread.id == data["id"])).scalar()
     if not thread:
         return {"message": "Thread not found"}, 400
     thread.resolved = True
@@ -489,7 +511,7 @@ def unresolve():
     Mark an email thread as unresolved.
     """
     data = request.form
-    thread = Thread.query.get(data["id"])
+    thread = db.session.execute(select(Thread).where(Thread.id == data["id"])).scalar()
     if not thread:
         return {"message": "Thread not found"}, 400
     thread.resolved = False
@@ -504,16 +526,18 @@ def get_threads():
 
     Get a list of all threads.
     """
-    thread_list = Thread.query.order_by(Thread.resolved, Thread.last_email.desc()).all()
+    thread_list = db.session.execute(
+        select(Thread).order_by(Thread.resolved, Thread.last_email.desc())
+    ).all()
     email_list = [
         {
             "id": thread.id,
             "resolved": thread.resolved,
             "emailList": [
                 thread_email.map()
-                for thread_email in Email.query.filter_by(thread_id=thread.id)
-                .order_by(Email.id)
-                .all()
+                for thread_email in db.session.execute(
+                    select(Email).where(Email.thread_id == thread.id)
+                ).all()
             ],
         }
         for thread in thread_list
