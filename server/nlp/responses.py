@@ -1,4 +1,4 @@
-"""Provides responses module.
+"""Responses.
 
 This module is used to generate responses to incoming emails using OpenAI.
 """
