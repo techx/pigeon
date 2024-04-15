@@ -40,11 +40,11 @@ def db_url(db_name="pigeondb_test"):
 
     conn.close()
 
-    yield "postgresql://postgres:password@database/pigeondb_test"
+    yield f"postgresql://postgres:password@{host}/{db_name}"
 
 
 @pytest.fixture(scope="session")
-def redis_db_index():
+def redis_host():
     """Yields test redis db host.
 
     Flushes test db if it already exists.
@@ -58,9 +58,9 @@ def redis_db_index():
 
 
 @pytest.fixture(scope="session")
-def app(db_url: str, redis_db_index: str):
+def app(db_url: str, redis_host: str):
     os.environ["DATABASE_URL"] = db_url
-    os.environ["REDIS_HOST"] = redis_db_index
+    os.environ["REDIS_HOST"] = redis_host
 
     app = create_app()
     app.config.update(

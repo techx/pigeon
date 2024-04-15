@@ -8,7 +8,6 @@ import time
 
 import numpy as np
 import openai
-import redis
 from redis.commands.search.field import (
     NumericField,
     TextField,
@@ -17,14 +16,14 @@ from redis.commands.search.field import (
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
-from server.config import REDIS_HOST, RedisDocument
+from server import redis_client
+from server.config import RedisDocument
+
+assert redis_client is not None
 
 cwd = os.path.dirname(__file__)
 
 VECTOR_DIMENSION = 1536
-
-# load redis client
-client = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
 
 # load corpus
 # with open('corpus.json', 'r') as f:
@@ -46,7 +45,7 @@ def load_corpus(corpus: list[RedisDocument]):
     """
     print("loading corpus...")
 
-    pipeline = client.pipeline()
+    pipeline = redis_client.pipeline()
     for i, doc in enumerate(corpus, start=1):
         redis_key = f"documents:{i:03}"
         pipeline.json().set(redis_key, "$", doc)
@@ -81,9 +80,9 @@ def compute_embeddings():
     print("computing embeddings...")
 
     # get keys, questions, content
-    keys = sorted(client.keys("documents:*"))  # type: ignore
-    questions = client.json().mget(keys, "$.question")
-    content = client.json().mget(keys, "$.content")
+    keys = sorted(redis_client.keys("documents:*"))  # type: ignore
+    questions = redis_client.json().mget(keys, "$.question")
+    content = redis_client.json().mget(keys, "$.content")
 
     # compute embeddings
     question_and_content = [
@@ -110,7 +109,7 @@ def load_embeddings(embeddings: list[list[float]]):
     print("loading embeddings into redis...")
 
     # load embeddings into redis
-    pipeline = client.pipeline()
+    pipeline = redis_client.pipeline()
     for i, embedding in enumerate(embeddings, start=1):
         redis_key = f"documents:{i:03}"
         pipeline.json().set(redis_key, "$.question_and_content_embeddings", embedding)
@@ -153,17 +152,17 @@ def create_index(corpus_len: int):
         ),
     )
     definition = IndexDefinition(prefix=["documents:"], index_type=IndexType.JSON)
-    res = client.ft("idx:documents_vss").create_index(
+    res = redis_client.ft("idx:documents_vss").create_index(
         fields=schema, definition=definition
     )
 
     if res == "OK":
         start = time.time()
         while 1:
-            if str(client.ft("idx:documents_vss").info()["num_docs"]) == str(
+            if str(redis_client.ft("idx:documents_vss").info()["num_docs"]) == str(
                 corpus_len
             ):
-                info = client.ft("idx:documents_vss").info()
+                info = redis_client.ft("idx:documents_vss").info()
                 num_docs = info["num_docs"]
                 indexing_failures = info["hash_indexing_failures"]
                 print("num_docs", num_docs, "indexing_failures", indexing_failures)
@@ -209,7 +208,7 @@ def queries(query, queries: list[str]) -> list[dict]:
     results_list = []
     for i, encoded_query in enumerate(encoded_queries):
         result_docs = (
-            client.ft("idx:documents_vss")
+            redis_client.ft("idx:documents_vss")
             .search(
                 query,
                 {"query_vector": np.array(encoded_query, dtype=np.float32).tobytes()},
@@ -259,7 +258,7 @@ def embed_corpus(corpus: list[RedisDocument]):
     """
     # flush database
     print("cleaning database...")
-    client.flushdb()
+    redis_client.flushdb()
     print("done cleaning database")
 
     # embed corpus

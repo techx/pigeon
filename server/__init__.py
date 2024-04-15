@@ -3,6 +3,7 @@
 from typing import Type, cast
 
 import numpy
+import redis
 from apiflask import APIFlask
 from flask import redirect, render_template
 from flask_cors import CORS
@@ -59,6 +60,8 @@ class ProperlyTypedSQLAlchemy(SQLAlchemy):
 db = SQLAlchemy(model_class=Base)
 db = cast(ProperlyTypedSQLAlchemy, db)
 
+redis_client: redis.Redis | None = None
+
 
 def create_app():
     """Create the Flask app."""
@@ -77,6 +80,11 @@ def create_app():
 
     with app.app_context():
         db.init_app(app)
+
+        global redis_client
+        redis_client = redis.Redis(
+            host=app.config["REDIS_HOST"], port=6379, decode_responses=True
+        )
 
         allowed_domains = app.config.get("ALLOWED_DOMAINS")
 
