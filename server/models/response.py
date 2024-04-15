@@ -6,9 +6,10 @@ from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server import db
-from server.models.document import Document
+from server.models.document_response import document_response_table
 
 if TYPE_CHECKING:
+    from server.models.document import Document
     from server.models.email import Email
 
 
@@ -34,8 +35,13 @@ class Response(db.Model):
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
     response: Mapped[str] = mapped_column(nullable=False)
     questions: Mapped[List[str]] = mapped_column(nullable=False)
-    documents: Mapped[List[List[int]]] = mapped_column(nullable=False)
-    documents_confidence: Mapped[List[List[float]]] = mapped_column(nullable=False)
+
+    documents: Mapped[List[List[Document]]] = relationship(
+        secondary=document_response_table, back_populates="responses"
+    )
+
+    document_confidences: Mapped[List[List[float]]] = mapped_column(nullable=False)
+
     confidence: Mapped[float] = mapped_column(nullable=False)
 
     email_id: Mapped[int] = mapped_column(ForeignKey("Emails.id", ondelete="CASCADE"))
@@ -48,13 +54,11 @@ class Response(db.Model):
         documents = []
         for index in range(len(self.questions)):
             question_documents = []
-            for document_index in range(len(self.documents[index])):
-                doc = Document.query.get(self.documents[index][document_index])
-                if doc is not None:
-                    doc = doc.map()
-                    del doc["id"]
-                    doc["confidence"] = self.documents_confidence[index][document_index]
-                    question_documents.append(doc)
+            for i, doc in enumerate(self.documents[index]):
+                doc = doc.map()
+                del doc["id"]
+                doc["confidence"] = self.document_confidences[index][i]
+                question_documents.append(doc)
             documents.append(question_documents)
         return {
             "id": self.id,

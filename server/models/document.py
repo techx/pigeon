@@ -1,8 +1,14 @@
 """Document."""
 
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import TYPE_CHECKING, List
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server import db
+from server.models.document_response import document_response_table
+
+if TYPE_CHECKING:
+    from server.models.response import Response
 
 
 class Document(db.Model):
@@ -28,6 +34,10 @@ class Document(db.Model):
     source: Mapped[str] = mapped_column(nullable=False)
     to_delete: Mapped[bool] = mapped_column(default=False, init=False)
     response_count: Mapped[int] = mapped_column(default=0, init=False)
+
+    responses: Mapped[List[Response]] = relationship(
+        secondary=document_response_table, back_populates="documents"
+    )
 
     def map(self):
         """Map the document to a dictionary."""
