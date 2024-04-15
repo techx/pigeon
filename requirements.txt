@@ -28,11 +28,8 @@ certifi==2024.2.2
     # via
     #   httpcore
     #   httpx
-    #   requests
 cffi==1.16.0
     # via cryptography
-charset-normalizer==3.3.2
-    # via requests
 click==8.1.7
     # via flask
 cryptography==42.0.5
@@ -67,7 +64,6 @@ idna==3.7
     # via
     #   anyio
     #   httpx
-    #   requests
 itsdangerous==2.1.2
     # via flask
 jinja2==3.1.2
@@ -117,8 +113,6 @@ pytz==2024.1
     # via pandas
 redis==5.0.1
     # via -r requirements.in
-requests==2.31.0
-    # via -r requirements.in
 s3transfer==0.10.1
     # via boto3
 six==1.16.0
@@ -143,9 +137,7 @@ typing-extensions==4.11.0
 tzdata==2024.1
     # via pandas
 urllib3==2.2.1
-    # via
-    #   botocore
-    #   requests
+    # via botocore
 webargs==8.4.0
     # via apiflask
 werkzeug==3.0.2

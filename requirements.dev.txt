@@ -6,3 +6,4 @@ pre-commit
 
 # needed for pip-compile, needed to generate requirements.txt
 pip-tools
+pigar

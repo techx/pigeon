@@ -61,7 +61,7 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
         }
     ]
 
-    response = openai.ChatCompletion.create(model=MODEL, messages=messages)
+    response = openai.chat.completions.create(model=MODEL, messages=messages)
 
     return response["choices"][0]["message"]["content"]
 
