@@ -116,6 +116,11 @@ PGPASSWORD='password' psql -h database -U postgres
 redis-cli -h redis
 ```
 
+Check redis keys with
+```sh
+keys *
+```
+
 Alternatively, you can access these services from your local machine, i.e., outside of the dev container, by connecting directly to the docker containers. To do this, run
 
 ```sh
