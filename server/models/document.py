@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server import db
-from server.models.document_response import document_response_table
 
 if TYPE_CHECKING:
     from server.models.response import Response
+
+from server.models.document_response import document_response_table
 
 
 class Document(db.Model):
@@ -35,7 +36,7 @@ class Document(db.Model):
     to_delete: Mapped[bool] = mapped_column(default=False, init=False)
     response_count: Mapped[int] = mapped_column(default=0, init=False)
 
-    responses: Mapped[List[Response]] = relationship(
+    responses: Mapped[List["Response"]] = relationship(
         secondary=document_response_table, back_populates="documents"
     )
 

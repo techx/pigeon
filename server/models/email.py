@@ -1,8 +1,9 @@
 """Email."""
 
+import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server import db
@@ -32,20 +33,20 @@ class Email(db.Model):
     __tablename__ = "Emails"
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
-    date: Mapped[DateTime] = mapped_column(nullable=False)
+    date: Mapped[datetime.datetime] = mapped_column(nullable=False)
     sender: Mapped[str] = mapped_column(nullable=False)
     subject: Mapped[str] = mapped_column(nullable=False)
     body: Mapped[str] = mapped_column(nullable=False)
     message_id: Mapped[str] = mapped_column(nullable=False)
 
-    response: Mapped[Optional[Response]] = relationship(
+    response: Mapped[Optional["Response"]] = relationship(
         back_populates="email", init=False
     )
 
     is_reply: Mapped[bool] = mapped_column(nullable=False)
 
     thread_id: Mapped[str] = mapped_column(ForeignKey("Threads.id"), nullable=False)
-    thread: Mapped[Thread] = relationship(back_populates="emails", init=False)
+    thread: Mapped["Thread"] = relationship(back_populates="emails", init=False)
 
     def map(self):
         """Map the email to a dictionary."""

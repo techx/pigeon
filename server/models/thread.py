@@ -29,7 +29,7 @@ class Thread(db.Model):
     last_email: Mapped[Optional[str]] = mapped_column(nullable=True, init=False)
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
 
-    emails: Mapped[List[Email]] = relationship(
+    emails: Mapped[List["Email"]] = relationship(
         "Email",
         back_populates="thread",
         default_factory=list,

@@ -2,15 +2,18 @@
 
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import Numeric
 
 from server import db
-from server.models.document_response import document_response_table
 
 if TYPE_CHECKING:
     from server.models.document import Document
     from server.models.email import Email
+
+from server.models.document_response import document_response_table
 
 
 class Response(db.Model):
@@ -34,18 +37,20 @@ class Response(db.Model):
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
     response: Mapped[str] = mapped_column(nullable=False)
-    questions: Mapped[List[str]] = mapped_column(nullable=False)
+    questions: Mapped[List[str]] = mapped_column(ARRAY(Text), nullable=False)
 
-    documents: Mapped[List[List[Document]]] = relationship(
+    documents: Mapped[List[List["Document"]]] = relationship(
         secondary=document_response_table, back_populates="responses"
     )
 
-    document_confidences: Mapped[List[List[float]]] = mapped_column(nullable=False)
+    document_confidences: Mapped[List[List[float]]] = mapped_column(
+        ARRAY(Numeric), nullable=False
+    )
 
     confidence: Mapped[float] = mapped_column(nullable=False)
 
     email_id: Mapped[str] = mapped_column(ForeignKey("Emails.id", ondelete="CASCADE"))
-    email: Mapped[Email] = relationship(
+    email: Mapped["Email"] = relationship(
         back_populates="response", init=False, single_parent=True
     )
 
