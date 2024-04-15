@@ -40,7 +40,7 @@ class Response(db.Model):
 
     email_id: Mapped[int] = mapped_column(ForeignKey("Emails.id", ondelete="CASCADE"))
     email: Mapped[Email] = relationship(
-        back_populates="responses", init=False, single_parent=True
+        back_populates="response", init=False, single_parent=True
     )
 
     def map(self):
