@@ -1,21 +1,42 @@
-from sqlalchemy import Integer
+"""Thread."""
+
+from typing import TYPE_CHECKING, List
+
+from sqlalchemy import select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server import db
-from server.models.email import Email
+
+if TYPE_CHECKING:
+    from server.models.email import Email
 
 
 class Thread(db.Model):
+    """Thread.
+
+    Table for storing threads.
+
+    id(str): The ID of the thread.
+    resolved(bool): Whether the thread is resolved.
+    last_email(int): The ID of the last email in the thread.
+    emails(list): The emails in the thread.
+    """
+
     __tablename__ = "Threads"
 
-    id = db.Column(Integer, primary_key=True)
-    resolved = db.Column(db.Boolean, nullable=False, default=False)
-    last_email = db.Column(Integer)
-    emails = relationship("Email", backref="threads", lazy=True)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
+    last_email: Mapped[int] = mapped_column(nullable=False)
+
+    emails: Mapped[List[Email]] = relationship("Email", back_populates="thread")
 
     @hybrid_property
     def first_sender(self):
-        return (
-            Email.query.filter_by(thread_id=self.id).order_by(Email.id).first().sender
-        )
+        """Get the first sender of the thread."""
+        from server.models.email import Email
+
+        email = db.session.execute(
+            select(Email).where(Email.thread_id == self.id)
+        ).scalar_one_or_none()
+        return email.sender if email else None
