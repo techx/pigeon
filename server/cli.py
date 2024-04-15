@@ -62,6 +62,15 @@ def corpus():
 @seed.cli.command()
 def email():
     """Seed the database with a test email."""
+    docs = db.session.query(Document).all()
+    if len(docs) == 0:
+        # the redis index needs to have non-zero documents to be able to generate
+        # responses, so the only way this command succeeds is if the corpus is
+        # already populated
+        print("No documents in the database. Generating test documents...")
+        test_documents = _generate_test_documents()
+        embed_corpus(test_documents)
+
     subject = "Test Email Subject"
     body = "Hello! What is blueprint?"
     body = "Dear Blueprint Team,\n\n" + body + "\n\nBest regards,\nAndrew\n\n"
