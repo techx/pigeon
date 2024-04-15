@@ -12,6 +12,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.engine.base import Connection
 
 from server import create_app, db
+from server.config import LOCAL
 
 
 @pytest.fixture(scope="session")
@@ -20,11 +21,12 @@ def db_url(db_name="pigeondb_test"):
 
     Drops and recreates the database if it already exists.
     """
+    host = "database" if LOCAL else "localhost"
     conn = psycopg2.connect(
         dbname="postgres",
         user="postgres",
         password="password",
-        host="database",
+        host=host,
         port="5432",
     )
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -47,11 +49,12 @@ def redis_db_index():
 
     Flushes test db if it already exists.
     """
-    client = redis.Redis(host="redis-test", port=6379)
+    host = "redis-test" if LOCAL else "localhost"
+    client = redis.Redis(host=host, port=6379)
     client.flushdb()
     client.close()
 
-    yield "redis-test"
+    yield host
 
 
 @pytest.fixture(scope="session")

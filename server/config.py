@@ -11,6 +11,18 @@ OpenAIMessage = dict[str, str]
 RedisDocument = dict[str, str]
 
 ENV = os.environ.get("ENV", "development")
+LOCAL: bool = os.environ.get("LOCAL", False) == "True"
+
+if not LOCAL:
+    print("\033[91mWarning! you are missing the LOCAL environment variable.\033[0m")
+    print("\033[91mThis will cause issues when running tests locally.\033[0m")
+    print(
+        "\033[91mThis is only acceptable in environments outside of "
+        "production/development, e.g., running tests with github actions.\033[0m"
+    )
+    print("\033[91mMake sure you know what you are doing!\033[0m")
+else:
+    print("\033[92mLocal environment detected.\033[0m")
 
 
 def _get_config_option(name: str, default_value: str | None = None) -> str:
