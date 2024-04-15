@@ -26,7 +26,7 @@ class Thread(db.Model):
     __tablename__ = "Threads"
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
-    last_email: Mapped[Optional[str]] = mapped_column(nullable=True)
+    last_email: Mapped[Optional[str]] = mapped_column(nullable=True, init=False)
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     emails: Mapped[List[Email]] = relationship(

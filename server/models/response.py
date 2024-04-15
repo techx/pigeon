@@ -44,7 +44,7 @@ class Response(db.Model):
 
     confidence: Mapped[float] = mapped_column(nullable=False)
 
-    email_id: Mapped[int] = mapped_column(ForeignKey("Emails.id", ondelete="CASCADE"))
+    email_id: Mapped[str] = mapped_column(ForeignKey("Emails.id", ondelete="CASCADE"))
     email: Mapped[Email] = relationship(
         back_populates="response", init=False, single_parent=True
     )

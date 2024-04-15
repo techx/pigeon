@@ -6,6 +6,7 @@ import email.mime.text
 import os
 import re
 from datetime import datetime, timezone
+from typing import List
 
 import boto3
 from apiflask import APIBlueprint
@@ -33,17 +34,13 @@ env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
 emails = APIBlueprint("emails", __name__, url_prefix="/emails", tag="Emails")
 
 
-def thread_emails_to_openai_messages(thread_emails: list[Email]) -> list[OpenAIMessage]:
+def thread_emails_to_openai_messages(thread_emails: List[Email]) -> List[OpenAIMessage]:
     """Converts list of email to openai messages.
 
-    Parameters:
-    ----------
-    thread_email_ids : :obj:`list` of :obj:`Email`
-        list of email ids
+    Args:
+        thread_emails: list of emails
 
     Returns:
-    -------
-    :obj:`list` of :obj:`OpenAIMessage`
         list of openai messages
     """
     openai_messages = []
@@ -54,11 +51,11 @@ def thread_emails_to_openai_messages(thread_emails: list[Email]) -> list[OpenAIM
 
 
 def document_data(
-    documents: dict[str, list[RedisDocument]],
-) -> tuple[list[str], list[list[int]], list[list[float]]]:
+    documents: dict[str, List[RedisDocument]],
+) -> tuple[List[str], List[List[int]], List[List[float]]]:
     """Process raw openai document output.
 
-    Parameters
+    Args:
     ----------
     documents : :obj:`list` of :obj:`dict`
         raw openai document output
@@ -88,14 +85,13 @@ def document_data(
     return questions, doc_ids, doc_confidences
 
 
-def increment_response_count(document_ids: list[list[int]]):
+def increment_response_count(document_ids: List[List[int]]):
     """Increment response count for documents.
 
-    Parameters
-    ----------
-    document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to
-        answer a specific question
+    Args:
+        document_ids : :obj:`list` of :obj:`list` of :obj:`int`
+            list of document ids. each element in the list is a list of document ids
+            used to answer a specific question
     """
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:
@@ -105,14 +101,13 @@ def increment_response_count(document_ids: list[list[int]]):
             db.session.commit()
 
 
-def decrement_response_count(document_ids: list[list[int]]):
+def decrement_response_count(document_ids: List[List[int]]):
     """Decrement response count for documents.
 
-    Parameters
-    ----------
-    document_ids : :obj:`list` of :obj:`list` of :obj:`int`
-        list of document ids. each element in the list is a list of document ids used to
-        answer a specific question
+    Args:
+        document_ids : :obj:`list` of :obj:`list` of :obj:`int`
+            list of document ids. each element in the list is a list of document ids
+            used to answer a specific question
     """
     for doc_ids_question in document_ids:
         for doc_id in doc_ids_question:

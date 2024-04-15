@@ -44,8 +44,8 @@ class Email(db.Model):
 
     is_reply: Mapped[bool] = mapped_column(nullable=False)
 
-    thread_id: Mapped[int] = mapped_column(ForeignKey("Threads.id"), nullable=False)
-    thread: Mapped[Thread] = relationship(back_populates="emails")
+    thread_id: Mapped[str] = mapped_column(ForeignKey("Threads.id"), nullable=False)
+    thread: Mapped[Thread] = relationship(back_populates="emails", init=False)
 
     def map(self):
         """Map the email to a dictionary."""
