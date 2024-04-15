@@ -37,7 +37,7 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt -r requirements.dev.txt
 
       - name: Run Pyright
         uses: jakebailey/pyright-action@v1

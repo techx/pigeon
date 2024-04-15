@@ -7,3 +7,6 @@ pre-commit
 # needed for pip-compile, needed to generate requirements.txt
 pip-tools
 pigar
+
+# needed to run tests
+pytest==8.0.2

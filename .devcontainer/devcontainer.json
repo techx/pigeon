@@ -1,41 +1,41 @@
 {
-    "name": "pigeon",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "app",
-    "workspaceFolder": "/workspaces/pigeon",
-    "features": {
-      "ghcr.io/devcontainers/features/node:1": {
-        "version": 20
-      },
-      "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
-        "version": 16
-      }
+  "name": "pigeon",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/pigeon",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": 20
     },
-    "forwardPorts": [
-      5173,
-      2010,
-      6379,
-      5432
-    ],
-    "postCreateCommand": "bash scripts/devcontainer_setup.sh",
-    "customizations": {
-      "vscode": {
-        "extensions": [
-          "tamasfe.even-better-toml",
-          "charliermarsh.ruff"
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
+      "version": 16
+    }
+  },
+  "forwardPorts": [
+    5173,
+    2010,
+    6379,
+    5432
+  ],
+  "postCreateCommand": "bash scripts/devcontainer_setup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "tamasfe.even-better-toml",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "editor.rulers": [
+          88
         ],
-        "settings": {
-          "editor.rulers": [
-            88
-          ],
-          "python.analysis.typeCheckingMode": "standard",
-          "python.analysis.autoImportCompletions": true,
-          "[python]": {
-            "editor.defaultFormatter": "charliermarsh.ruff",
-            "editor.tabSize": 4,
-            "editor.showUnused": false
-          }
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.autoImportCompletions": true,
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.tabSize": 4,
+          "editor.showUnused": false
         }
       }
     }
   }
+}
