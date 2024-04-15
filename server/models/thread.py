@@ -1,6 +1,6 @@
 """Thread."""
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -19,15 +19,15 @@ class Thread(db.Model):
 
     id(str): The ID of the thread.
     resolved(bool): Whether the thread is resolved.
-    last_email(int): The ID of the last email in the thread.
+    last_email(str): The ID of the last email in the thread.
     emails(list): The emails in the thread.
     """
 
     __tablename__ = "Threads"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, init=False)
+    last_email: Mapped[Optional[str]] = mapped_column(nullable=True)
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
-    last_email: Mapped[int] = mapped_column(nullable=False)
 
     emails: Mapped[List[Email]] = relationship(
         "Email",

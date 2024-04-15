@@ -31,7 +31,7 @@ class Email(db.Model):
 
     __tablename__ = "Emails"
 
-    id: Mapped[str] = mapped_column(db.Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, init=False)
     date: Mapped[DateTime] = mapped_column(nullable=False)
     sender: Mapped[str] = mapped_column(nullable=False)
     subject: Mapped[str] = mapped_column(nullable=False)

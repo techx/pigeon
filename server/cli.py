@@ -29,13 +29,13 @@ def email():
     db.session.add(thread)
     db.session.commit()
     email = Email(
-        datetime.datetime.now(datetime.timezone.utc),
-        "azliu@mit.edu",
-        subject,
-        body,
-        "message-id",
-        False,
-        thread.id,
+        date=datetime.datetime.now(datetime.timezone.utc),
+        sender="azliu@mit.edu",
+        subject=subject,
+        body=body,
+        message_id="message-id",
+        is_reply=False,
+        thread_id=thread.id,
     )
 
     if email is not None and thread is not None:

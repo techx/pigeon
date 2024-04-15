@@ -31,7 +31,7 @@ class Response(db.Model):
     __tablename__ = "Responses"
     __table_args__ = (UniqueConstraint("email_id", name="unique_email_id"),)
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, init=False)
     response: Mapped[str] = mapped_column(nullable=False)
     questions: Mapped[List[str]] = mapped_column(nullable=False)
     documents: Mapped[List[List[int]]] = mapped_column(nullable=False)

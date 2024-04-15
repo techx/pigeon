@@ -21,7 +21,7 @@ class Document(db.Model):
 
     __tablename__ = "Documents"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, init=False)
     question: Mapped[str] = mapped_column(nullable=False)
     label: Mapped[str] = mapped_column(nullable=False)
     content: Mapped[str] = mapped_column(nullable=False)
