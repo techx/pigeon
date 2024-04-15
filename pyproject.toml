@@ -42,6 +42,7 @@ select = [
 [tool.ruff.lint.per-file-ignores]
 # D415: API endpoint docstrings shouldn't end with a period
 "server/controllers/*" = ["D415"]
+"server_tests/*" = ["D"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
