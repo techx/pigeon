@@ -85,22 +85,13 @@ def compute_embeddings():
     questions = client.json().mget(keys, "$.question")
     content = client.json().mget(keys, "$.content")
 
-    assert len(questions) == len(content)
-
     # compute embeddings
     question_and_content = [
-        questions[i][0] + " " + content[i][0]
+        questions[i][0] + " " + content[i][0]  # type: ignore
         for i in range(len(questions))  # type: ignore
     ]
 
-    # embeddings = embedder.encode(question_and_content).astype(np.float32).tolist()
     embeddings = compute_openai_embeddings(question_and_content)
-
-    # save embeddings
-    # with open(f"{cwd}/embeddings.json", "w") as f:
-    #     json.dump(embeddings, f)
-
-    # VECTOR_DIMENSION = len(embeddings[0])
 
     print("successfully computed embeddings")
     return embeddings
