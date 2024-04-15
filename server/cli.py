@@ -31,7 +31,7 @@ def email():
     db.session.commit()
 
     email = Email(
-        date=datetime.datetime.now(datetime.timezone.utc),  # type: ignore
+        date=datetime.datetime.now(datetime.timezone.utc),
         sender="azliu@mit.edu",
         subject=subject,
         body=body,
