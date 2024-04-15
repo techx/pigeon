@@ -285,15 +285,16 @@ def receive_email():
         openai_res, documents, confidence = generate_response(
             email.sender, email.body, openai_messages
         )
-        questions, documents, document_confidences = document_data(documents)
+        questions, documents, doc_confs, docs_per_question = document_data(documents)
 
         db.session.add(email)
         db.session.commit()
         r = Response(
             openai_res,
             questions,
+            docs_per_question,
             documents,
-            document_confidences,
+            doc_confs,
             confidence,
             email.id,
         )
@@ -472,12 +473,13 @@ def regen_response():
         email.sender, email.body, openai_messages
     )
     decrement_response_count(response.documents)
-    questions, documents, document_confidences = document_data(documents)
+    questions, documents, doc_confs, docs_per_question = document_data(documents)
     increment_response_count(documents)
     response.response = openai_res
     response.questions = questions
+    response.docs_per_question = docs_per_question
     response.documents = documents
-    response.document_confidences = document_confidences
+    response.document_confidences = doc_confs
     response.confidence = confidence
     db.session.commit()
 
