@@ -526,20 +526,23 @@ def get_threads():
 
     Get a list of all threads.
     """
-    thread_list = db.session.execute(
-        select(Thread).order_by(Thread.resolved, Thread.last_email.desc())
-    ).all()
-    email_list = [
-        {
-            "id": thread.id,
-            "resolved": thread.resolved,
-            "emailList": [
-                thread_email.map()
-                for thread_email in db.session.execute(
-                    select(Email).where(Email.thread_id == thread.id)
-                ).all()
-            ],
-        }
-        for thread in thread_list
-    ]
+    thread_list = db.session.execute(select(Thread)).all()
+    print("thread list", thread_list)
+    # thread_list = db.session.execute(
+    #     select(Thread).order_by(Thread.resolved, Thread.last_email.desc())
+    # ).all()
+    # email_list = [
+    #     {
+    #         "id": thread.id,
+    #         "resolved": thread.resolved,
+    #         "emailList": [
+    #             thread_email.map()
+    #             for thread_email in db.session.execute(
+    #                 select(Email).where(Email.thread_id == thread.id)
+    #             ).all()
+    #         ],
+    #     }
+    #     for thread in thread_list
+    # ]
+    email_list = []
     return email_list

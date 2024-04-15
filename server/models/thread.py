@@ -23,14 +23,14 @@ class Thread(db.Model):
     emails(list): The emails in the thread.
     """
 
-    __tablename__ = "Threads"
+    __tablename__ = "thread"
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
     last_email: Mapped[Optional[str]] = mapped_column(nullable=True, init=False)
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     emails: Mapped[List["Email"]] = relationship(
-        "Email",
+        "email",
         back_populates="thread",
         default_factory=list,
         cascade="all, delete-orphan",
@@ -43,5 +43,5 @@ class Thread(db.Model):
 
         email = db.session.execute(
             select(Email).where(Email.thread_id == self.id)
-        ).scalar_one_or_none()
+        ).scalar()
         return email.sender if email else None

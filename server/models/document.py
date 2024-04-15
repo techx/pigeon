@@ -26,7 +26,7 @@ class Document(db.Model):
     response_count(int): The number of responses the document has.
     """
 
-    __tablename__ = "Documents"
+    __tablename__ = "document"
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
     question: Mapped[str] = mapped_column(nullable=False)

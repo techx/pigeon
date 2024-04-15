@@ -30,7 +30,7 @@ class Email(db.Model):
     thread(Thread): The thread the email belongs to.
     """
 
-    __tablename__ = "Emails"
+    __tablename__ = "email"
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False)
     date: Mapped[datetime.datetime] = mapped_column(nullable=False)
@@ -45,7 +45,7 @@ class Email(db.Model):
 
     is_reply: Mapped[bool] = mapped_column(nullable=False)
 
-    thread_id: Mapped[str] = mapped_column(ForeignKey("Threads.id"), nullable=False)
+    thread_id: Mapped[str] = mapped_column(ForeignKey("thread.id"), nullable=False)
     thread: Mapped["Thread"] = relationship(back_populates="emails", init=False)
 
     def map(self):
