@@ -15,6 +15,7 @@
     5173,
     2010,
     6379,
+    6380,
     5432
   ],
   "postCreateCommand": "bash scripts/devcontainer_setup.sh",

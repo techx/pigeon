@@ -43,22 +43,21 @@ def db_url(db_name="pigeondb_test"):
 
 @pytest.fixture(scope="session")
 def redis_db_index():
-    """Yields test db index for Redis.
+    """Yields test redis db host.
 
     Flushes test db if it already exists.
     """
-    test_db_index = 1
-    client = redis.Redis(host="redis", port=6379, db=test_db_index)
+    client = redis.Redis(host="redis-test", port=6379)
     client.flushdb()
     client.close()
 
-    yield test_db_index
+    yield "redis-test"
 
 
 @pytest.fixture(scope="session")
-def app(db_url: str, redis_db_index: int):
+def app(db_url: str, redis_db_index: str):
     os.environ["DATABASE_URL"] = db_url
-    os.environ["REDIS_DB_INDEX"] = str(redis_db_index)
+    os.environ["REDIS_HOST"] = redis_db_index
 
     app = create_app()
     app.config.update(

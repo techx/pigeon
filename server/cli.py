@@ -52,6 +52,20 @@ def _generate_test_documents():
     return test_documents
 
 
+def _embed_existing_documents(documents: list[Document]):
+    """Embed existing documents."""
+    to_embed_documents = [
+        {
+            "question": doc.question,
+            "source": doc.source,
+            "content": doc.content,
+            "sql_id": doc.id,
+        }
+        for doc in documents
+    ]
+    embed_corpus(to_embed_documents)
+
+
 @seed.cli.command()
 def corpus():
     """Add test documents to the corpus."""
@@ -70,6 +84,9 @@ def email():
         print("No documents in the database. Generating test documents...")
         test_documents = _generate_test_documents()
         embed_corpus(test_documents)
+    else:
+        print("Embedding existing documents...")
+        _embed_existing_documents(docs)
 
     subject = "Test Email Subject"
     body = "Hello! What is blueprint?"
