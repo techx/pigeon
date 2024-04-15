@@ -20,10 +20,12 @@ from server.nlp.responses import generate_response
 
 seed = Blueprint("seed", __name__)
 
+FLASK_SEED_CORPUS = "server/nlp/corpus_flask_seed.json"
+
 
 def _generate_test_documents():
     """Generate test documents."""
-    with open("server/nlp/corpus_mit.json") as f:
+    with open(FLASK_SEED_CORPUS) as f:
         corpus = json.load(f)
 
     documents = []
