@@ -49,6 +49,7 @@ SQLALCHEMY_DATABASE_URI = _get_config_option(
     "DATABASE_URL", "postgresql://postgres:password@database/pigeondb"
 )
 REDIS_HOST = _get_config_option("REDIS_HOST", "redis")
+VECTOR_DIMENSION = 1536
 
 FLASK_RUN_PORT = 2010
 DEBUG = True

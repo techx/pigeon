@@ -17,20 +17,12 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
 from server import redis_client
-from server.config import RedisDocument
+from server.config import VECTOR_DIMENSION, RedisDocument
 
 assert redis_client is not None
 
 cwd = os.path.dirname(__file__)
 
-VECTOR_DIMENSION = 1536
-
-# load corpus
-# with open('corpus.json', 'r') as f:
-#     corpus = json.load(f)
-
-# load embedding model
-# embedder = SentenceTransformer("msmarco-distilbert-base-v4")
 embedding_model = "text-embedding-3-small"
 
 
