@@ -5,7 +5,7 @@ filterwarnings = []
 
 
 [tool.pyright]
-exclude = ["**/node_modules", "**/__pycache__"]
+exclude = ["**/node_modules", "**/__pycache__", "**/venv"]
 reportMissingImports = true
 reportMissingTypeStubs = false
 pythonVersion = "3.12"

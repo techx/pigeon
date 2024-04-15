@@ -5,7 +5,7 @@
 # Description: Run all ci/cd tests locally.
 # These are the same tests that run on GitHub when you push code.
 
-cd "/workspaces/ballot"
+cd "/workspaces/pigeon"
 
 echo "Running ci/cd checks..."
 echo "(1) pre-commit checks..."

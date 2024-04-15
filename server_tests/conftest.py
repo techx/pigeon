@@ -37,7 +37,7 @@ def db_url(db_name="pigeondb_test"):
 
     conn.close()
 
-    yield "postgresql://postgres:password@localhost/ballotdb_test"
+    yield "postgresql://postgres:password@localhost/pigeondb_test"
 
 
 @pytest.fixture(scope="session")
