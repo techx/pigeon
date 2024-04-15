@@ -29,7 +29,12 @@ class Thread(db.Model):
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False)
     last_email: Mapped[int] = mapped_column(nullable=False)
 
-    emails: Mapped[List[Email]] = relationship("Email", back_populates="thread")
+    emails: Mapped[List[Email]] = relationship(
+        "Email",
+        back_populates="thread",
+        default_factory=list,
+        cascade="all, delete-orphan",
+    )
 
     @hybrid_property
     def first_sender(self):
