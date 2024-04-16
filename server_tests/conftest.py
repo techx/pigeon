@@ -63,25 +63,6 @@ def redis_host():
     yield host
 
 
-@pytest.fixture(scope="session")
-def app(db_url: str, redis_host: str):
-    os.environ["DATABASE_URL"] = db_url
-    os.environ["REDIS_HOST"] = redis_host
-
-    app = create_app()
-    app.config.update(
-        {
-            "TESTING": True,
-        }
-    )
-
-    with app.app_context():
-        from server_tests.utils import seed_database
-        seed_database()
-
-    yield app
-
-
 @pytest.fixture(autouse=True)
 def mock_openai_chat_completion():
     """Mock the OpenAI chat completion API."""
@@ -125,6 +106,28 @@ def mock_openai_embeddings():
             ),
         )
         yield mock
+
+
+@pytest.fixture(scope="session")
+def app(
+    db_url: str, redis_host: str, mock_openai_chat_completion, mock_openai_embeddings
+):
+    os.environ["DATABASE_URL"] = db_url
+    os.environ["REDIS_HOST"] = redis_host
+
+    app = create_app()
+    app.config.update(
+        {
+            "TESTING": True,
+        }
+    )
+
+    with app.app_context():
+        from server_tests.utils import seed_database
+
+        seed_database()
+
+    yield app
 
 
 @pytest.fixture(autouse=True)
