@@ -1,14 +1,9 @@
 """Utils for testing."""
 
-import datetime
 import logging
 
+from apiflask import APIFlask
 from werkzeug.test import TestResponse
-
-from server import ProperlyTypedSQLAlchemy
-from server.fake_data import generate_test_documents
-from server.models.email import Email
-from server.models.thread import Thread
 
 
 def assert_status(response: TestResponse, status: int):
@@ -22,33 +17,11 @@ def assert_status(response: TestResponse, status: int):
         )
         raise
 
-def seed_database(db: ProperlyTypedSQLAlchemy):
+def seed_database(app: APIFlask):
     """Seeds the database with some fake data."""
 
-    # add some documents to the database
-    generate_test_documents()
+    with app.app_context():
+        from server.fake_data import generate_fake_thread, generate_test_documents
 
-    # create fake thread with 5 emails
-    thread = Thread()
-    db.session.add(thread)
-    db.session.commit()
-
-    emails = []
-    for i in range(5):
-        # every other email is a reply sent from pigeon
-        is_reply = i % 2 == 1
-        test_email = Email(
-            date=datetime.datetime.now(datetime.timezone.utc),
-            sender=f"test-{i}@test.com",
-            subject=f"Test Subject {i}",
-            body=f"Test Body {i}",
-            message_id=f"test-message-id-{i}",
-            is_reply=is_reply,
-            thread_id=thread.id
-        )
-        emails.append(test_email)
-        db.session.add(test_email)
-
-    db.session.commit()
-    thread.last_email = emails[-1].id
-    db.session.commit()
+        generate_test_documents()
+        generate_fake_thread(generate_response=False)

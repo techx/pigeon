@@ -20,8 +20,6 @@ from server import redis_client
 from server.config import VECTOR_DIMENSION, RedisDocument
 from server.utils import custom_log
 
-assert redis_client is not None
-
 cwd = os.path.dirname(__file__)
 
 embedding_model = "text-embedding-3-small"
@@ -36,6 +34,7 @@ def load_corpus(corpus: list[RedisDocument]):
     Raises:
         exception: if failed to load corpus into redis
     """
+    assert redis_client is not None
     custom_log("loading corpus...")
 
     pipeline = redis_client.pipeline()
@@ -70,6 +69,8 @@ def compute_openai_embeddings(texts):
 
 def compute_embeddings():
     """Compute embeddings from redis documents."""
+    assert redis_client is not None
+
     custom_log("computing embeddings...")
 
     # get keys, questions, content
@@ -99,6 +100,8 @@ def load_embeddings(embeddings: list[list[float]]):
     Raises:
         exception: if failed to load embeddings into redis
     """
+    assert redis_client is not None
+
     custom_log("loading embeddings into redis...")
 
     # load embeddings into redis
@@ -126,6 +129,7 @@ def create_index(corpus_len: int):
     Raises:
         exception: if failed to create index
     """
+    assert redis_client is not None
     custom_log("creating index...")
 
     schema = (
@@ -192,6 +196,7 @@ def queries(query, queries: list[str]) -> list[dict]:
     Returns:
         list of dictionaries containing query and result
     """
+    assert redis_client is not None
     custom_log("running queries...")
 
     # encode queries
@@ -249,6 +254,7 @@ def embed_corpus(corpus: list[RedisDocument]):
     Raises:
         exception: if failed to load corpus
     """
+    assert redis_client is not None
     # flush database
     custom_log("cleaning database...")
     redis_client.flushdb()
