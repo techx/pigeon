@@ -39,9 +39,9 @@ def seed_database(db: ProperlyTypedSQLAlchemy):
         is_reply = i % 2 == 1
         test_email = Email(
             date=datetime.datetime.now(datetime.timezone.utc),
-            sender="test@test.com",
-            subject="Test Subject",
-            body="Test Body",
+            sender=f"test-{i}@test.com",
+            subject=f"Test Subject {i}",
+            body=f"Test Body {i}",
             message_id=f"test-message-id-{i}",
             is_reply=is_reply,
             thread_id=thread.id

@@ -16,7 +16,6 @@ def test_thread_first_sender(app: APIFlask):
             )
             .scalar_one()
         )
-        # get the earliest sent email in thread.emails
         earliest_email = min(thread.emails, key=lambda x: x.date)
         assert earliest_email.sender == thread.first_sender
 
