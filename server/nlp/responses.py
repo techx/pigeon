@@ -12,6 +12,7 @@ from openai.types.chat import ChatCompletionMessageParam
 
 from server.config import OPENAI_API_KEY, OpenAIMessage, RedisDocument
 from server.nlp.embeddings import query_all
+from server.utils import custom_log
 
 openai.api_key = OPENAI_API_KEY
 
@@ -94,7 +95,13 @@ def openai_parse(email: str) -> list[str]:
         assert len(questions) > 0
         return questions
     except Exception as e:
-        print(e)
+        custom_log(
+            "open ai parsed email as '",
+            response.choices[0].message.content,
+            "', resulting in error '",
+            e,
+            "'. returning entire email as a single question instead.",
+        )
         return [email]
 
 
@@ -107,7 +114,7 @@ def confidence_metric(confidences: list[float]) -> float:
     Returns:
         confidence metric
     """
-    print("confidences", confidences)
+    custom_log("confidences", confidences)
     return np.min(np.array(confidences))
 
 
@@ -171,39 +178,3 @@ def generate_response(
     thread.append({"role": "user", "content": email})
     thread += contexts
     return openai_response(thread, sender), docs, confidence
-
-
-# def test():
-#     thread = []
-#     new_email = "Where is the hackathon held? When is the application deadline? \
-#                 When is HackMIT happening?"
-#     response, docs, confidence = generate_response(new_email)
-
-#     for question in docs.keys():
-#         print("question", question)
-#         for doc in docs[question]:
-#             print("confidence:", doc["score"])
-#             print(f"Q: {doc['question']}")
-#             print(f"A: {doc['content']}")
-#         print()
-#     print(response)
-#     print("confidence:", confidence)
-
-#     thread.append({"role": "user", "content": new_email})
-#     thread.append({"role": "assistant", "content": response})
-
-#     new_email = "Thank you for your response! Is there anything else I should know \
-#                 before heading to the event? Thanks!"
-#     response, docs, confidence = generate_response(new_email, thread)
-
-#     print("thread", thread)
-
-#     for question in docs.keys():
-#         print("question", question)
-#         for doc in docs[question]:
-#             print("confidence:", doc["score"])
-#             print(f"Q: {doc['question']}")
-#             print(f"A: {doc['content']}")
-#         print()
-#     print(response)
-#     print("confidence:", confidence)

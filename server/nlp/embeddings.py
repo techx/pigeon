@@ -18,6 +18,7 @@ from redis.commands.search.query import Query
 
 from server import redis_client
 from server.config import VECTOR_DIMENSION, RedisDocument
+from server.utils import custom_log
 
 assert redis_client is not None
 
@@ -35,7 +36,7 @@ def load_corpus(corpus: list[RedisDocument]):
     Raises:
         exception: if failed to load corpus into redis
     """
-    print("loading corpus...")
+    custom_log("loading corpus...")
 
     pipeline = redis_client.pipeline()
     for i, doc in enumerate(corpus, start=1):
@@ -45,7 +46,7 @@ def load_corpus(corpus: list[RedisDocument]):
 
     if not all(res):
         raise Exception("failed to load some documents")
-    print("successfully loaded all documents")
+    custom_log("successfully loaded all documents")
 
 
 def compute_openai_embeddings(texts):
@@ -69,7 +70,7 @@ def compute_openai_embeddings(texts):
 
 def compute_embeddings():
     """Compute embeddings from redis documents."""
-    print("computing embeddings...")
+    custom_log("computing embeddings...")
 
     # get keys, questions, content
     keys = sorted(redis_client.keys("documents:*"))  # type: ignore
@@ -84,7 +85,7 @@ def compute_embeddings():
 
     embeddings = compute_openai_embeddings(question_and_content)
 
-    print("successfully computed embeddings")
+    custom_log("successfully computed embeddings")
     return embeddings
 
 
@@ -98,7 +99,7 @@ def load_embeddings(embeddings: list[list[float]]):
     Raises:
         exception: if failed to load embeddings into redis
     """
-    print("loading embeddings into redis...")
+    custom_log("loading embeddings into redis...")
 
     # load embeddings into redis
     pipeline = redis_client.pipeline()
@@ -110,7 +111,7 @@ def load_embeddings(embeddings: list[list[float]]):
     if not all(res):
         raise Exception("failed to load embeddings")
 
-    print("successfully loaded all embeddings")
+    custom_log("successfully loaded all embeddings")
 
 
 def create_index(corpus_len: int):
@@ -125,7 +126,7 @@ def create_index(corpus_len: int):
     Raises:
         exception: if failed to create index
     """
-    print("creating index...")
+    custom_log("creating index...")
 
     schema = (
         TextField("$.source", no_stem=True, as_name="source"),
@@ -157,7 +158,7 @@ def create_index(corpus_len: int):
                 info = redis_client.ft("idx:documents_vss").info()
                 num_docs = info["num_docs"]
                 indexing_failures = info["hash_indexing_failures"]
-                print("num_docs", num_docs, "indexing_failures", indexing_failures)
+                custom_log("num_docs", num_docs, "indexing_failures", indexing_failures)
                 return
             if time.time() - start >= 60:
                 raise Exception("time out")
@@ -191,7 +192,7 @@ def queries(query, queries: list[str]) -> list[dict]:
     Returns:
         list of dictionaries containing query and result
     """
-    print("running queries...")
+    custom_log("running queries...")
 
     # encode queries
     encoded_queries = compute_openai_embeddings(queries)
@@ -221,7 +222,7 @@ def queries(query, queries: list[str]) -> list[dict]:
             )
         results_list.append({"query": queries[i], "result": query_result})
 
-    print("done running query")
+    custom_log("done running query")
     return results_list
 
 
@@ -249,9 +250,9 @@ def embed_corpus(corpus: list[RedisDocument]):
         exception: if failed to load corpus
     """
     # flush database
-    print("cleaning database...")
+    custom_log("cleaning database...")
     redis_client.flushdb()
-    print("done cleaning database")
+    custom_log("done cleaning database")
 
     # embed corpus
     if not corpus:

@@ -48,4 +48,7 @@ def seed_database(db: ProperlyTypedSQLAlchemy):
         )
         emails.append(test_email)
         db.session.add(test_email)
+
+    db.session.commit()
+    thread.last_email = emails[-1].id
     db.session.commit()
