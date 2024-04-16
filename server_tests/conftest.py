@@ -77,7 +77,7 @@ def app(db_url: str, redis_host: str):
 
     with app.app_context():
         from server_tests.utils import seed_database
-        seed_database(app)
+        seed_database()
 
     yield app
 

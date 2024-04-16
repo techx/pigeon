@@ -73,7 +73,7 @@ def _generate_response(email: Email, thread: Thread):
     increment_response_count(documents)
 
 
-def generate_fake_email(generate_response=True):
+def generate_fake_email():
     """Generate fake email."""
     thread = Thread()
     db.session.add(thread)
@@ -101,11 +101,10 @@ def generate_fake_email(generate_response=True):
     thread.resolved = False
     db.session.commit()
 
-    if generate_response:
-        _generate_response(email, thread)
+    _generate_response(email, thread)
 
 
-def generate_fake_thread(generate_response=True):
+def generate_fake_thread():
     """Generate fake unresolved thread."""
     thread = Thread()
     db.session.add(thread)
@@ -199,5 +198,4 @@ def generate_fake_thread(generate_response=True):
     thread.resolved = False
     db.session.commit()
 
-    if generate_response:
-        _generate_response(email_5, thread)
+    _generate_response(email_5, thread)

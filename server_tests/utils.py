@@ -2,7 +2,6 @@
 
 import logging
 
-from apiflask import APIFlask
 from werkzeug.test import TestResponse
 
 
@@ -17,11 +16,12 @@ def assert_status(response: TestResponse, status: int):
         )
         raise
 
-def seed_database(app: APIFlask):
+def seed_database():
     """Seeds the database with some fake data."""
 
-    with app.app_context():
-        from server.fake_data import generate_fake_thread, generate_test_documents
+    from server.fake_data import generate_fake_thread, generate_test_documents
+    from server.nlp.embeddings import embed_corpus
 
-        generate_test_documents()
-        generate_fake_thread(generate_response=False)
+    test_documents = generate_test_documents()
+    embed_corpus(test_documents)
+    generate_fake_thread()
