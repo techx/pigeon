@@ -442,6 +442,7 @@ def get_response():
     response = db.session.execute(
         select(Response).where(Response.email_id == data["id"])
     ).scalar()
+
     if not response:
         return {"message": "Response not found"}, 400
     return response.map()
@@ -524,23 +525,26 @@ def get_threads():
 
     Get a list of all threads.
     """
-    thread_list = db.session.execute(select(Thread)).all()
-    print("thread list", thread_list)
-    # thread_list = db.session.execute(
-    #     select(Thread).order_by(Thread.resolved, Thread.last_email.desc())
-    # ).all()
-    # email_list = [
-    #     {
-    #         "id": thread.id,
-    #         "resolved": thread.resolved,
-    #         "emailList": [
-    #             thread_email.map()
-    #             for thread_email in db.session.execute(
-    #                 select(Email).where(Email.thread_id == thread.id)
-    #             ).all()
-    #         ],
-    #     }
-    #     for thread in thread_list
-    # ]
-    email_list = []
+    thread_list = (
+        db.session.execute(
+            select(Thread).order_by(Thread.resolved, Thread.last_email.desc())
+        )
+        .scalars()
+        .all()
+    )
+    email_list = [
+        {
+            "id": thread.id,
+            "resolved": thread.resolved,
+            "emailList": [
+                thread_email.map()
+                for thread_email in db.session.execute(
+                    select(Email).where(Email.thread_id == thread.id)
+                )
+                .scalars()
+                .all()
+            ],
+        }
+        for thread in thread_list
+    ]
     return email_list

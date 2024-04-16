@@ -54,12 +54,25 @@ class Response(db.Model):
     )
 
     def map(self):
-        """Map the response to a dictionary."""
+        """Map the response to a dictionary.
+
+        Groups documents and document_confidences into a list of lists clustered by
+        question.
+        """
+        doc_confs = []
+        docs = []
+        cur_idx = 0
+        for num_docs in self.docs_per_question:
+            doc_confs.append(self.document_confidences[cur_idx : cur_idx + num_docs])
+            docs.append(self.documents[cur_idx : cur_idx + num_docs])
+            cur_idx += num_docs
+        docs = [[doc.map() for doc in doc_list] for doc_list in docs]
         return {
             "id": self.id,
             "content": self.response,
             "questions": self.questions,
-            "document_confidences": self.document_confidences,
+            "documents": docs,
+            "document_confidences": doc_confs,
             "confidence": self.confidence,
             "emailId": self.email_id,
         }
