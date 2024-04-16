@@ -3,6 +3,7 @@ import os
 from typing import cast
 from unittest.mock import patch
 
+import openai
 import psycopg2
 import pytest
 import redis
@@ -66,6 +67,14 @@ def redis_host():
 @pytest.fixture(scope="session")
 def mock_openai_chat_completion():
     """Mock the OpenAI chat completion API."""
+
+    # setting the key here is pretty scuffed, but we need to bypass the openai
+    # "api key exists" checker. we only need to do this because we are declaring this
+    # as a session-level fixture, and injecting it into app. if we declared this as a
+    # test-level fixture, we would not have to worry about this, but then we would not
+    # be able to access the mocks when seeding the database with test data.
+    openai.api_key = "dummy_key"
+
     with patch("openai.chat.completions.create") as mock:
         mock.return_value = ChatCompletion(
             id="foo",
