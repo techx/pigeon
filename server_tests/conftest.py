@@ -63,7 +63,7 @@ def redis_host():
     yield host
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session")
 def mock_openai_chat_completion():
     """Mock the OpenAI chat completion API."""
     with patch("openai.chat.completions.create") as mock:
@@ -86,7 +86,7 @@ def mock_openai_chat_completion():
         yield mock
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session")
 def mock_openai_embeddings():
     """Mock the OpenAI embeddings API."""
     with patch("openai.embeddings.create") as mock:
