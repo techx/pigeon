@@ -19,6 +19,7 @@ from sqlalchemy.engine.base import Connection
 
 from server import create_app, db
 from server.config import LOCAL, VECTOR_DIMENSION
+from server_tests.utils import seed_database
 
 
 @pytest.fixture(scope="session")
@@ -74,6 +75,9 @@ def app(db_url: str, redis_host: str):
             "TESTING": True,
         }
     )
+
+    with app.app_context():
+        seed_database(db)
 
     yield app
 

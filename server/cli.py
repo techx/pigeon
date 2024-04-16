@@ -1,7 +1,6 @@
 """Flask CLI commands."""
 
 import datetime
-import json
 
 from flask import Blueprint
 
@@ -11,6 +10,7 @@ from server.controllers.emails import (
     increment_response_count,
     thread_emails_to_openai_messages,
 )
+from server.fake_data import generate_test_documents
 from server.models.document import Document
 from server.models.email import Email
 from server.models.response import Response
@@ -19,37 +19,6 @@ from server.nlp.embeddings import embed_corpus
 from server.nlp.responses import generate_response
 
 seed = Blueprint("seed", __name__)
-
-FLASK_SEED_CORPUS = "server/nlp/corpus_flask_seed.json"
-
-
-def _generate_test_documents():
-    """Generate test documents."""
-    with open(FLASK_SEED_CORPUS) as f:
-        corpus = json.load(f)
-
-    documents = []
-    for doc in corpus:
-        document = Document(
-            question=doc["question"],
-            label=doc["question"],
-            source=doc["source"],
-            content=doc["content"],
-        )
-        db.session.add(document)
-        db.session.commit()
-        documents.append(document)
-
-    test_documents = [
-        {
-            "question": doc.question,
-            "source": doc.source,
-            "content": doc.content,
-            "sql_id": doc.id,
-        }
-        for doc in documents
-    ]
-    return test_documents
 
 
 def _embed_existing_documents(documents: list[Document]):
@@ -69,7 +38,7 @@ def _embed_existing_documents(documents: list[Document]):
 @seed.cli.command()
 def corpus():
     """Add test documents to the corpus."""
-    test_documents = _generate_test_documents()
+    test_documents = generate_test_documents()
     embed_corpus(test_documents)
 
 
@@ -82,7 +51,7 @@ def email():
         # responses, so the only way this command succeeds is if the corpus is
         # already populated
         print("No documents in the database. Generating test documents...")
-        test_documents = _generate_test_documents()
+        test_documents = generate_test_documents()
         embed_corpus(test_documents)
     else:
         print("Embedding existing documents...")

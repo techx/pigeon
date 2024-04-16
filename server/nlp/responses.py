@@ -131,7 +131,6 @@ def generate_context(
     docs = {}
 
     results = query_all(3, questions)
-    print("results", results)
     message = "Here is some context to help you answer this email: \n"
     for result in results:
         confidence = 0
