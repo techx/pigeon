@@ -472,7 +472,7 @@ export default function InboxPage() {
             return (
               <Accordion.Item
                 style={{
-                  "border-left": `6px solid ${computeColor(
+                  borderLeft: `6px solid ${computeColor(
                     // Math.round((document.confidence / 0.8) * 100) / 100
                     Math.round(document.confidence * 100) / 100,
                   )}`,

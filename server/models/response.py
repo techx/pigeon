@@ -67,12 +67,14 @@ class Response(db.Model):
             docs.append(self.documents[cur_idx : cur_idx + num_docs])
             cur_idx += num_docs
         docs = [[doc.map() for doc in doc_list] for doc_list in docs]
+        for i, doc_list in enumerate(docs):
+            for j, doc in enumerate(doc_list):
+                doc["confidence"] = doc_confs[i][j]
         return {
             "id": self.id,
             "content": self.response,
             "questions": self.questions,
             "documents": docs,
-            "document_confidences": doc_confs,
             "confidence": self.confidence,
             "emailId": self.email_id,
         }
