@@ -18,3 +18,6 @@ parallel --tag -j2 --line-buffer ::: "pip install --user -r requirements.txt -r 
 echo "Initializing git repository..."
 
 git config --global --add safe.directory /workspaces/pigeon
+
+echo "Installing pre-commit hooks"
+pre-commit install
