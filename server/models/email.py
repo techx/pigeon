@@ -41,7 +41,13 @@ class Email(db.Model):
     message_id: Mapped[str] = mapped_column(nullable=False)
 
     response: Mapped[Optional["Response"]] = relationship(
-        "Response", back_populates="email", init=False
+        "Response",
+        back_populates="email",
+        cascade="all, delete-orphan",
+        single_parent=True,
+        uselist=False,
+        passive_deletes=True,
+        init=False,
     )
 
     is_reply: Mapped[bool] = mapped_column(nullable=False)
