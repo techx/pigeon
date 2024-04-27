@@ -82,6 +82,8 @@ export default function InboxPage() {
 
   const [response, setResponse] = useState<Response | undefined>(undefined);
 
+  const [storedResponses, setStoredResponses] = useState<{ [key: number]: Response }>({});
+
   const viewport = useRef<HTMLDivElement>(null);
 
   const editor = useEditor(
@@ -153,11 +155,22 @@ export default function InboxPage() {
   };
 
   const getResponse = () => {
+    // Checks if response is already stored
+    const currEmailID = activeThread.emailList[activeThread.emailList.length - 1].id;
+    if (storedResponses[currEmailID]) {
+      const oldResponse = storedResponses[currEmailID];
+      setResponse(oldResponse);
+      setContent(oldResponse.content.replace("\n", "<br/>"));
+      return;
+    }
+
+    // Otherwise fetches response from server
     const formData = new FormData();
     formData.append(
       "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
+      currEmailID.toString(),
     );
+    console.log(formData);
     fetch(`/api/emails/get_response`, {
       method: "POST",
       body: formData,
@@ -171,6 +184,9 @@ export default function InboxPage() {
         });
       })
       .then((data) => {
+        setStoredResponses((oldResponses) => {
+          return { ...oldResponses, [currEmailID]: data };
+        });
         setResponse(data);
         setContent(data.content.replaceAll("\n", "<br/>"));
       });
