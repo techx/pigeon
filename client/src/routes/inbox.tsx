@@ -82,7 +82,9 @@ export default function InboxPage() {
 
   const [response, setResponse] = useState<Response | undefined>(undefined);
 
-  const [storedResponses, setStoredResponses] = useState<{ [key: number]: Response }>({});
+  const [storedResponses, setStoredResponses] = useState<{
+    [key: number]: Response;
+  }>({});
 
   const viewport = useRef<HTMLDivElement>(null);
 
@@ -156,7 +158,8 @@ export default function InboxPage() {
 
   const getResponse = () => {
     // Checks if response is already stored
-    const currEmailID = activeThread.emailList[activeThread.emailList.length - 1].id;
+    const currEmailID =
+      activeThread.emailList[activeThread.emailList.length - 1].id;
     if (storedResponses[currEmailID]) {
       const oldResponse = storedResponses[currEmailID];
       setResponse(oldResponse);
@@ -166,10 +169,7 @@ export default function InboxPage() {
 
     // Otherwise fetches response from server
     const formData = new FormData();
-    formData.append(
-      "id",
-      currEmailID.toString(),
-    );
+    formData.append("id", currEmailID.toString());
     console.log(formData);
     fetch(`/api/emails/get_response`, {
       method: "POST",
