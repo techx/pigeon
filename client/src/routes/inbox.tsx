@@ -170,7 +170,7 @@ export default function InboxPage() {
     // Otherwise fetches response from server
     const formData = new FormData();
     formData.append("id", currEmailID.toString());
-    console.log(formData);
+
     fetch(`/api/emails/get_response`, {
       method: "POST",
       body: formData,
