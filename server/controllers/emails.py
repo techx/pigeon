@@ -357,6 +357,13 @@ def get_full_message_id(message_id):
     return f"<{message_id}@us-east-2.amazonses.com>"
 
 
+def clean_up(text):
+    r"""Clean text by removing html tags and replacing <br /> with \n."""
+    breaked_line_text = text.replace("<br/>", "\n")
+    clean_regex = re.compile("<.*?>")
+    return re.sub(clean_regex, " ", breaked_line_text)
+
+
 @emails.route("/send_email", methods=["POST"])
 def send_email():
     """POST /send_email"""
@@ -373,12 +380,19 @@ def send_email():
         return {"message": "Thread not found"}, 400
 
     # replace <br /> with \n in body
-    breaked_line_text = data["body"].replace("<br/>", "\n")
-    clean_regex = re.compile("<.*?>")
-    clean_text = re.sub(clean_regex, " ", breaked_line_text)
+    clean_text = clean_up(data["body"])
+    # breaked_line_text = data["body"].replace("<br/>", "\n")
+    # clean_regex = re.compile("<.*?>")
+    # clean_text = re.sub(clean_regex, " ", breaked_line_text)
     context = {"body": data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
+
+    # add body to documents
+    question = clean_up(reply_to_email.body)
+    new_doc = Document(question, reply_to_email.subject, clean_text, "HackMIT team")
+    db.session.add(new_doc)
+    db.session.commit()
 
     client = boto3.client(
         "ses",
