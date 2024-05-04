@@ -36,6 +36,7 @@ interface Thread {
   id: number;
   emailList: Email[];
   resolved: boolean;
+  read: boolean;
 }
 
 interface Email {
@@ -72,6 +73,9 @@ export default function InboxPage() {
   const [threads, setThreads] = useState<Array<Thread>>([]);
   const [active, setActive] = useState(-1);
   const [content, setContent] = useState("");
+  const [showAllMail, setShowAllMail] = useState(true);
+  const [showUnreadMail, setShowUnreadMail] = useState(false);
+
   const activeThread = threads.filter((thread) => {
     return thread.id === active;
   })[0];
@@ -98,10 +102,29 @@ export default function InboxPage() {
     },
     [response],
   );
+  const markAsRead = (threadId: number) => {
+    fetch(`/api/emails/mark_as_read/${threadId}`).then((res) => {
+      if (res.ok) {
+        getThreads();
+      }
+    });
+  };
+  const handleThreadClick = (threadId: number) => {
+    markAsRead(threadId);
+  };
+  const filteredThreads = threads.filter((thread) => {
+    if (showAllMail) {
+      return true;
+    } else if (showUnreadMail) {
+      return !thread.read;
+    }
+  });
+
   const getThreads = () => {
     fetch(`/api/emails/get_threads`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setThreads(data);
       });
   };
@@ -412,7 +435,7 @@ export default function InboxPage() {
     else return -1;
   };
 
-  const threadList = threads.sort(sortThreads).map((thread) => {
+  const threadList = filteredThreads.sort(sortThreads).map((thread) => {
     if (thread.emailList.length === 0) return <></>;
     const sender =
       thread.emailList[thread.emailList.length - 1].sender.indexOf("<") !== -1
@@ -433,6 +456,7 @@ export default function InboxPage() {
                 return thread.id === newThread.id;
               })[0].emailList.length,
             );
+            handleThreadClick(thread.id);
           }
         }}
       >
@@ -445,7 +469,19 @@ export default function InboxPage() {
             (!thread.resolved ? classes.unresolved : "")
           }
         >
-          <Title size="md">{sender}</Title>
+          <Title size="md">
+            <span>{sender}</span>
+
+            {!thread.read && (
+              <ThemeIcon
+                size={10}
+                color="indigo"
+                radius="xl"
+                style={{ marginLeft: "5px" }}
+              ></ThemeIcon>
+            )}
+          </Title>
+
           <Flex className={classes.between}>
             <Text>{thread.emailList[thread.emailList.length - 1].subject}</Text>
             <Text>
@@ -530,7 +566,41 @@ export default function InboxPage() {
     >
       {!sourceActive && (
         <Grid.Col span={30} className={classes.threads}>
-          <Text className={classes.inboxText}>Inbox</Text>
+          <Flex className={classes.inboxHeader}>
+            <Box>
+              <Text className={classes.inboxText}>Inbox</Text>
+            </Box>
+            <Box className={classes.inboxReadButton}>
+              <Button
+                style={{
+                  backgroundColor: showUnreadMail ? "#E3E3E3" : "white",
+                  color: showUnreadMail ? "#787878" : "black",
+                  borderRadius: "10px",
+                  padding: "5px 10px",
+                }}
+                onClick={() => {
+                  setShowAllMail(true);
+                  setShowUnreadMail(false);
+                }}
+              >
+                All Mail
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: showAllMail ? "#E3E3E3" : "white",
+                  color: showAllMail ? "#787878" : "black",
+                  padding: "5px 10px",
+                  borderRadius: "10px",
+                }}
+                onClick={() => {
+                  setShowAllMail(false);
+                  setShowUnreadMail(true);
+                }}
+              >
+                Unread
+              </Button>
+            </Box>
+          </Flex>
           <Stack gap={0} className={classes.threadList}>
             {threadList}
           </Stack>

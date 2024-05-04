@@ -536,6 +536,7 @@ def get_threads():
         {
             "id": thread.id,
             "resolved": thread.resolved,
+            "read": thread.read,
             "emailList": [
                 thread_email.map()
                 for thread_email in db.session.execute(
@@ -548,3 +549,18 @@ def get_threads():
         for thread in thread_list
     ]
     return email_list
+
+
+@emails.route("/mark_as_read/<int:thread_id>", methods=["GET"])
+def mark_as_read(thread_id):
+    """GET /mark_as_read/<threadId>
+
+    Mark a thread as read.
+    """
+    thread = db.session.execute(select(Thread).where(Thread.id == thread_id)).scalar()
+    if not thread:
+        return {"message": "Thread not found"}, 400
+    thread.read = True
+    db.session.commit()
+
+    return {"message": "Successfully updated"}, 200

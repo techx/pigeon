@@ -21,6 +21,7 @@
 .grid {
   height: 100vh;
 }
+
 .grid_inner {
   height: 100%;
   margin: 0;
@@ -61,12 +62,12 @@
 }
 
 .inboxText {
+  padding-left: 10px;
   font-size: 3vh;
   font-weight: 500;
   margin-bottom: 0;
   text-align: center;
   height: 6vh;
-  border-bottom: 1px solid var(--mantine-color-gray-4);
 }
 
 .subjectText {
@@ -110,6 +111,7 @@
   justify-content: space-between;
   padding-right: 10px;
 }
+
 .sourceHeader {
   font-size: 1.5rem;
   font-weight: 500;
@@ -119,6 +121,7 @@
   border-top: 1px solid var(--mantine-color-gray-4);
   border-bottom: 1px solid var(--mantine-color-gray-4);
 }
+
 .sourceText {
   font-size: 1rem;
   font-weight: 500;
@@ -153,4 +156,18 @@
   font-weight: bold;
   margin-bottom: 0;
   color: var(--mantine-color-red-6);
+}
+
+.inboxReadButton {
+  display: flex;
+  gap: 5px;
+  background-color: #e3e3e3;
+  padding: 5px 8px;
+  border-radius: 15px;
+}
+
+.inboxHeader {
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--mantine-color-gray-4);
 }
