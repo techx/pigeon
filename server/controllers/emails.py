@@ -522,6 +522,24 @@ def unresolve():
     return {"message": "Successfully updated"}, 200
 
 
+@emails.route("/delete", methods=["POST"])
+def delete():
+    """POST /delete
+
+    Delete an email thread.
+    """
+    data = request.form
+    thread = db.session.execute(select(Thread).where(Thread.id == data["id"])).scalar()
+    if not thread:
+        return {"message": "Thread not found"}, 400
+    db.session.delete(thread)
+    db.session.commit()
+
+    print("deleted thread", flush=True)
+
+    return {"message": "Successfully deleted"}, 200
+
+
 @emails.route("/get_threads", methods=["GET"])
 def get_threads():
     """GET /get_threads
