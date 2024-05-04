@@ -30,6 +30,7 @@ import {
   IconFolderOff,
   IconCheck,
   IconX,
+  IconTrash,
 } from "@tabler/icons-react";
 
 interface Thread {
@@ -85,6 +86,10 @@ export default function InboxPage() {
   const [sourceActive, setSourceActive] = useState(false);
 
   const [response, setResponse] = useState<Response | undefined>(undefined);
+
+  const [storedResponses, setStoredResponses] = useState<{
+    [key: number]: Response;
+  }>({});
 
   const viewport = useRef<HTMLDivElement>(null);
 
@@ -176,11 +181,20 @@ export default function InboxPage() {
   };
 
   const getResponse = () => {
+    // Checks if response is already stored
+    const currEmailID =
+      activeThread.emailList[activeThread.emailList.length - 1].id;
+    if (storedResponses[currEmailID]) {
+      const oldResponse = storedResponses[currEmailID];
+      setResponse(oldResponse);
+      setContent(oldResponse.content.replace("\n", "<br/>"));
+      return;
+    }
+
+    // Otherwise fetches response from server
     const formData = new FormData();
-    formData.append(
-      "id",
-      activeThread.emailList[activeThread.emailList.length - 1].id.toString(),
-    );
+    formData.append("id", currEmailID.toString());
+
     fetch(`/api/emails/get_response`, {
       method: "POST",
       body: formData,
@@ -194,6 +208,9 @@ export default function InboxPage() {
         });
       })
       .then((data) => {
+        setStoredResponses((oldResponses) => {
+          return { ...oldResponses, [currEmailID]: data };
+        });
         setResponse(data);
         setContent(data.content.replaceAll("\n", "<br/>"));
       });
@@ -383,6 +400,66 @@ export default function InboxPage() {
           title: "Success!",
           color: "green",
           message: "Unresolved thread",
+          icon: <IconCheck />,
+          autoClose: 2000,
+          withCloseButton: false,
+          loading: false,
+        });
+      });
+  };
+
+  const deleteThread = () => {
+    notifications.show({
+      id: "loading",
+      title: "Loading",
+      color: "red",
+      message: "Deleting thread...",
+      loading: true,
+      autoClose: false,
+    });
+    const formData = new FormData();
+    formData.append("id", active.toString());
+    fetch("/api/emails/delete", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        notifications.update({
+          id: "loading",
+          title: "Error!",
+          color: "red",
+          loading: false,
+          message: "Something went wrong!",
+        });
+      })
+      .then(() => {
+        setThreads((oldThreads) => {
+          const updatedThreads = oldThreads.filter(
+            (thread) => thread.id !== active,
+          );
+
+          let newActive = -1;
+
+          //setting to next email hopefully
+          if (updatedThreads.length > 0) {
+            const currentIndex = oldThreads.findIndex(
+              (thread) => thread.id === active,
+            );
+            if (currentIndex >= 0 && currentIndex < updatedThreads.length) {
+              newActive = updatedThreads[currentIndex].id;
+            } else if (currentIndex >= updatedThreads.length) {
+              newActive = updatedThreads[updatedThreads.length - 1].id;
+            }
+          }
+          setActive(newActive);
+          return updatedThreads;
+        });
+        notifications.update({
+          id: "loading",
+          title: "Success!",
+          color: "green",
+          message: "Deleted thread",
           icon: <IconCheck />,
           autoClose: 2000,
           withCloseButton: false,
@@ -750,6 +827,16 @@ export default function InboxPage() {
                     onClick={() => unresolveThread()}
                   >
                     Unresolve
+                  </Button>
+                )}
+
+                {!activeThread.resolved && (
+                  <Button
+                    leftSection={<IconTrash />}
+                    color="red"
+                    onClick={() => deleteThread()}
+                  >
+                    Delete
                   </Button>
                 )}
               </Group>

@@ -371,8 +371,11 @@ def send_email():
     ).scalar()
     if not thread:
         return {"message": "Thread not found"}, 400
+
+    # replace <br /> with \n in body
+    breaked_line_text = data["body"].replace("<br/>", "\n")
     clean_regex = re.compile("<.*?>")
-    clean_text = re.sub(clean_regex, " ", data["body"])
+    clean_text = re.sub(clean_regex, " ", breaked_line_text)
     context = {"body": data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
@@ -517,6 +520,24 @@ def unresolve():
     db.session.commit()
 
     return {"message": "Successfully updated"}, 200
+
+
+@emails.route("/delete", methods=["POST"])
+def delete():
+    """POST /delete
+
+    Delete an email thread.
+    """
+    data = request.form
+    thread = db.session.execute(select(Thread).where(Thread.id == data["id"])).scalar()
+    if not thread:
+        return {"message": "Thread not found"}, 400
+    db.session.delete(thread)
+    db.session.commit()
+
+    print("deleted thread", flush=True)
+
+    return {"message": "Successfully deleted"}, 200
 
 
 @emails.route("/get_threads", methods=["GET"])
