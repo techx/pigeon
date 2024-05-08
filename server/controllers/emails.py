@@ -379,11 +379,7 @@ def send_email():
     if not thread:
         return {"message": "Thread not found"}, 400
 
-    # replace <br /> with \n in body
     clean_text = clean_up(data["body"])
-    # breaked_line_text = data["body"].replace("<br/>", "\n")
-    # clean_regex = re.compile("<.*?>")
-    # clean_text = re.sub(clean_regex, " ", breaked_line_text)
     context = {"body": data["body"]}
     template = env.get_template("template.html")
     body = template.render(**context)
