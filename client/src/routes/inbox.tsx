@@ -129,7 +129,6 @@ export default function InboxPage() {
     fetch(`/api/emails/get_threads`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setThreads(data);
       });
   };
