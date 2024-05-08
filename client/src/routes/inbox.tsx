@@ -15,7 +15,7 @@ import {
   Accordion,
   Center,
 } from "@mantine/core";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import classes from "./inbox.module.css";
 import { RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
@@ -161,6 +161,7 @@ export default function InboxPage() {
     return d.toLocaleString("en-US", { timeZone: "America/New_York" });
   };
   const parseBody = (body: string) => {
+    // eslint-disable-next-line no-control-regex
     const lines = body.replace(new RegExp("\r?\n", "g"), "<br />");
     const linesArray = lines.split("<br />");
     return (
@@ -179,7 +180,7 @@ export default function InboxPage() {
     );
   };
 
-  const getResponse = () => {
+  const getResponse = useCallback(() => {
     // Checks if response is already stored
     const currEmailID =
       activeThread.emailList[activeThread.emailList.length - 1].id;
@@ -213,10 +214,11 @@ export default function InboxPage() {
         setResponse(data);
         setContent(data.content.replaceAll("\n", "<br/>"));
       });
-  };
+  }, [activeThread, storedResponses]);
+
   useEffect(() => {
     if (activeThread && !activeThread.resolved) getResponse();
-  }, [active]);
+  }, [activeThread, getResponse]);
 
   const sendEmail = () => {
     const strippedContent = strip(content);
@@ -485,7 +487,7 @@ export default function InboxPage() {
         setActive(Math.min(...actualThreads));
       }
     }
-  }, [active, threads]);
+  }, [active, threads, activeThread, getResponse, threadSize]);
 
   const cmpDate: (a: string, b: string) => number = (a, b) => {
     const d1 = new Date(a as string | number | Date);
@@ -532,8 +534,8 @@ export default function InboxPage() {
                 return thread.id === newThread.id;
               })[0].emailList.length,
             );
-            handleThreadClick(thread.id);
           }
+          handleThreadClick(thread.id);
         }}
       >
         <Box
@@ -651,8 +653,8 @@ export default function InboxPage() {
                 style={{
                   backgroundColor: showUnreadMail ? "#E3E3E3" : "white",
                   color: showUnreadMail ? "#787878" : "black",
-                  borderRadius: "10px",
-                  padding: "5px 10px",
+                  borderRadius: "var(--mantine-radius-md)",
+                  padding: "4px 12px",
                 }}
                 onClick={() => {
                   setShowAllMail(true);
@@ -665,8 +667,8 @@ export default function InboxPage() {
                 style={{
                   backgroundColor: showAllMail ? "#E3E3E3" : "white",
                   color: showAllMail ? "#787878" : "black",
-                  padding: "5px 10px",
-                  borderRadius: "10px",
+                  borderRadius: "var(--mantine-radius-md)",
+                  padding: "4px 12px",
                 }}
                 onClick={() => {
                   setShowAllMail(false);

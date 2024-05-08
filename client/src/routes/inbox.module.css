@@ -62,12 +62,11 @@
 }
 
 .inboxText {
-  padding-left: 10px;
+  padding: var(--mantine-spacing-md);
   font-size: 3vh;
-  font-weight: 500;
-  margin-bottom: 0;
+  font-weight: 600;
   text-align: center;
-  height: 6vh;
+  height: 100%;
 }
 
 .subjectText {
@@ -160,10 +159,10 @@
 
 .inboxReadButton {
   display: flex;
-  gap: 5px;
   background-color: #e3e3e3;
-  padding: 5px 8px;
-  border-radius: 15px;
+  padding: 4px 6px;
+  border-radius: var(--mantine-radius-md);
+  margin-right: var(--mantine-spacing-md);
 }
 
 .inboxHeader {
