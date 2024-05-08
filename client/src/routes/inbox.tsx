@@ -15,7 +15,7 @@ import {
   Accordion,
   Center,
 } from "@mantine/core";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import classes from "./inbox.module.css";
 import { RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
@@ -37,6 +37,7 @@ interface Thread {
   id: number;
   emailList: Email[];
   resolved: boolean;
+  read: boolean;
 }
 
 interface Email {
@@ -73,6 +74,9 @@ export default function InboxPage() {
   const [threads, setThreads] = useState<Array<Thread>>([]);
   const [active, setActive] = useState(-1);
   const [content, setContent] = useState("");
+  const [showAllMail, setShowAllMail] = useState(true);
+  const [showUnreadMail, setShowUnreadMail] = useState(false);
+
   const activeThread = threads.filter((thread) => {
     return thread.id === active;
   })[0];
@@ -103,6 +107,24 @@ export default function InboxPage() {
     },
     [response],
   );
+  const markAsRead = (threadId: number) => {
+    fetch(`/api/emails/mark_as_read/${threadId}`).then((res) => {
+      if (res.ok) {
+        getThreads();
+      }
+    });
+  };
+  const handleThreadClick = (threadId: number) => {
+    markAsRead(threadId);
+  };
+  const filteredThreads = threads.filter((thread) => {
+    if (showAllMail) {
+      return true;
+    } else if (showUnreadMail) {
+      return !thread.read;
+    }
+  });
+
   const getThreads = () => {
     fetch(`/api/emails/get_threads`)
       .then((res) => res.json())
@@ -139,7 +161,7 @@ export default function InboxPage() {
     return d.toLocaleString("en-US", { timeZone: "America/New_York" });
   };
   const parseBody = (body: string) => {
-    const lines = body.replace(new RegExp("\r?\n", "g"), "<br />");
+    const lines = body.replace(new RegExp("\\r?\\n", "g"), "<br />");
     const linesArray = lines.split("<br />");
     return (
       <Text>
@@ -157,14 +179,14 @@ export default function InboxPage() {
     );
   };
 
-  const getResponse = () => {
+  const getResponse = useCallback(() => {
     // Checks if response is already stored
     const currEmailID =
       activeThread.emailList[activeThread.emailList.length - 1].id;
     if (storedResponses[currEmailID]) {
       const oldResponse = storedResponses[currEmailID];
       setResponse(oldResponse);
-      setContent(oldResponse.content.replace("\n", "<br/>"));
+      setContent(oldResponse.content.replaceAll("\n", "<br/>"));
       return;
     }
 
@@ -191,10 +213,11 @@ export default function InboxPage() {
         setResponse(data);
         setContent(data.content.replaceAll("\n", "<br/>"));
       });
-  };
+  }, [activeThread, storedResponses]);
+
   useEffect(() => {
     if (activeThread && !activeThread.resolved) getResponse();
-  }, [active]);
+  }, [activeThread, getResponse]);
 
   const sendEmail = () => {
     const strippedContent = strip(content);
@@ -463,7 +486,7 @@ export default function InboxPage() {
         setActive(Math.min(...actualThreads));
       }
     }
-  }, [active, threads]);
+  }, [active, threads, activeThread, getResponse, threadSize]);
 
   const cmpDate: (a: string, b: string) => number = (a, b) => {
     const d1 = new Date(a as string | number | Date);
@@ -489,7 +512,7 @@ export default function InboxPage() {
     else return -1;
   };
 
-  const threadList = threads.sort(sortThreads).map((thread) => {
+  const threadList = filteredThreads.sort(sortThreads).map((thread) => {
     if (thread.emailList.length === 0) return <></>;
     const sender =
       thread.emailList[thread.emailList.length - 1].sender.indexOf("<") !== -1
@@ -511,6 +534,7 @@ export default function InboxPage() {
               })[0].emailList.length,
             );
           }
+          handleThreadClick(thread.id);
         }}
       >
         <Box
@@ -522,7 +546,19 @@ export default function InboxPage() {
             (!thread.resolved ? classes.unresolved : "")
           }
         >
-          <Title size="md">{sender}</Title>
+          <Title size="md">
+            <span>{sender}</span>
+
+            {!thread.read && (
+              <ThemeIcon
+                size={10}
+                color="indigo"
+                radius="xl"
+                style={{ marginLeft: "5px" }}
+              ></ThemeIcon>
+            )}
+          </Title>
+
           <Flex className={classes.between}>
             <Text>{thread.emailList[thread.emailList.length - 1].subject}</Text>
             <Text>
@@ -607,7 +643,41 @@ export default function InboxPage() {
     >
       {!sourceActive && (
         <Grid.Col span={30} className={classes.threads}>
-          <Text className={classes.inboxText}>Inbox</Text>
+          <Flex className={classes.inboxHeader}>
+            <Box>
+              <Text className={classes.inboxText}>Inbox</Text>
+            </Box>
+            <Box className={classes.inboxReadButton}>
+              <Button
+                style={{
+                  backgroundColor: showUnreadMail ? "#E3E3E3" : "white",
+                  color: showUnreadMail ? "#787878" : "black",
+                  borderRadius: "var(--mantine-radius-md)",
+                  padding: "4px 12px",
+                }}
+                onClick={() => {
+                  setShowAllMail(true);
+                  setShowUnreadMail(false);
+                }}
+              >
+                All Mail
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: showAllMail ? "#E3E3E3" : "white",
+                  color: showAllMail ? "#787878" : "black",
+                  borderRadius: "var(--mantine-radius-md)",
+                  padding: "4px 12px",
+                }}
+                onClick={() => {
+                  setShowAllMail(false);
+                  setShowUnreadMail(true);
+                }}
+              >
+                Unread
+              </Button>
+            </Box>
+          </Flex>
           <Stack gap={0} className={classes.threadList}>
             {threadList}
           </Stack>

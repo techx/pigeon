@@ -22,6 +22,7 @@ class Thread(db.Model):
         resolved (bool): Whether the thread is resolved.
         last_email (int): The ID of the last email in the thread.
         emails (list): The emails in the thread.
+        read (bool): Whether the thread is read.
     """
 
     __tablename__ = "thread"
@@ -29,6 +30,7 @@ class Thread(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, init=False, autoincrement=True)
     last_email: Mapped[Optional[int]] = mapped_column(nullable=True, init=False)
     resolved: Mapped[bool] = mapped_column(nullable=False, default=False, init=False)
+    read: Mapped[bool] = mapped_column(nullable=False, default=False, init=False)
 
     emails: Mapped[List["Email"]] = relationship(
         "Email",

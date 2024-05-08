@@ -97,7 +97,7 @@ After that, follow [this tutorial](https://www.youtube.com/watch?v=Uvf2FVS1F8k) 
 To start the server, run
 
 ```sh
-python3 run.py
+python3 wsgi.py
 ```
 
 To start the client, in a different terminal, run
