@@ -161,8 +161,7 @@ export default function InboxPage() {
     return d.toLocaleString("en-US", { timeZone: "America/New_York" });
   };
   const parseBody = (body: string) => {
-    // eslint-disable-next-line no-control-regex
-    const lines = body.replace(new RegExp("\r?\n", "g"), "<br />");
+    const lines = body.replace(new RegExp("\\r?\\n", "g"), "<br />");
     const linesArray = lines.split("<br />");
     return (
       <Text>
@@ -187,7 +186,7 @@ export default function InboxPage() {
     if (storedResponses[currEmailID]) {
       const oldResponse = storedResponses[currEmailID];
       setResponse(oldResponse);
-      setContent(oldResponse.content.replace("\n", "<br/>"));
+      setContent(oldResponse.content.replaceAll("\n", "<br/>"));
       return;
     }
 
