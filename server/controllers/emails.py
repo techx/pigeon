@@ -4,13 +4,18 @@ import email
 import email.mime.multipart
 import email.mime.text
 import os
+import pickle
 import re
 from datetime import datetime, timezone
 from typing import List
 
 import boto3
 from apiflask import APIBlueprint
-from flask import request
+from flask import jsonify, redirect, request, session, url_for
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 
@@ -33,6 +38,96 @@ from server.nlp.responses import generate_response
 cwd = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader([f"{cwd}/../email_template"]))
 emails = APIBlueprint("emails", __name__, url_prefix="/emails", tag="Emails")
+
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+CLIENT_SECRETS_FILE = "credentials.json"
+
+# Scopes needed for accessing Gmail messages
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+# The authorization flow
+flow = Flow.from_client_secrets_file(
+    CLIENT_SECRETS_FILE,
+    scopes=SCOPES,
+    redirect_uri='http://localhost:2010/api/emails/callback'
+)
+
+
+@emails.route("/get_emails")
+def index():
+    """Authorization url"""
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+    return redirect(authorization_url)
+
+
+@emails.route("/callback")
+def callback():
+    """Dump credentials"""
+    flow.fetch_token(authorization_response=request.url)
+
+    if session["state"] != request.args["state"]:
+        return redirect(url_for("index"))
+
+    credentials = flow.credentials
+    with open("token.pkl", "wb") as token:
+        pickle.dump(credentials, token)
+
+    return redirect("http://localhost:2010/api/emails/read_emails")
+
+
+@emails.route("/read_emails")
+def read_emails():
+    """Read emails"""
+    if os.path.exists("token.pkl"):
+        with open("token.pkl", "rb") as token:
+            credentials = pickle.load(token)
+
+        service = build("gmail", "v1", credentials=credentials)
+        results_inbox = (
+            service.users()
+            .messages()
+            .list(userId="me", labelIds=["INBOX"])
+            .execute()
+        )
+        messages = results_inbox.get("messages", [])
+
+        print("messages", messages)
+
+        all_emails = []
+        for msg in messages:
+            # Fetch each message by ID
+            message = (
+                service.users().messages().get(userId="me", id=msg["id"]).execute()
+            )
+
+            # Extract headers like From, To, and Subject
+            headers = message["payload"]["headers"]
+            subject = next(
+                header["value"] for header in headers if header["name"] == "Subject"
+            )
+            from_email = next(
+                header["value"] for header in headers if header["name"] == "From"
+            )
+            to_email = next(
+                header["value"] for header in headers if header["name"] == "To"
+            )
+
+            # Print or process the email details
+            print(f"Subject: {subject}, From: {from_email}, To: {to_email}")
+            all_emails.append(
+                {
+                    "id": msg["id"],
+                    "threadId": msg["threadId"],
+                    "subject": subject,
+                    "from": from_email,
+                    "to": to_email,
+                }
+            )
+
+        print("all_emails", all_emails)
+        return "Email details printed to console."
+    return "No credentials available."
 
 
 def thread_emails_to_openai_messages(thread_emails: List[Email]) -> List[OpenAIMessage]:
@@ -119,6 +214,52 @@ def decrement_response_count(documents: List["Document"]):
         db.session.commit()
 
 
+# @emails.route("/receive_email", methods=["GET"])
+# def receive_email():
+#     """Fetch new emails from the Gmail API."""
+#     if 'credentials' not in session:
+#         return redirect(url_for('authorize'))
+
+#     # Load credentials from the session
+#     credentials = Credentials(**session['credentials'])
+
+#     # Build the Gmail service
+#     service = build('gmail', 'v1', credentials=credentials)
+
+#     try:
+#         # Get the list of messages
+#         results = service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=10).execute()
+#         messages = results.get('messages', [])
+
+#         emails_processed = []
+#         for message in messages:
+#             msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
+
+#             # Process the email contents
+#             headers = msg['payload']['headers']
+#             subject = next(header['value'] for header in headers if header['name'] == 'Subject')
+#             from_email = next(header['value'] for header in headers if header['name'] == 'From')
+#             date = next(header['value'] for header in headers if header['name'] == 'Date')
+#             snippet = msg['snippet']
+
+#             # Here you can continue processing as per your requirements
+#             # For example, creating Email and Thread objects and storing in DB
+#             print(f"Processing email: {subject} from {from_email}")
+
+#             emails_processed.append({
+#                 'subject': subject,
+#                 'from': from_email,
+#                 'date': date,
+#                 'snippet': snippet
+#             })
+
+#         return jsonify(emails_processed)
+
+#     except HttpError as error:
+#         print(f'An error occurred: {error}')
+#         return jsonify({"message": "Failed to fetch emails", "error": str(error)}), 500
+
+
 # not used as of 1/28/2024
 # save for future reference, in case we ever need to switch back to mailgun or a similar
 # provider
@@ -193,117 +334,249 @@ def decrement_response_count(documents: List["Document"]):
 #     return data
 
 
-@emails.route("/receive_email", methods=["POST"])
-def receive_email():
-    """GET /receive_email
+# @emails.route("/receive_email", methods=["POST"])
+# def receive_email():
+#     """GET /receive_email
 
-    More information about the way that AWS SES sends emails can be found at
-    go/pigeon-emails
-    """
-    data = request.form
-    print(data, flush=True)
+#     More information about the way that AWS SES sends emails can be found at
+#     go/pigeon-emails
+#     """
+#     data = request.form
+#     print(data, flush=True)
 
-    if (
-        "From" not in data
-        or "Subject" not in data
-        or "stripped-text" not in data
-        or "Message-Id" not in data
-    ):
-        return {"message": "Missing fields"}, 400
+#     if (
+#         "From" not in data
+#         or "Subject" not in data
+#         or "stripped-text" not in data
+#         or "Message-Id" not in data
+#     ):
+#         return {"message": "Missing fields"}, 400
 
-    # aws sends duplicate emails sometimes. ignore if duplicate
-    email_exists = db.session.execute(
-        select(Email).where(Email.message_id == data["Message-Id"])
-    ).scalar()
-    if email_exists:
-        print("duplicate email", flush=True)
-        return data
+#     # aws sends duplicate emails sometimes. ignore if duplicate
+#     email_exists = db.session.execute(
+#         select(Email).where(Email.message_id == data["Message-Id"])
+#     ).scalar()
+#     if email_exists:
+#         print("duplicate email", flush=True)
+#         return data
 
-    # by default, body contains the full email bodies of all previous emails in the
-    # thread here, we filter out previous emails so that only the body of the current
-    # email is used. this filtering is purposely not done on AWS because of potentially
-    # needing context for the TODO below
-    body = data["stripped-text"]
-    body = str(body)
-    start_of_reply = body.find("________________________________")
+    # # by default, body contains the full email bodies of all previous emails in the
+    # # thread here, we filter out previous emails so that only the body of the current
+    # # email is used. this filtering is purposely not done on AWS because of potentially
+    # # needing context for the TODO below
+    # body = data["stripped-text"]
+    # body = str(body)
+    # start_of_reply = body.find("________________________________")
 
-    if start_of_reply != -1:
-        body = body[:start_of_reply]
+    # if start_of_reply != -1:
+    #     body = body[:start_of_reply]
 
-    email = None
-    thread = None
+    # email = None
+    # thread = None
 
-    if "In-Reply-To" in data:
-        # reply to existing email, add to existing thread
+    # if "In-Reply-To" in data:
+    #     # reply to existing email, add to existing thread
 
-        # for some reason AWS adds three spaces to the message id
-        real_message_id = data["In-Reply-To"].strip()
+    #     # for some reason AWS adds three spaces to the message id
+    #     real_message_id = data["In-Reply-To"].strip()
 
-        replied_to_email = db.session.execute(
-            select(Email).where(Email.message_id == real_message_id)
-        ).scalar()
-        print("replied to email", replied_to_email, flush=True)
-        print("real message id", real_message_id, len(real_message_id), flush=True)
-        print(
-            "data from",
-            data["From"],
-            "blueprint@my.hackmit.org" not in data["From"],
-            flush=True,
-        )
-        if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
-            thread = db.session.execute(
-                select(Thread).where(Thread.id == replied_to_email.thread_id)
-            ).scalar()
-            if thread:
-                email = Email(
-                    datetime.now(timezone.utc),
-                    data["From"],
-                    data["Subject"],
-                    body,
-                    data["Message-Id"],
-                    False,
-                    thread.id,
-                )
-        # TODO(#5): this ignores case where user responds to an email that isn't in the
-        # database. should we handle this?
-    else:
-        # new email, create new thread
-        thread = Thread()
-        db.session.add(thread)
-        db.session.commit()
-        email = Email(
-            datetime.now(timezone.utc),
-            data["From"],
-            data["Subject"],
-            body,
-            data["Message-Id"],
-            False,
-            thread.id,
-        )
-    if email is not None and thread is not None:
-        openai_messages = thread_emails_to_openai_messages(thread.emails)
-        openai_res, documents, confidence = generate_response(
-            email.sender, email.body, openai_messages
-        )
-        questions, documents, doc_confs, docs_per_question = document_data(documents)
+    #     replied_to_email = db.session.execute(
+    #         select(Email).where(Email.message_id == real_message_id)
+    #     ).scalar()
+    #     print("replied to email", replied_to_email, flush=True)
+    #     print("real message id", real_message_id, len(real_message_id), flush=True)
+    #     print(
+    #         "data from",
+    #         data["From"],
+    #         "blueprint@my.hackmit.org" not in data["From"],
+    #         flush=True,
+    #     )
+    #     if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
+    #         thread = db.session.execute(
+    #             select(Thread).where(Thread.id == replied_to_email.thread_id)
+    #         ).scalar()
+    #         if thread:
+    #             email = Email(
+    #                 datetime.now(timezone.utc),
+    #                 data["From"],
+    #                 data["Subject"],
+    #                 body,
+    #                 data["Message-Id"],
+    #                 False,
+    #                 thread.id,
+    #             )
+    #     # TODO(#5): this ignores case where user responds to an email that isn't in the
+    #     # database. should we handle this?
+    # else:
+    #     # new email, create new thread
+    #     thread = Thread()
+    #     db.session.add(thread)
+    #     db.session.commit()
+    #     email = Email(
+    #         datetime.now(timezone.utc),
+    #         data["From"],
+    #         data["Subject"],
+    #         body,
+    #         data["Message-Id"],
+    #         False,
+    #         thread.id,
+    #     )
+    # if email is not None and thread is not None:
+    #     openai_messages = thread_emails_to_openai_messages(thread.emails)
+    #     openai_res, documents, confidence = generate_response(
+    #         email.sender, email.body, openai_messages
+    #     )
+    #     questions, documents, doc_confs, docs_per_question = document_data(documents)
 
-        db.session.add(email)
-        db.session.commit()
-        r = Response(
-            openai_res,
-            questions,
-            docs_per_question,
-            documents,
-            doc_confs,
-            confidence,
-            email.id,
-        )
-        db.session.add(r)
-        thread.last_email = email.id
-        thread.resolved = False
-        db.session.commit()
-        increment_response_count(documents)
-    return data
+    #     db.session.add(email)
+    #     db.session.commit()
+    #     r = Response(
+    #         openai_res,
+    #         questions,
+    #         docs_per_question,
+    #         documents,
+    #         doc_confs,
+    #         confidence,
+    #         email.id,
+    #     )
+    #     db.session.add(r)
+    #     thread.last_email = email.id
+    #     thread.resolved = False
+    #     db.session.commit()
+    #     increment_response_count(documents)
+    # return data
+
+
+# @emails.route("/receive_email", methods=["POST"])
+# def receive_email():
+#     """GET /receive_email
+
+#     More information about the way that AWS SES sends emails can be found at
+#     go/pigeon-emails
+#     """
+#     data = request.form
+#     print(data, flush=True)
+
+#     if ("From" not in data or "Subject" not in data or
+#         "stripped-text" not in data or "Message-Id" not in data):
+#         return {"message": "Missing fields"}, 400
+
+#     try:
+#         # Fixes transaction timing
+#         db.session.begin()
+
+#         # Check for duplicate email
+#         email_exists = db.session.execute(
+#             select(Email).where(Email.message_id == data["Message-Id"].strip())
+#         ).scalar()
+
+#         if email_exists:
+#             print("duplicate email", flush=True)
+#             db.session.rollback()
+#             return {"message": "Duplicate email received"}, 200
+
+#         # Process email depending on whether it is a reply or a new thread
+#         # by default, body contains the full email bodies of all previous emails in the
+#         # thread here, we filter out previous emails so that only the body of the current
+#         # email is used. this filtering is purposely not done on AWS because of potentially
+#         # needing context for the TODO below
+#         body = data["stripped-text"]
+#         body = str(body)
+#         start_of_reply = body.find("________________________________")
+
+#         if start_of_reply != -1:
+#             body = body[:start_of_reply]
+
+#         email = None
+#         thread = None
+
+#         if "In-Reply-To" in data:
+#             # reply to existing email, add to existing thread
+
+#             # for some reason AWS adds three spaces to the message id
+#             real_message_id = data["In-Reply-To"].strip()
+
+#             replied_to_email = db.session.execute(
+#                 select(Email).where(Email.message_id == real_message_id)
+#             ).scalar()
+#             print("replied to email", replied_to_email, flush=True)
+#             print("real message id", real_message_id, len(real_message_id), flush=True)
+#             print(
+#                 "data from",
+#                 data["From"],
+#                 "blueprint@my.hackmit.org" not in data["From"],
+#                 flush=True,
+#             )
+#             if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
+#                 thread = db.session.execute(
+#                     select(Thread).where(Thread.id == replied_to_email.thread_id)
+#                 ).scalar()
+#                 if thread:
+#                     email = Email(
+#                         datetime.now(timezone.utc),
+#                         data["From"],
+#                         data["Subject"],
+#                         body,
+#                         data["Message-Id"],
+#                         False,
+#                         thread.id,
+#                     )
+#             # TODO(#5): this ignores case where user responds to an email that isn't in the
+#             # database. should we handle this?
+#         else:
+#             # new email, create new thread
+#             thread = Thread()
+#             db.session.add(thread)
+#             db.session.commit()
+#             email = Email(
+#                 datetime.now(timezone.utc),
+#                 data["From"],
+#                 data["Subject"],
+#                 body,
+#                 data["Message-Id"],
+#                 False,
+#                 thread.id,
+#             )
+#         if email is not None and thread is not None:
+#             openai_messages = thread_emails_to_openai_messages(thread.emails)
+#             openai_res, documents, confidence = generate_response(
+#                 email.sender, email.body, openai_messages
+#             )
+#             questions, documents, doc_confs, docs_per_question = document_data(documents)
+
+#             db.session.add(email)
+#             db.session.commit()
+#             r = Response(
+#                 openai_res,
+#                 questions,
+#                 docs_per_question,
+#                 documents,
+#                 doc_confs,
+#                 confidence,
+#                 email.id,
+#             )
+#             db.session.add(r)
+#             thread.last_email = email.id
+#             thread.resolved = False
+#             db.session.commit()
+#             increment_response_count(documents)
+
+#         # If all is well, commit the transaction
+#         db.session.commit()
+
+#     except SQLAlchemyError as e:
+#         db.session.rollback()
+#         print(f"Database error: {e}", flush=True)
+#         return {"message": "Database error, transaction rolled back"}, 500
+#     except Exception as e:
+#         db.session.rollback()
+#         print(f"Unexpected error: {e}", flush=True)
+#         return {"message": "Unexpected error, transaction rolled back"}, 500
+
+#     return {"message": "Email processed successfully"}, 200
+
+
+
 
 
 # not used as of 1/28/2024
