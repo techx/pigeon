@@ -247,10 +247,10 @@ def receive_email():
         print(
             "data from",
             data["From"],
-            "blueprint@my.hackmit.org" not in data["From"],
+            "hackmit@my.hackmit.org" not in data["From"],
             flush=True,
         )
-        if "blueprint@my.hackmit.org" not in data["From"] and replied_to_email:
+        if "hackmit@my.hackmit.org" not in data["From"] and replied_to_email:
             thread = db.session.execute(
                 select(Thread).where(Thread.id == replied_to_email.thread_id)
             ).scalar()
@@ -400,7 +400,7 @@ def send_email():
     msg = email.mime.multipart.MIMEMultipart()
     msg["Subject"] = reply_to_email.subject
     # msg["FROM"] = MAIL_SENDER_TAG
-    msg["FROM"] = '"Blueprint Team" <blueprint@my.hackmit.org>'
+    msg["FROM"] = '"HackMIT Team" <hackmit@my.hackmit.org>'
     msg["In-Reply-To"] = reply_to_email.message_id
     msg["References"] = reply_to_email.message_id
     to_email_addresses = [thread.first_sender, MAIL_CC]
@@ -426,7 +426,7 @@ def send_email():
     thread.resolved = True
     reply_email = Email(
         datetime.now(timezone.utc),
-        '"Blueprint Team" <blueprint@my.hackmit.org>',
+        '"HackMIT Team" <hackmit@my.hackmit.org>',
         reply_to_email.subject,
         clean_text,
         get_full_message_id(response["MessageId"]),

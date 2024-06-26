@@ -703,7 +703,7 @@ export default function InboxPage() {
                     .filter(
                       (email) =>
                         email.sender ===
-                        '"Blueprint Team" <blueprint@my.hackmit.org>',
+                        '"HackMIT Team" <hackmit@my.hackmit.org>',
                     )
                     .map((email) => activeThread.emailList.indexOf(email)),
                 )}
@@ -713,7 +713,7 @@ export default function InboxPage() {
                     key={email.id}
                     bullet={
                       email.sender ===
-                        '"Blueprint Team" <blueprint@my.hackmit.org>' && (
+                        '"HackMIT Team" <hackmit@my.hackmit.org>' && (
                         <ThemeIcon
                           size={20}
                           color="blue"

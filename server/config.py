@@ -57,7 +57,7 @@ MAIL_USERNAME = _get_config_option("MAIL_USERNAME", "test_mail_username")
 MAIL_PASSWORD = _get_config_option("MAIL_PASSWORD", "test_mail_password")
 MAIL_CC = _get_config_option("MAIL_CC", "test_mail_cc")
 
-MAIL_SENDER_TAG = f'"Blueprint Team" <{MAIL_USERNAME}>'
+MAIL_SENDER_TAG = f'"HackMIT Team" <{MAIL_USERNAME}>'
 
 AUTH_CLIENT_ID = _get_config_option("AUTH_CLIENT_ID", "test_auth_client_id")
 AUTH_CLIENT_SECRET = _get_config_option("AUTH_CLIENT_SECRET", "test_auth_client_secret")

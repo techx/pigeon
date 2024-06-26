@@ -16,7 +16,7 @@ from server.utils import custom_log
 
 openai.api_key = OPENAI_API_KEY
 
-MODEL = "gpt-3.5-turbo"
+MODEL = "gpt-4o"
 
 
 def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
@@ -32,13 +32,12 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
     messages = [
         {
             "role": "system",
-            "content": f"You are an organizer for Blueprint, a hackathon for high \
-            schoolers led by the organizers of HackMIT. You are responsible for \
+            "content": f"You are an organizer for HackMIT. You are responsible for \
             responding to an email from a participant. \
             Please write an email response to the participant. Begin the email with \
             the header 'Dear [First Name]' where '[First Name]' is the participant's \
-            first name and end the email with the footer 'Best regards, The Blueprint \
-            Team'. Do not include the subject line in your response. \
+            first name and end the email with the footer 'Best regards, The \
+            HackMIT Team'. Do not include the subject line in your response. \
             The participant's email address is {sender}.\
             You receive documents to help you answer the email. \
             Please do not include information that is not explicitly stated in the \
