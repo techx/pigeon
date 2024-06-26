@@ -39,11 +39,14 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
             first name and end the email with the footer 'Best regards, The \
             HackMIT Team'. Do not include the subject line in your response. \
             The participant's email address is {sender}.\
-            You receive documents to help you answer the email. \
+            The user will provide documents to help you answer the email. \
             Please do not include information that is not explicitly stated in the \
             documents. It is very important to keep responses brief and only answer \
             the questions asked. However, please write the emails in a friendly \
-            tone.",
+            tone. Finally, please make sure you address the actual content in the \
+            email. The documents are not guaranteed to be relevant to the email. \
+            Sometimes the emails don't actually have a question, in which case you \
+            should just write a general response to the email. ",
         }
     ]
     messages += thread
@@ -58,6 +61,7 @@ def openai_response(thread: list[OpenAIMessage], sender: str) -> str:
         }
     ]
 
+    custom_log("query:", messages)
     messages = cast(list[ChatCompletionMessageParam], messages)
     response = openai.chat.completions.create(model=MODEL, messages=messages)
 
@@ -76,32 +80,74 @@ def openai_parse(email: str) -> list[str]:
     Returns:
         list of questions parsed from the email
     """
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an organizer for HackMIT. Please parse incoming "
+            "emails from participants into a python list of separate questions. "
+            "Return a list of questions in the format of a python list. For "
+            "example, given the following email: 'What is the best way to get "
+            "started? What is HackMIT?', the list of questions would be ['What is "
+            "the best way to get started?', 'What is HackMIT?'], and you should then "
+            "format your response with only the python list: ['What is the best way "
+            "to get started?', 'What is HackMIT?']. If there are no questions in the "
+            "email, just return the whole email as a single element list. Do not "
+            "return an empty list. ",
+        },
+        {"role": "user", "content": email},
+    ]
     response = openai.chat.completions.create(
         model=MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an organizer for HackMIT. Please parse incoming \
-                    emails from participants into separate questions. Return a list of \
-                    questions in the format of a python list.",
-            },
-            {"role": "user", "content": email},
-        ],
+        messages=cast(list[ChatCompletionMessageParam], messages),
     )
-    try:
-        questions = ast.literal_eval(cast(str, response.choices[0].message.content))
-        assert isinstance(questions, list)
-        assert len(questions) > 0
-        return questions
-    except Exception as e:
-        custom_log(
-            "open ai parsed email as '",
-            response.choices[0].message.content,
-            "', resulting in error '",
-            e,
-            "'. returning entire email as a single question instead.",
-        )
-        return [email]
+    attempts = 0
+    while attempts < 3:
+        try:
+            questions = ast.literal_eval(cast(str, response.choices[0].message.content))
+            assert isinstance(questions, list)
+            assert len(questions) > 0
+            return questions
+        except Exception as e:
+            attempts += 1
+            custom_log(
+                "open ai failed to parse email after",
+                attempts,
+                "attempts. attempted response:",
+                response.choices[0].message.content,
+                "resulting in error:",
+                e,
+                "trying again...",
+            )
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": response.choices[0].message.content
+                    if response.choices[0].message.content is not None
+                    else "",
+                }
+            )
+            messages.append(
+                {
+                    "role": "user",
+                    "content": "your answer is not formatted as a python list, or "
+                    "is empty. please format your answer with only the python list. "
+                    "do not include any markdown formatting or any explanation. just "
+                    "a parseable python list that I can directly parse with the "
+                    "python ast library. for reference once more, here is the email: "
+                    f"{email}",
+                }
+            )
+            custom_log("query:", messages)
+            response = openai.chat.completions.create(
+                model=MODEL,
+                messages=cast(list[ChatCompletionMessageParam], messages),
+            )
+
+    custom_log(
+        "open ai failed to parse email after three attempts. "
+        "returning entire email as a single question instead.",
+    )
+    return [email]
 
 
 def confidence_metric(confidences: list[float]) -> float:
@@ -136,7 +182,7 @@ def generate_context(
     contexts = []
     docs = {}
 
-    results = query_all(3, questions)
+    results = query_all(5, questions)
     message = "Here is some context to help you answer this email: \n"
     for result in results:
         confidence = 0
@@ -147,7 +193,8 @@ def generate_context(
             docs[result["query"]].append(doc)
         confidences.append(confidence)
 
-    contexts.append({"role": "system", "content": message})
+    contexts.append({"role": "user", "content": message})
+    contexts.append({"role": "assistant", "content": "understood."})
     return contexts, docs, confidence_metric(confidences)
 
 
@@ -174,6 +221,6 @@ def generate_response(
     contexts, docs, confidence = generate_context(email)
 
     # generate new response
-    thread.append({"role": "user", "content": email})
+    thread.append({"role": "user", "content": "EMAIL FROM USER: \n\n" + email})
     thread += contexts
     return openai_response(thread, sender), docs, confidence

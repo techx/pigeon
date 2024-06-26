@@ -76,6 +76,7 @@ export default function InboxPage() {
   const [content, setContent] = useState("");
   const [showAllMail, setShowAllMail] = useState(true);
   const [showUnreadMail, setShowUnreadMail] = useState(false);
+  const [sourceList, setSourceList] = useState<JSX.Element[]>([]);
 
   const activeThread = threads.filter((thread) => {
     return thread.id === active;
@@ -179,41 +180,45 @@ export default function InboxPage() {
     );
   };
 
-  const getResponse = useCallback(() => {
-    // Checks if response is already stored
-    const currEmailID =
-      activeThread.emailList[activeThread.emailList.length - 1].id;
-    if (storedResponses[currEmailID]) {
-      const oldResponse = storedResponses[currEmailID];
-      setResponse(oldResponse);
-      setContent(oldResponse.content.replaceAll("\n", "<br/>"));
-      return;
-    }
+  const getResponse = useCallback(
+    (skip: boolean = false) => {
+      // Checks if response is already stored
+      const currEmailID =
+        activeThread.emailList[activeThread.emailList.length - 1].id;
+      if (storedResponses[currEmailID] && !skip) {
+        const oldResponse = storedResponses[currEmailID];
+        setResponse(oldResponse);
+        setContent(oldResponse.content.replaceAll("\n", "<br/>"));
+        return;
+      }
 
-    // Otherwise fetches response from server
-    const formData = new FormData();
-    formData.append("id", currEmailID.toString());
+      // Otherwise fetches response from server
+      const formData = new FormData();
+      formData.append("id", currEmailID.toString());
 
-    fetch(`/api/emails/get_response`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        notifications.show({
-          title: "Error!",
-          color: "red",
-          message: "Something went wrong!",
-        });
+      fetch(`/api/emails/get_response`, {
+        method: "POST",
+        body: formData,
       })
-      .then((data) => {
-        setStoredResponses((oldResponses) => {
-          return { ...oldResponses, [currEmailID]: data };
+        .then((res) => {
+          if (res.ok) return res.json();
+          notifications.show({
+            title: "Error!",
+            color: "red",
+            message: "Something went wrong!",
+          });
+          return;
+        })
+        .then((data) => {
+          setStoredResponses((oldResponses) => {
+            return { ...oldResponses, [currEmailID]: data };
+          });
+          setResponse(data);
+          setContent(data.content.replaceAll("\n", "<br/>"));
         });
-        setResponse(data);
-        setContent(data.content.replaceAll("\n", "<br/>"));
-      });
-  }, [activeThread, storedResponses]);
+    },
+    [activeThread, storedResponses],
+  );
 
   useEffect(() => {
     if (activeThread && !activeThread.resolved) getResponse();
@@ -300,7 +305,7 @@ export default function InboxPage() {
         });
       })
       .then(() => {
-        getResponse();
+        getResponse(true);
         notifications.update({
           id: "loading",
           title: "Success!",
@@ -574,67 +579,76 @@ export default function InboxPage() {
     );
   });
 
-  const sourceList = response?.questions.map((question, index) => {
-    return (
-      <div key={index}>
-        <Text className={classes.sourceQuestion}>
-          {"Question: " + question}
-        </Text>
-        <Accordion>
-          {response.documents[index].map((document, documentIndex) => {
-            return (
-              <Accordion.Item
-                style={{
-                  borderLeft: `6px solid ${computeColor(
-                    // Math.round((document.confidence / 0.8) * 100) / 100
-                    Math.round(document.confidence * 100) / 100,
-                  )}`,
-                }}
-                key={documentIndex}
-                value={
-                  document.label.length === 0
-                    ? "Unlabeled Document " + documentIndex
-                    : document.label + " " + documentIndex
-                }
-              >
-                <Accordion.Control>
-                  {document.label.length === 0
-                    ? "Unlabeled Document"
-                    : document.label}
-                  <Text className={classes.sourceConfidence}>
-                    {"Relevance: " +
-                      // Math.round((document.confidence / 0.8) * 100) / 100
-                      Math.round(document.confidence * 100) / 100}
-                  </Text>
-                  {document.to_delete && (
-                    <Text className={classes.deletedWarning}>
-                      {
-                        "This source has been deleted! Regenerating response recommended."
+  useEffect(() => {
+    console.log("setting source list");
+    if (response) {
+      setSourceList(
+        response.questions.map((question, index) => {
+          return (
+            <div key={index}>
+              <Text className={classes.sourceQuestion}>
+                {"Question: " + question}
+              </Text>
+              <Accordion>
+                {response.documents[index].map((document, documentIndex) => {
+                  return (
+                    <Accordion.Item
+                      style={{
+                        borderLeft: `6px solid ${computeColor(
+                          // Math.round((document.confidence / 0.8) * 100) / 100
+                          Math.round(document.confidence * 100) / 100,
+                        )}`,
+                      }}
+                      key={documentIndex}
+                      value={
+                        document.label.length === 0
+                          ? "Unlabeled Document " + documentIndex
+                          : document.label + " " + documentIndex
                       }
-                    </Text>
-                  )}
-                </Accordion.Control>
-                <Accordion.Panel>
-                  <div>
-                    {document.question.length > 0 && (
-                      <Text className={classes.sourceText}>
-                        {document.question}
-                      </Text>
-                    )}
-                    <Text className={classes.sourceText}>
-                      {document.content}
-                    </Text>
-                    <Text>Source: ({document.source})</Text>
-                    {/* Change source to links in the future */}
-                  </div>
-                </Accordion.Panel>
-              </Accordion.Item>
-            );
-          })}
-        </Accordion>
-      </div>
-    );
-  });
+                    >
+                      <Accordion.Control>
+                        {document.label.length === 0
+                          ? "Unlabeled Document"
+                          : document.label}
+                        <Text className={classes.sourceConfidence}>
+                          {"Relevance: " +
+                            // Math.round((document.confidence / 0.8) * 100) / 100
+                            Math.round(document.confidence * 100) / 100}
+                        </Text>
+                        {document.to_delete && (
+                          <Text className={classes.deletedWarning}>
+                            {
+                              "This source has been deleted! Regenerating response recommended."
+                            }
+                          </Text>
+                        )}
+                      </Accordion.Control>
+                      <Accordion.Panel>
+                        <div>
+                          {document.question.length > 0 && (
+                            <Text className={classes.sourceText}>
+                              {document.question}
+                            </Text>
+                          )}
+                          <Text className={classes.sourceText}>
+                            {document.content}
+                          </Text>
+                          <Text>Source: ({document.source})</Text>
+                          Change source to links in the future
+                        </div>
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                  );
+                })}
+              </Accordion>
+            </div>
+          );
+        }),
+      );
+    } else {
+      setSourceList([]);
+    }
+  }, [response]);
 
   return (
     <Grid
@@ -846,8 +860,10 @@ export default function InboxPage() {
       </Grid.Col>
       {sourceActive && (
         <Grid.Col span={42} className={classes.threads}>
-          <Text className={classes.inboxText}>Sources</Text>
-          <ScrollArea h="95vh">{sourceList}</ScrollArea>
+          <Stack>
+            <Text className={classes.inboxText}>Sources</Text>
+            <ScrollArea h="95vh">{sourceList}</ScrollArea>
+          </Stack>
         </Grid.Col>
       )}
     </Grid>
