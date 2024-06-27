@@ -2,6 +2,7 @@
 
 import json
 from ast import literal_eval
+from typing import cast
 
 import pandas as pd
 from apiflask import APIBlueprint
@@ -149,10 +150,10 @@ def import_csv():
 
         for _, row in df.iterrows():
             document = Document(
-                "" if pd.isna(row["question"]) else row["question"],  # type: ignore
-                row["content"],  # type: ignore
-                row["source"],  # type: ignore
-                "" if pd.isna(row["label"]) else row["label"],  # type: ignore
+                question=cast(str, "" if pd.isna(row["question"]) else row["question"]),  # type: ignore
+                content=cast(str, row["content"]),
+                source=cast(str, row["source"]),
+                label=cast(str, "" if pd.isna(row["label"]) else row["label"]),  # type: ignore
             )
             db.session.add(document)
         db.session.commit()
