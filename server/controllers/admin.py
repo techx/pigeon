@@ -21,7 +21,10 @@ def upload_text():
     """POST /admin/upload_document"""
     data = request.form
     document = Document(
-        data["question"], data["content"], data["source"], data["label"]
+        question=data["question"],
+        content=data["content"],
+        source=data["source"],
+        label=data["label"],
     )
     db.session.add(document)
     db.session.commit()
