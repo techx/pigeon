@@ -310,6 +310,10 @@ export default function DocumentsPage() {
       .then(updateEmbeddings);
   };
   const clearDocuments = () => {
+    const userConfirmed = window.confirm(
+      "Are you sure you want to clear all documents? This action cannot be undone.",
+    );
+    if (!userConfirmed) return; // Exit the function if the user cancels
     notifications.clean();
     fetch(`/api/admin/clear_documents`, {
       method: "POST",
